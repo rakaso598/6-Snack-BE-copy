@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  name      String
+  password  String
+  companyId Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  role      Role
+  cartItems CartItem[]
+  company   Company    @relation(fields: [companyId], references: [id])
+  orders    Order[]    @relation("UserOrders")
+  invites   Invite[]   @relation("InvitedBy")
+  products  Product[]  @relation("ProductCreator")
+}
+
+model Company {
+  id        Int      @id @default(autoincrement())
+  name      String
+  bizNumber String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  budgets MonthlyBudget[]
+  users   User[]
+  invites Invite[]
+}
+
+// 월별 지출&예산
+model MonthlyBudget {
+  id                 Int       @id @default(autoincrement())
+  companyId          Int
+  totalExpense       Int       @default(0) // 총 지출액
+  currentMonthBudget Int       @default(0) // 이번 달 예산
+  monthlyBudget      Int       @default(0) // 매달 고정 예산
+  year               String
+  month              String
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  company            Company   @relation(fields: [companyId], references: [id])
+
+  @@unique([companyId, year, month])
+}
+
+model Product {
+  id         Int       @id @default(autoincrement())
+  categoryId Int
+  creatorId  String
+  name       String
+  price      Int
+  imageUrl   String
+  linkUrl    String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  cart         CartItem[]
+  orderedItems OrderedItem[]
+  creator      User          @relation("ProductCreator", fields: [creatorId], references: [id])
+  category     Category      @relation(fields: [categoryId], references: [id])
+}
+
+model Category {
+  id       Int    @id @default(autoincrement())
+  name     String
+  parentId Int?
+
+  products Product[]
+  children Category[] @relation("CategoryToCategory_children")
+  parent   Category?  @relation("CategoryToCategory_children", fields: [parentId], references: [id])
+}
+
+model CartItem {
+  id        Int       @id @default(autoincrement())
+  userId    String
+  productId Int
+  quantity  Int
+  deletedAt DateTime?
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id             Int      @id @default(autoincrement())
+  userId         String
+  adminMessage   String?
+  requestMessage String?
+  totalPrice     Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  status OrderStatus
+  items  OrderedItem[]
+  user   User          @relation("UserOrders", fields: [userId], references: [id])
+}
+
+model OrderedItem {
+  id        Int @id @default(autoincrement())
+  productId Int
+  orderId   Int
+  price     Int
+  quantity  Int
+
+  product Product @relation(fields: [productId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
+}
+
+model Invite {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  name        String
+  companyId   Int
+  invitedById String
+  expiresAt   DateTime
+  isUsed      Boolean  @default(false)
+
+  role      Role
+  company   Company @relation(fields: [companyId], references: [id])
+  invitedBy User    @relation("InvitedBy", fields: [invitedById], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELED
+}
