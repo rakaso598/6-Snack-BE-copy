@@ -1,8 +1,10 @@
-import { Router } from 'express';
-import userRoutes from './userRoutes';
+import express from 'express';
+import type { Application, Request, Response } from 'express';
 
-const router = Router();
+const app: Application = express();
 
-router.use('/users', userRoutes);
+app.get('/', (req: Request, res: Response) => {
+  res.send('Welcome to Express with TypeScript!');
+});
 
-export default router;
+export default app;
