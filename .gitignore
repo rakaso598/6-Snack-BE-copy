@@ -18,6 +18,9 @@ jspm_packages/
 .env.*.local
 .env.local
 
+# Ignore all .env files except .env.example
+!.env.example
+
 # Build outputs
 /dist
 /build

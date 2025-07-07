@@ -6,7 +6,8 @@
     "start": "node dist/app.js",
     "dev": "nodemon --exec ts-node src/app.ts",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ssh": "dotenv -- bash -c 'ssh -i \"$SSH_KEY_PATH\" -L 5432:$DB_HOST:5432 $EC2_USER@$EC2_HOST'"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,7 @@
     "@types/node": "^24.0.10",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
+    "dotenv-cli": "^8.0.0",
     "nodemon": "^3.1.10",
     "prisma": "^6.11.0",
     "ts-node": "^10.9.2"
