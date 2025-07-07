@@ -67,11 +67,10 @@ model Product {
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
 
-  cart         CartItem[]
-  orderedItems OrderedItem[]
-  likes        Like[]
-  creator      User          @relation("ProductCreator", fields: [creatorId], references: [id])
-  category     Category      @relation(fields: [categoryId], references: [id])
+  cart     CartItem[]
+  likes    Like[]
+  creator  User       @relation("ProductCreator", fields: [creatorId], references: [id])
+  category Category   @relation(fields: [categoryId], references: [id])
 }
 
 model Category {
@@ -89,35 +88,35 @@ model CartItem {
   userId    String
   productId Int
   quantity  Int
+  isChecked Boolean   @default(true)
   deletedAt DateTime?
 
-  user    User    @relation(fields: [userId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  user        User          @relation(fields: [userId], references: [id])
+  product     Product       @relation(fields: [productId], references: [id])
+  OrderedItem OrderedItem[]
 }
 
 model Order {
-  id             Int      @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   userId         String
   adminMessage   String?
   requestMessage String?
   totalPrice     Int
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  status         OrderStatus
 
-  status OrderStatus
-  items  OrderedItem[]
-  user   User          @relation("UserOrders", fields: [userId], references: [id])
+  orderedItems OrderedItem[]
+  user         User          @relation("UserOrders", fields: [userId], references: [id])
 }
 
 model OrderedItem {
-  id        Int @id @default(autoincrement())
-  productId Int
-  orderId   Int
-  price     Int
-  quantity  Int
+  id      Int @id @default(autoincrement())
+  orderId Int
+  cartId  Int
 
-  product Product @relation(fields: [productId], references: [id])
-  order   Order   @relation(fields: [orderId], references: [id])
+  order    Order    @relation(fields: [orderId], references: [id])
+  cartItem CartItem @relation(fields: [cartId], references: [id])
 }
 
 model Invite {

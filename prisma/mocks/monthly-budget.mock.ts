@@ -1,0 +1,26 @@
+export const monthlyBudgetMockData = [
+  {
+    id: 1,
+    companyId: 1,
+    totalExpense: 4500,
+    currentMonthBudget: 2000000,
+    monthlyBudget: 2000000,
+    year: "2025",
+    month: "06",
+    createdAt: new Date("2025-06-01"),
+    updatedAt: new Date("2025-06-15"),
+    deletedAt: null,
+  },
+  {
+    id: 2,
+    companyId: 1,
+    totalExpense: 5700,
+    currentMonthBudget: 3500000,
+    monthlyBudget: 2000000,
+    year: "2025",
+    month: "07",
+    createdAt: new Date("2025-07-01"),
+    updatedAt: new Date("2025-07-07"),
+    deletedAt: null,
+  },
+];

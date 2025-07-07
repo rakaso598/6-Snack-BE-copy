@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "dist/app.js",
   "scripts": {
-    "start": "node dist/app.js",
-    "dev": "nodemon --exec ts-node src/app.ts",
+    "seed": "ts-node prisma/seed.ts",
+    "start": "node --enable-source-maps dist/app.js",
+    "dev": "ts-node-dev --respawn src/app.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
     "ssh": "dotenv -- bash -c 'ssh -i \"$SSH_KEY_PATH\" -L 5432:$DB_HOST:5432 $EC2_USER@$EC2_HOST'"
