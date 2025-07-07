@@ -19,6 +19,7 @@ model User {
 
   role      Role
   cartItems CartItem[]
+  likes     Like[]
   company   Company    @relation(fields: [companyId], references: [id])
   orders    Order[]    @relation("UserOrders")
   invites   Invite[]   @relation("InvitedBy")
@@ -68,6 +69,7 @@ model Product {
 
   cart         CartItem[]
   orderedItems OrderedItem[]
+  likes        Like[]
   creator      User          @relation("ProductCreator", fields: [creatorId], references: [id])
   category     Category      @relation(fields: [categoryId], references: [id])
 }
@@ -130,6 +132,15 @@ model Invite {
   role      Role
   company   Company @relation(fields: [companyId], references: [id])
   invitedBy User    @relation("InvitedBy", fields: [invitedById], references: [id])
+}
+
+model Like {
+  id        Int    @id @default(autoincrement())
+  userId    String
+  productId Int
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 }
 
 enum Role {
