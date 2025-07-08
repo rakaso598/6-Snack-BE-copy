@@ -1,10 +1,13 @@
-import express from 'express';
-import type { Application, Request, Response } from 'express';
+import { Router, Request, Response } from 'express';
+import authRouter from './auth.route';
 
-const indexRouter: Application = express();
+const indexRouter = Router();
 
+// 기본 라우트
 indexRouter.get('/', (req: Request, res: Response) => {
   res.send('Welcome to Express with TypeScript!');
 });
+
+indexRouter.use('/auth', authRouter);
 
 export default indexRouter;

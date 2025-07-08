@@ -5,6 +5,8 @@ import express, { Application, Request, Response } from 'express';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
 import indexRouter from './routes/index.route';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const app: Application = express();
 const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
