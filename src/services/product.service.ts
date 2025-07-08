@@ -8,17 +8,20 @@ interface ProductQueryOptions {
   category?: number;
   skip?: number;
   take?: number;
-  creatorId?: string; 
+  creatorId?: string;
+  cursor?: { id: number } | undefined
+  orderBy?: any;
+  
 }
 
-const createProduct = async (dto: CreateProductDto) => {
-  const product = await productRepository.create(dto);
-  return productRepository.findById(product.id);
-};
+// const createProduct = async (dto: CreateProductDto) => {
+//   const product = await productRepository.create(dto);
+//   return productRepository.findById(product.id);
+// };
 
-const getProductById = async (id: number) => {
-  return productRepository.findById(id);
-};
+// const getProductById = async (id: number) => {
+//   return productRepository.findById(id);
+// };
 
 
 const getAllProducts = async (options: ProductQueryOptions) => {
@@ -26,12 +29,12 @@ const getAllProducts = async (options: ProductQueryOptions) => {
 };
 
 
-const getProductsByCreator = async ({ creatorId, skip = 0, take = 10 }: ProductQueryOptions) => {
-  return productRepository.findManyByCreator({ creatorId: creatorId!, skip, take });
-};
+// const getProductsByCreator = async ({ creatorId, skip = 0, take = 10 }: ProductQueryOptions) => {
+//   return productRepository.findManyByCreator({ creatorId: creatorId!, skip, take });
+// };
 export default {
-  createProduct,
-  getProductById,
+  // createProduct,
+  // getProductById,
   getAllProducts,
-  getProductsByCreator
+  // getProductsByCreator
 };

@@ -1,0 +1,38 @@
+POST http://localhost:8080/products
+Content-Type: application/json
+Cookie: accessToken=your_token_here  
+
+{
+  "name": "포도",
+  "categoryId": 28,
+  "price": 5000,
+  "imageUrl": "https://example.com/images.jpg",
+  "linkUrl": "https://external-shop.com/"
+}
+
+### 유저가 등록한 상품 목록
+GET http://localhost:8080/my/products
+Host: localhost:8080
+Cookie: accessToken=<YOUR_ACCESS_TOKEN_HERE>
+
+### 상품 전체 요청 
+GET http://localhost:8080/products
+Content-Type: application/json
+
+# 쿼리스트링 옵션:
+#
+# - sort: 정렬 기준 (string)
+#   가능한 값:
+#     - latest   : 최신순 (기본값)
+#     - popular  : 판매순
+#     - low      : 가격 낮은순
+#     - high     : 가격 높은순
+#
+# - category: 카테고리 ID (number)
+#   예) category=3
+#
+# - cursor: 커서 ID (number)
+#   페이징용으로 사용, 이전 요청 마지막 아이템 ID
+#
+# - limit: 한번에 가져올 아이템 수 (number)
+#   기본값 9, 최대 50까지 허용

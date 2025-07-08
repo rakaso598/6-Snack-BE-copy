@@ -9,17 +9,17 @@ interface ProductQueryOptions {
   category?: number;
   skip?: number;
   take?: number;
+  cursor?: { id: number } | undefined;
 }
 
 const findManyAll = async (options: ProductQueryOptions = {}) => {
-  const { sort = "latest", category, skip = 0, take = 6 } = options;
+  const { sort = "latest", category, take = 9, cursor } = options;
 
   if (sort === "popular") {
-    return findManyAllPopular({ category, skip, take }); 
+    return findManyAllPopular({ category, take });
   }
 
   let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: "desc" };
-
   if (sort === "low") orderBy = { price: "asc" };
   else if (sort === "high") orderBy = { price: "desc" };
 
@@ -28,14 +28,17 @@ const findManyAll = async (options: ProductQueryOptions = {}) => {
       ...(category && { categoryId: category }),
     },
     orderBy,
-    skip,
     take,
+    cursor,
+    skip: cursor ? 1 : 0,
     include: {
       category: true,
       creator: true,
     },
   });
 };
+
+
 
 const findManyAllPopular = async ({
   category,
@@ -57,44 +60,45 @@ const findManyAllPopular = async ({
   return result;
 };
 
-const findById = (id: number) => {
-  return prisma.product.findUnique({
-    where: { id },
-    include: {
-      category: true,
-      creator: true,
-    },
-  });
-};
+// 미완성
+// const findById = (id: number) => {
+//   return prisma.product.findUnique({
+//     where: { id },
+//     include: {
+//       category: true,
+//       creator: true,
+//     },
+//   });
+// };
 
-const create = (dto: CreateProductDto) => {
-  return prisma.product.create({ data: dto });
-};
+// const create = (dto: CreateProductDto) => {
+//   return prisma.product.create({ data: dto });
+// };
 
-interface CreatorQueryOptions {
-  creatorId: string;
-  skip?: number;
-  take?: number;
-}
+// interface CreatorQueryOptions {
+//   creatorId: string;
+//   skip?: number;
+//   take?: number;
+// }
 
-const findManyByCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions) => {
-  return prisma.product.findMany({
-    where: { creatorId },
-    skip,
-    take,
-    include: {
-      category: true,
-      creator: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-};
+// const findManyByCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions) => {
+//   return prisma.product.findMany({
+//     where: { creatorId },
+//     skip,
+//     take,
+//     include: {
+//       category: true,
+//       creator: true,
+//     },
+//     orderBy: {
+//       createdAt: "desc",
+//     },
+//   });
+// };
 
 export default {
-  create,
-  findById,
+  // create,
+  // findById,
   findManyAll,
-  findManyByCreator,
+  // findManyByCreator,
 };
