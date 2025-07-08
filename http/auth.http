@@ -1,4 +1,6 @@
 @token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NTgzOTksImV4cCI6MTc1MTk2MTk5OX0.T1iIV0VSadnAbb_Nm-okXCQ8mVd8CLrjufjx2EKFPYw
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NjMzMzIsImV4cCI6MTc1MTk2NDIzMn0.qtpZKSF6RsxaGqCogwPBvvFKVwVhAPanxPIqVNcV48k
+
 
 ### 회원가입
 POST http://localhost:8080/auth/signup
@@ -21,18 +23,12 @@ Content-Type: application/json
     "password": "password123"
 }
 
-### 인증된 사용자 정보 조회
+### 사용자 정보 조회
 GET http://localhost:8080/auth/me
-Authorization: Bearer {{token}}
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
 
-{
-    "user": {
-        "id": "user_id",
-        "username": "testuser",
-        "email": "testuser@example.com",
-        "name": "Test User",
-        "role": "USER"
-    }
-}
-
-###
+### 로그아웃
+POST http://localhost:8080/auth/logout
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
