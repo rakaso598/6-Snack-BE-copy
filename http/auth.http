@@ -1,5 +1,7 @@
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NDI2NjEsImV4cCI6MTc1MTk0NjI2MX0.FrnrI73XWHnAVcOL3DFYBb7NmG5nqnsOskhlLTQNuqg
+
 ### 회원가입
-POST http://localhost:8080/auth/register
+POST http://localhost:8080/auth/signup
 Content-Type: application/json
 
 {
@@ -18,3 +20,20 @@ Content-Type: application/json
     "email": "testuser@example.com",
     "password": "password123"
 }
+
+### 인증된 사용자 정보 조회
+GET http://localhost:8080/auth/me
+Authorization: Bearer {{token}}
+
+{
+    "message": "환영합니다, 인증된 사용자님!",
+    "user": {
+        "id": "user_id",
+        "username": "testuser",
+        "email": "testuser@example.com",
+        "name": "Test User",
+        "role": "USER"
+    }
+}
+
+###
