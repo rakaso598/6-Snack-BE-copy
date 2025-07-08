@@ -2,6 +2,8 @@ import { Router } from "express";
 import adminRouter from "./admin.route";
 import superAdminRouter from "./superAdmin.route";
 import cartRouter from "./cart.route";
+import productRouter from './product.route'
+import myRouter from './my.route';
 
 const indexRouter = Router();
 
