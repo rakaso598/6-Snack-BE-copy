@@ -1,5 +1,5 @@
 import { PrismaClient, Prisma } from '@prisma/client';
-import type { TCreateOrderRequest, TCreateOrderResponse } from '../types/order.types';
+import type { TCreateOrderRequest, TCreateOrderResponse } from '../types/orderRequest.types';
 
 const prisma = new PrismaClient();
 

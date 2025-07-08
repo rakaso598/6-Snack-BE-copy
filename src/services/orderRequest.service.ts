@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import orderRepository from '../repositories/order.repository';
-import type { TCreateOrderRequest, TCreateOrderResponse } from '../types/order.types';
-import { BadRequestError, NotFoundError, ValidationError, ForbiddenError } from '../types/error.types';
+import orderRequestRepository from '../repositories/orderRequest.repository';
+import type { TCreateOrderRequest, TCreateOrderResponse } from '../types/orderRequest.types';
+import { BadRequestError, NotFoundError, ValidationError, ForbiddenError } from '../types/error';
 
 const prisma = new PrismaClient();
 
@@ -46,7 +46,7 @@ const createOrder = async (orderData: TCreateOrderRequest): Promise<TCreateOrder
 
   // 트랜잭션으로 주문 생성
   const result = await prisma.$transaction(async (tx) => {
-    const order = await orderRepository.createOrder(orderData, tx);
+    const order = await orderRequestRepository.createOrder(orderData, tx);
 
     // 장바구니 아이템들을 삭제 처리 (soft delete)
     await tx.cartItem.updateMany({
@@ -65,7 +65,7 @@ const createOrder = async (orderData: TCreateOrderRequest): Promise<TCreateOrder
 };
 
 const getOrderById = async (orderId: number, userId: string) => {
-  const order = await orderRepository.getOrderById(orderId);
+  const order = await orderRequestRepository.getOrderById(orderId);
 
   if (!order) {
     throw new NotFoundError('주문을 찾을 수 없습니다.');
@@ -79,11 +79,11 @@ const getOrderById = async (orderId: number, userId: string) => {
 };
 
 const getOrdersByUserId = async (userId: string) => {
-  return await orderRepository.getOrdersByUserId(userId);
+  return await orderRequestRepository.getOrdersByUserId(userId);
 };
 
 const cancelOrder = async (orderId: number, userId: string) => {
-  const order = await orderRepository.getOrderById(orderId);
+  const order = await orderRequestRepository.getOrderById(orderId);
 
   if (!order) {
     throw new NotFoundError('주문을 찾을 수 없습니다.');
@@ -97,7 +97,7 @@ const cancelOrder = async (orderId: number, userId: string) => {
     throw new BadRequestError('대기 중인 주문만 취소할 수 있습니다.');
   }
 
-  return await orderRepository.updateOrderStatus(orderId, 'CANCELED');
+  return await orderRequestRepository.updateOrderStatus(orderId, 'CANCELED');
 };
 
 const createInstantOrder = async (orderData: TCreateOrderRequest): Promise<TCreateOrderResponse> => {
@@ -146,7 +146,7 @@ const createInstantOrder = async (orderData: TCreateOrderRequest): Promise<TCrea
       status: 'APPROVED' as const
     };
     
-    const order = await orderRepository.createOrder(instantOrderData, tx);
+    const order = await orderRequestRepository.createOrder(instantOrderData, tx);
 
     // 장바구니 아이템들을 삭제 처리 (soft delete)
     await tx.cartItem.updateMany({

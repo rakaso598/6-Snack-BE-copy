@@ -1,14 +1,16 @@
-import express from 'express';
-import type { Request, Response } from 'express';
-import orderRoute from './order.route';
+import { Router } from "express";
+import authRouter from "./auth.route";
+import cartRouter from "./cart.route";
+import orderRequestRouter from "./orderRequest.route";
+import adminRouter from "./admin.route";
+import superAdminRouter from "./superAdmin.route";
 
-const indexRouter = express.Router();
+const indexRouter = Router();
 
-indexRouter.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to Express with TypeScript!');
-});
-
-// Order routes
-indexRouter.use('/orders', orderRoute);
+indexRouter.use("/auth", authRouter);
+indexRouter.use("/cart", cartRouter);
+indexRouter.use("/orders", orderRequestRouter);
+indexRouter.use("/admin", adminRouter);
+indexRouter.use("/super-admin", superAdminRouter);
 
 export default indexRouter;

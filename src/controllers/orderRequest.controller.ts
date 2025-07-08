@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import orderService from '../services/order.service';
-import type { TCreateOrderRequest } from '../types/order.types';
+import orderRequestService from '../services/orderRequest.service';
+import type { TCreateOrderRequest } from '../types/orderRequest.types';
 
 const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -8,7 +8,7 @@ const createOrder = async (req: Request, res: Response, next: NextFunction) => {
     
     // TODO: 실제 인증 미들웨어에서 userId를 가져와야 함
     // 현재는 임시로 body에서 가져옴
-    const result = await orderService.createOrder(orderData);
+    const result = await orderRequestService.createOrder(orderData);
     
     res.status(201).json({
       message: '구매 요청이 성공적으로 생성되었습니다.',
@@ -24,7 +24,7 @@ const getOrderById = async (req: Request, res: Response, next: NextFunction) => 
     const orderId = parseInt(req.params.orderId);
     const userId = req.body.userId; // TODO: 실제 인증 미들웨어에서 가져와야 함
     
-    const result = await orderService.getOrderById(orderId, userId);
+    const result = await orderRequestService.getOrderById(orderId, userId);
     
     res.status(200).json({
       message: '구매 요청 조회가 완료되었습니다.',
@@ -44,7 +44,7 @@ const getOrdersByUserId = async (req: Request, res: Response, next: NextFunction
       return;
     }
 
-    const result = await orderService.getOrdersByUserId(userId);
+    const result = await orderRequestService.getOrdersByUserId(userId);
 
     res.status(200).json({
       message: '구매 요청 목록 조회가 완료되었습니다.',
@@ -68,7 +68,7 @@ const cancelOrder = async (req: Request, res: Response, next: NextFunction) => {
       return;
     }
     
-    const result = await orderService.cancelOrder(orderId, userId);
+    const result = await orderRequestService.cancelOrder(orderId, userId);
     
     res.status(200).json({
       message: '구매 요청이 성공적으로 취소되었습니다.',
@@ -84,7 +84,7 @@ const createInstantOrder = async (req: Request, res: Response, next: NextFunctio
     const orderData = req.body;
     
     // TODO: 실제 인증 미들웨어에서 userId를 가져와야 함
-    const result = await orderService.createInstantOrder(orderData);
+    const result = await orderRequestService.createInstantOrder(orderData);
     
     res.status(201).json({
       message: '즉시 구매가 성공적으로 완료되었습니다.',
