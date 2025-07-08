@@ -3,7 +3,7 @@ import authRouter from './auth.route';
 
 const indexRouter = Router();
 
-indexRouter.get('/', (req: Request, res: Response) => {
+indexRouter.get('/', (req, res) => {
   res.send('Welcome to Express with TypeScript!');
 });
 
