@@ -6,12 +6,12 @@ import authRouter from "./auth.route";
 
 const indexRouter = Router();
 
-// indexRouter.use("/super-admin", superAdminRouter);
-// indexRouter.use("/admin", adminRouter);
-// indexRouter.use("/products", productRouter);
-// indexRouter.use("/cart", cartRouter);
-// indexRouter.use("/orders", orderRouter);
-// indexRouter.use("/my", myRouter);
+indexRouter.use("/super-admin", superAdminRouter);
+indexRouter.use("/admin", adminRouter);
+indexRouter.use("/products", productRouter);
+indexRouter.use("/cart", cartRouter);
+indexRouter.use("/orders", orderRouter);
+indexRouter.use("/my", myRouter);
 indexRouter.use("/auth", authRouter);
 
 export default indexRouter;
