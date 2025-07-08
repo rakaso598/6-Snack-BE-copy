@@ -6,11 +6,13 @@ import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger";
 import indexRouter from "./routes/index.route";
 import errorHandler from "./middlewares/errorHandler.middleware";
+import cookieParser from "cookie-parser";
 
 const app: Application = express();
 const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", indexRouter);
