@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { Role, Company, PrismaClient, Prisma } from '@prisma/client';
 import authenticateToken from '../middlewares/auth.middleware'; // 수정된 미들웨어 임포트
 import prisma from '../lib/prisma';
+import HttpError from '../utils/HttpError'; // HttpError 유틸리티 임포트
 
 // JWT 비밀 키는 환경 변수에서 가져옵니다.
 // accessToken 서명에 사용됩니다.
@@ -24,15 +25,15 @@ const authRouter = Router();
 
 // HttpError 클래스: 표준 Error 객체를 확장하여 HTTP 상태 코드를 포함합니다.
 // 이는 에러 발생 시 클라이언트에게 적절한 HTTP 상태 코드를 반환하기 위해 사용됩니다.
-class HttpError extends Error {
-  public status: number;
-  constructor(message: string, status: number) {
-    super(message);
-    this.name = 'HttpError';
-    this.status = status;
-    Object.setPrototypeOf(this, HttpError.prototype);
-  }
-}
+// class HttpError extends Error {
+//   public status: number;
+//   constructor(message: string, status: number) {
+//     super(message);
+//     this.name = 'HttpError';
+//     this.status = status;
+//     Object.setPrototypeOf(this, HttpError.prototype);
+//   }
+// }
 
 /**
  * 사용자 회원가입 라우트
@@ -361,25 +362,31 @@ authRouter.post('/logout', authenticateToken, async (req: Request, res: Response
  * 현재 로그인된 사용자 정보 조회 라우트
  * @route GET /auth/me
  * @middleware authenticateToken - Access Token 유효성 검사
- * @returns {object} - 현재 로그인된 사용자 정보 (ID, 이메일, 이름, 역할)
+ * @returns {object} - 현재 로그인된 사용자 정보 (ID, 이메일, 이름, 역할, 회사 정보 포함)
  * @throws {HttpError} - 사용자 정보를 찾을 수 없거나 인증되지 않은 경우
  */
 authRouter.get('/me', authenticateToken, (req: Request, res: Response, next: NextFunction) => {
   // authenticateToken 미들웨어를 통해 req.user에 사용자 정보가 설정됩니다.
+  // 이 시점에서는 req.user에 company 정보도 포함되어 있습니다.
   if (!req.user) {
-    // 이 경우는 authenticateToken 미들웨어에서 이미 처리되었어야 하지만,
-    // 혹시 모를 상황을 대비하여 한 번 더 확인합니다.
+    // req.user가 없을 경우 (미들웨어에서 에러가 처리되지 않았거나 비정상적인 접근 시)
     return next(new HttpError('사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.', 401));
   }
 
-  // 사용자 정보를 클라이언트에게 반환합니다.
+  // 이제 user 객체와 company 객체를 모두 포함하여 응답합니다.
   res.status(200).json({
-    user: {
+    user: { // "user" 키로 한 번 더 감싸서 응답 형식을 맞춥니다.
       id: req.user.id,
       email: req.user.email,
       name: req.user.name,
       role: req.user.role,
-    }
+      company: { // <-- **여기가 바로 회사 정보를 추가하는 부분입니다!**
+        id: req.user.company.id,
+        name: req.user.company.name,
+        // 필요하다면 company 스키마에 정의된 다른 필드를 여기에 추가할 수 있습니다.
+        // 예: bizNumber: req.user.company.bizNumber,
+      },
+    },
   });
 });
 
