@@ -53,7 +53,7 @@ const getProductById = async (id: number) => {
   return productRepository.findById(id);
 };
 
-const getAllProducts = async (options: ProductQueryOptions) => {
+const getProductList = async (options: ProductQueryOptions) => {
   return productRepository.findManyAll(options);
 };
 
@@ -71,6 +71,6 @@ const getProductsByCreator = async (options: Pick<ProductQueryOptions, "creatorI
 export default {
   createProduct,
   getProductById,
-  getAllProducts,
+  getProductList,
   getProductsByCreator,
 };

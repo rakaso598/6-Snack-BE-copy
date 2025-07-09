@@ -67,7 +67,7 @@ const getProducts: RequestHandler = async (req, res, next) => {
 
     const cursorObj = cursor ? { id: Number(cursor) } : undefined;
 
-    const items = await productService.getAllProducts({
+    const items = await productService.getProductList({
       sort: sortOption,
       category: category ? Number(category) : undefined,
       take,
