@@ -1,9 +1,11 @@
+import { Order } from "@prisma/client";
 import orderRepository from "../repositories/order.repository";
 import { NotFoundError } from "../types/error";
+import { TApprovedOrderQuery } from "../types/order.types";
 
 // 승인된 전체 구매내역 조회
-const getApprovedOrders = async (offset: number, limit: number, orderBy: "latest" | "priceLow" | "priceHigh") => {
-  const orders = await orderRepository.getApprovedOrders(offset, limit, orderBy);
+const getApprovedOrders = async ({ offset, limit, orderBy }: TApprovedOrderQuery) => {
+  const orders = await orderRepository.getApprovedOrders({ offset, limit, orderBy });
 
   if (!orders) {
     throw new NotFoundError("주문 내역을 찾을 수 없습니다.");
@@ -23,7 +25,7 @@ const getApprovedOrders = async (offset: number, limit: number, orderBy: "latest
 };
 
 // 승인된 구매내역 상세 조회
-const getApprovedOrder = async (orderId: number) => {
+const getApprovedOrder = async (orderId: Order["id"]) => {
   const order = await orderRepository.getApprovedById(orderId);
 
   if (!order) {

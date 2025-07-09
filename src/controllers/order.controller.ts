@@ -9,7 +9,7 @@ const getApprovedOrders: RequestHandler<{}, {}, {}, TApprovedOrderQueryDto> = as
   const limit = parseNumberOrThrow(req.query.limit ?? "4", "limit");
   const { orderBy } = req.query;
 
-  const orderList = await orderService.getApprovedOrders(offset, limit, orderBy);
+  const orderList = await orderService.getApprovedOrders({ offset, limit, orderBy });
 
   res.status(200).json(orderList);
 };

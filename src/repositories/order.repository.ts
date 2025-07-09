@@ -1,11 +1,8 @@
 import { Order, Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
+import { TApprovedOrderQuery } from "../types/order.types";
 
-const getApprovedOrders = async (
-  offset: number,
-  limit: number,
-  orderBy: "latest" | "priceLow" | "priceHigh" = "latest",
-) => {
+const getApprovedOrders = async ({ offset, limit, orderBy }: TApprovedOrderQuery) => {
   const sortOptions: Record<"latest" | "priceLow" | "priceHigh", Prisma.OrderOrderByWithRelationInput> = {
     latest: { createdAt: "desc" },
     priceLow: { totalPrice: "asc" },
