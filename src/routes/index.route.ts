@@ -13,7 +13,7 @@ indexRouter.use("/super-admin", superAdminRouter);
 indexRouter.use("/admin", adminRouter);
 indexRouter.use("/products", productRouter);
 indexRouter.use("/cart", cartRouter);
-// indexRouter.use("/orders", orderRouter);
+indexRouter.use("/orders", orderRouter);
 indexRouter.use("/my", myRouter);
 
 
