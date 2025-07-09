@@ -11,7 +11,6 @@ const createProduct: RequestHandler = async (req, res) => {
     const { name, price, linkUrl, categoryId } = req.body;
     const creatorId = req.user?.id;
 
-    // 숫자 변환 + 유효성 검사
     const priceNum = parseNumberOrThrow(price, "price");
     const categoryIdNum = parseNumberOrThrow(categoryId, "categoryId");
 
