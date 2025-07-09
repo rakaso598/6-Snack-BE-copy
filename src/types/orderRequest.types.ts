@@ -2,14 +2,13 @@ export type TCreateOrderRequest = {
   userId: string;
   adminMessage?: string;
   requestMessage?: string;
-  totalPrice: number;
   cartItemIds: number[];
-  status?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELED';
 };
 
 export type TCreateOrderResponse = {
   id: number;
   userId: string;
+  approver?: string;
   adminMessage?: string;
   requestMessage?: string;
   totalPrice: number;
@@ -18,15 +17,12 @@ export type TCreateOrderResponse = {
   updatedAt: Date;
   orderedItems: Array<{
     id: number;
-    cartItem: {
+    receipt: {
       id: number;
+      productName: string;
+      price: number;
+      imageUrl: string;
       quantity: number;
-      product: {
-        id: number;
-        name: string;
-        price: number;
-        imageUrl: string;
-      };
     };
   }>;
 }; 

@@ -3,11 +3,10 @@ POST http://localhost:8080/orders
 Content-Type: application/json
 
 {
-  "userId": "user-2",
-  "adminMessage": "테스트 주문11",
+  "userId": "user-1",
+  "adminMessage": "테스트 주문",
   "requestMessage": "테스트 요청",
-  "totalPrice": 2500,
-  "cartItemIds": [7]
+  "cartItemIds": [1, 2]
 }
 
 ### 내 구매 요청 리스트
@@ -19,7 +18,7 @@ Content-Type: application/json
 }
 
 ### 구매 요청 상세 조회
-GET http://localhost:8080/orders/9
+GET http://localhost:8080/orders/1
 Content-Type: application/json
 
 {
@@ -27,7 +26,7 @@ Content-Type: application/json
 }
 
 ### 구매 요청 취소
-PATCH http://localhost:8080/orders/9
+PATCH http://localhost:8080/orders/1
 Content-Type: application/json
 
 {
@@ -41,8 +40,7 @@ Content-Type: application/json
 
 {
   "userId": "user-1",
-  "adminMessage": "즉시 구매 테스트2",
-  "requestMessage": "즉시 구매 요청2",
-  "totalPrice": 3000,
-  "cartItemIds": [6]
+  "adminMessage": "즉시 구매 테스트",
+  "requestMessage": "즉시 구매 요청",
+  "cartItemIds": [3]
 } 

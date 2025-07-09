@@ -12,52 +12,12 @@ const createOrder = async (orderData: TCreateOrderRequest): Promise<TCreateOrder
   }
 
   if (!orderData.cartItemIds || orderData.cartItemIds.length === 0) {
-    throw new ValidationError('장바구니 아이템이 필요합니다.');
-  }
-
-  if (!orderData.totalPrice || orderData.totalPrice <= 0) {
-    throw new ValidationError('총 가격은 0보다 커야 합니다.');
-  }
-
-  // 장바구니 아이템들이 실제로 존재하는지 확인
-  const cartItems = await prisma.cartItem.findMany({
-    where: {
-      id: { in: orderData.cartItemIds },
-      userId: orderData.userId,
-      deletedAt: null
-    },
-    include: {
-      product: true
-    }
-  });
-
-  if (cartItems.length !== orderData.cartItemIds.length) {
-    throw new NotFoundError('일부 장바구니 아이템을 찾을 수 없습니다.');
-  }
-
-  // 실제 총 가격 계산 및 검증
-  const calculatedTotalPrice = cartItems.reduce((sum, item) => {
-    return sum + (item.product.price * item.quantity);
-  }, 0);
-
-  if (calculatedTotalPrice !== orderData.totalPrice) {
-    throw new BadRequestError('총 가격이 일치하지 않습니다.');
+    throw new ValidationError('카트 아이템이 필요합니다.');
   }
 
   // 트랜잭션으로 주문 생성
   const result = await prisma.$transaction(async (tx) => {
     const order = await orderRequestRepository.createOrder(orderData, tx);
-
-    // 장바구니 아이템들을 삭제 처리 (soft delete)
-    await tx.cartItem.updateMany({
-      where: {
-        id: { in: orderData.cartItemIds }
-      },
-      data: {
-        deletedAt: new Date()
-      }
-    });
-
     return order;
   });
 
@@ -107,36 +67,7 @@ const createInstantOrder = async (orderData: TCreateOrderRequest): Promise<TCrea
   }
 
   if (!orderData.cartItemIds || orderData.cartItemIds.length === 0) {
-    throw new ValidationError('장바구니 아이템이 필요합니다.');
-  }
-
-  if (!orderData.totalPrice || orderData.totalPrice <= 0) {
-    throw new ValidationError('총 가격은 0보다 커야 합니다.');
-  }
-
-  // 장바구니 아이템들이 실제로 존재하는지 확인
-  const cartItems = await prisma.cartItem.findMany({
-    where: {
-      id: { in: orderData.cartItemIds },
-      userId: orderData.userId,
-      deletedAt: null
-    },
-    include: {
-      product: true
-    }
-  });
-
-  if (cartItems.length !== orderData.cartItemIds.length) {
-    throw new NotFoundError('일부 장바구니 아이템을 찾을 수 없습니다.');
-  }
-
-  // 실제 총 가격 계산 및 검증
-  const calculatedTotalPrice = cartItems.reduce((sum, item) => {
-    return sum + (item.product.price * item.quantity);
-  }, 0);
-
-  if (calculatedTotalPrice !== orderData.totalPrice) {
-    throw new BadRequestError('총 가격이 일치하지 않습니다.');
+    throw new ValidationError('카트 아이템이 필요합니다.');
   }
 
   // 트랜잭션으로 즉시 구매 주문 생성 (APPROVED 상태로)
@@ -147,17 +78,6 @@ const createInstantOrder = async (orderData: TCreateOrderRequest): Promise<TCrea
     };
     
     const order = await orderRequestRepository.createOrder(instantOrderData, tx);
-
-    // 장바구니 아이템들을 삭제 처리 (soft delete)
-    await tx.cartItem.updateMany({
-      where: {
-        id: { in: orderData.cartItemIds }
-      },
-      data: {
-        deletedAt: new Date()
-      }
-    });
-
     return order;
   });
 

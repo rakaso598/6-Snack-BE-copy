@@ -6,32 +6,75 @@ const prisma = new PrismaClient();
 const createOrder = async (orderData: TCreateOrderRequest, tx?: Prisma.TransactionClient): Promise<TCreateOrderResponse> => {
   const client = tx || prisma;
 
-  const { cartItemIds, ...orderInfo } = orderData;
+  // 1. 카트 아이템들을 가져와서 receipt 생성
+  const cartItems = await client.cartItem.findMany({
+    where: {
+      id: { in: orderData.cartItemIds }
+    },
+    include: {
+      product: true
+    }
+  });
 
-  // 주문 생성
+  if (cartItems.length !== orderData.cartItemIds.length) {
+    throw new Error('일부 카트 아이템을 찾을 수 없습니다.');
+  }
+
+  // 2. 각 카트 아이템으로부터 receipt 생성
+  const receipts = await Promise.all(
+    cartItems.map(async (cartItem) => {
+      return await client.receipt.create({
+        data: {
+          productName: cartItem.product.name,
+          price: cartItem.product.price,
+          imageUrl: cartItem.product.imageUrl,
+          quantity: cartItem.quantity
+        }
+      });
+    })
+  );
+
+  // 3. 총 가격 계산
+  const totalPrice = receipts.reduce((sum, receipt) => {
+    return sum + (receipt.price * receipt.quantity);
+  }, 0);
+
+  // 4. 주문 생성
   const order = await client.order.create({
     data: {
-      ...orderInfo,
-      status: orderInfo.status || 'PENDING',
-      orderedItems: {
-        create: cartItemIds.map(cartItemId => ({
-          cartId: cartItemId
-        }))
-      }
-    },
+      userId: orderData.userId,
+      adminMessage: orderData.adminMessage,
+      requestMessage: orderData.requestMessage,
+      totalPrice: totalPrice,
+      status: 'PENDING'
+    }
+  });
+
+  // 5. OrderedItem 생성 (주문과 receipt 연결)
+  await Promise.all(
+    receipts.map(async (receipt) => {
+      return await client.orderedItem.create({
+        data: {
+          orderId: order.id,
+          receiptId: receipt.id
+        }
+      });
+    })
+  );
+
+  // 6. 생성된 주문 정보 반환
+  const result = await client.order.findUnique({
+    where: { id: order.id },
     include: {
       orderedItems: {
         include: {
-          cartItem: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  price: true,
-                  imageUrl: true
-                }
-              }
+          receipt: {
+            select: {
+              id: true,
+              productName: true,
+              price: true,
+              imageUrl: true,
+              quantity: true
             }
           }
         }
@@ -39,7 +82,7 @@ const createOrder = async (orderData: TCreateOrderRequest, tx?: Prisma.Transacti
     }
   });
 
-  return order as TCreateOrderResponse;
+  return result as TCreateOrderResponse;
 };
 
 const getOrderById = async (orderId: number, tx?: Prisma.TransactionClient) => {
@@ -50,16 +93,13 @@ const getOrderById = async (orderId: number, tx?: Prisma.TransactionClient) => {
     include: {
       orderedItems: {
         include: {
-          cartItem: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  price: true,
-                  imageUrl: true
-                }
-              }
+          receipt: {
+            select: {
+              id: true,
+              productName: true,
+              price: true,
+              imageUrl: true,
+              quantity: true
             }
           }
         }
@@ -76,16 +116,13 @@ const getOrdersByUserId = async (userId: string, tx?: Prisma.TransactionClient) 
     include: {
       orderedItems: {
         include: {
-          cartItem: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  price: true,
-                  imageUrl: true
-                }
-              }
+          receipt: {
+            select: {
+              id: true,
+              productName: true,
+              price: true,
+              imageUrl: true,
+              quantity: true
             }
           }
         }
@@ -104,16 +141,13 @@ const updateOrderStatus = async (orderId: number, status: 'PENDING' | 'APPROVED'
     include: {
       orderedItems: {
         include: {
-          cartItem: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  price: true,
-                  imageUrl: true
-                }
-              }
+          receipt: {
+            select: {
+              id: true,
+              productName: true,
+              price: true,
+              imageUrl: true,
+              quantity: true
             }
           }
         }
