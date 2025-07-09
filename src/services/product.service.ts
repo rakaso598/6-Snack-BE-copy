@@ -36,29 +36,38 @@ const createProduct = async (input: CreateProductParams) => {
   return productRepository.findById(product.id);
 };
 
-
+// 상품 ID로 단일 상품 조회
 const getProductById = async (id: number) => {
   return productRepository.findById(id);
 };
 
+// 옵션에 따라 여러 상품 목록 조회
 const getProductList = async (options: ProductQueryOptions) => {
   return productRepository.findManyAll(options);
 };
 
-const getProductsByCreator = async (options: Pick<ProductQueryOptions, "creatorId" | "skip" | "take">) => {
+
+// 특정 사용자가 등록한 상품 목록 조회
+const getProductsCreator = async (options: Pick<ProductQueryOptions, "creatorId" | "skip" | "take">) => {
   if (!options.creatorId) {
     throw new ValidationError("creatorId는 필수입니다.");
   }
-  return productRepository.findManyByCreator({
+  return productRepository.findManyCreator({
     creatorId: options.creatorId,
     skip: options.skip,
     take: options.take,
   });
 };
 
+// 특정 사용자가 등록한 상품 개수 조회
+const countProducts = async (creatorId: string) => {
+  return productRepository.countCreator(creatorId);
+};
+
 export default {
   createProduct,
   getProductById,
   getProductList,
-  getProductsByCreator,
+  getProductsCreator,
+  countProducts
 };

@@ -1,7 +1,6 @@
 import { RequestHandler } from "express";
-import { TCreateProductInput } from "../dtos/product.dto";
 import productService from "../services/product.service";
-import { AppError, AuthenticationError, BadRequestError, ServerError } from "../types/error";
+import { AppError, AuthenticationError, ServerError } from "../types/error";
 import { uploadImageToS3 } from "../utils/s3";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 
@@ -73,13 +72,13 @@ const getProducts: RequestHandler = async (req, res, next) => {
   }
 };
 
-//미완성: 유저가 등록한상품 목록
+//유저가 등록한상품 목록
 const getMyProducts: RequestHandler = async (req, res) => {
   try {
-    const creatorId = "test-user-uuid";
+    const creatorId = req.user?.id;
 
     if (!creatorId) {
-      res.status(401).json({ message: "로그인 정보가 필요합니다." });
+      res.status(401).json({ message: "로그인이 필요합니다." });
       return;
     }
 
@@ -88,13 +87,18 @@ const getMyProducts: RequestHandler = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    const items = await productService.getProductsByCreator({
-      creatorId,
-      skip,
-      take: limit,
-    });
+ const [items, totalCount] = await Promise.all([
+      productService.getProductsCreator({ creatorId, skip, take: limit }),
+      productService.countProducts(creatorId),
+    ]);
 
-    res.json({ items });
+    res.json({ items, 
+      meta: {
+        totalCount,
+        currentPage: page,
+        itemsPerPage: limit,
+        totalPages: Math.ceil(totalCount / limit),
+      }, });
   } catch (error) {
     console.error("getMyProducts error:", error);
     res.status(500).json({ message: "서버 에러 발생" });

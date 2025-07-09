@@ -2,6 +2,7 @@ import prisma from "../config/prisma";
 import { Prisma } from "@prisma/client";
 import type { ProductQueryOptions, CreatorQueryOptions, CreateProductParams } from "../types/product.types";
 
+// 전체 상품을 조건에 맞게 조회
 const findManyAll = async (
   options: ProductQueryOptions = {},
   tx?: Prisma.TransactionClient
@@ -32,6 +33,7 @@ const findManyAll = async (
   });
 };
 
+// 인기 상품
 const findManyAllPopular = async ({
   category,
   skip = 0,
@@ -52,9 +54,10 @@ const findManyAllPopular = async ({
   return result;
 };
 
+// ID로 단일 상품 조회, **deletedAt이 null**인 활성 상품만 조회
 const findById = (id: number) => {
   return prisma.product.findUnique({
-    where: { id },
+    where: { id, deletedAt: null },
     include: {
       category: true,
       creator: true,
@@ -62,13 +65,14 @@ const findById = (id: number) => {
   });
 };
 
+// 새로운 상품 생성
 const create = (data: CreateProductParams) => {
   return prisma.product.create({ data });
 };
-
-const findManyByCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions) => {
+// 특정 사용자의 상품 목록 조회, **deletedAt이 null**인 활성 상품만
+const findManyCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions) => {
   return prisma.product.findMany({
-    where: { creatorId },
+    where: { creatorId, deletedAt: null},
     skip,
     take,
     include: {
@@ -81,9 +85,17 @@ const findManyByCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptio
   });
 };
 
+// 특정 사용자 상품 총 개수 조회
+const countCreator = (creatorId: string) => {
+  return prisma.product.count({
+    where: { creatorId, deletedAt: null },
+  });
+};
+
 export default {
   create,
   findById,
   findManyAll,
-  findManyByCreator,
+  findManyCreator,
+  countCreator
 };

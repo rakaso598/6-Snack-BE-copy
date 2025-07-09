@@ -12,7 +12,6 @@ FormData:
 
 ### 유저가 등록한 상품 목록
 GET http://localhost:8080/my/products
-Host: localhost:8080
 Cookie: accessToken=<YOUR_ACCESS_TOKEN_HERE>
 
 ### 상품 전체 요청 
