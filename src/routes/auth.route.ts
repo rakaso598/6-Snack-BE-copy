@@ -1,19 +1,14 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { Role, Company, PrismaClient, Prisma } from '@prisma/client';
-import authenticateToken from '../middlewares/jwtAuth.middleware'; // 수정된 미들웨어 임포트
+import { Role, Prisma } from '@prisma/client';
+import authenticateToken from '../middlewares/jwtAuth.middleware';
 import prisma from '../lib/prisma';
-import HttpError from '../utils/HttpError'; // HttpError 유틸리티 임포트
+import HttpError from '../utils/HttpError';
 
-// JWT 비밀 키는 환경 변수에서 가져옵니다.
-// accessToken 서명에 사용됩니다.
 const JWT_SECRET: string = process.env.JWT_SECRET || 'your_very_strong_and_secret_jwt_key_please_change_this_in_production';
-// REFRESH_TOKEN_SECRET은 refreshToken 서명에 사용됩니다.
-// accessToken과 다른 별도의 강력한 비밀 키를 사용하는 것이 보안상 권장됩니다.
 const REFRESH_TOKEN_SECRET: string = process.env.REFRESH_TOKEN_SECRET || 'your_very_strong_and_secret_refresh_jwt_key_please_change_this_in_production';
 
-// 개발 환경 경고 메시지
 if (JWT_SECRET === 'your_very_strong_and_secret_jwt_key_please_change_this_in_production') {
   console.warn('[경고]: JWT_SECRET 환경 변수가 설정되지 않았거나 기본값이 사용되고 있습니다. 프로덕션 환경에서는 반드시 변경하세요!');
 }
@@ -23,89 +18,203 @@ if (REFRESH_TOKEN_SECRET === 'your_very_strong_and_secret_refresh_jwt_key_please
 
 const authRouter = Router();
 
-// HttpError 클래스: 표준 Error 객체를 확장하여 HTTP 상태 코드를 포함합니다.
-// 이는 에러 발생 시 클라이언트에게 적절한 HTTP 상태 코드를 반환하기 위해 사용됩니다.
-// class HttpError extends Error {
-//   public status: number;
-//   constructor(message: string, status: number) {
-//     super(message);
-//     this.name = 'HttpError';
-//     this.status = status;
-//     Object.setPrototypeOf(this, HttpError.prototype);
-//   }
-// }
-
 /**
- * 사용자 회원가입 라우트
+ * 최고 관리자(SUPER_ADMIN) 회원가입 라우트
+ * 이 라우트는 새로운 회사를 생성하고 해당 회사의 최고 관리자로 유저를 등록합니다.
  * @route POST /auth/signup
  * @body {string} email - 사용자 이메일
  * @body {string} name - 사용자 이름
  * @body {string} password - 사용자 비밀번호
- * @body {Role} role - 사용자 역할 (예: 'ADMIN', 'USER')
- * @body {number} companyId - 소속 회사 ID
- * @returns {object} - 성공 메시지 및 생성된 사용자 정보 (비밀번호 제외)
- * @throws {HttpError} - 입력 유효성 검사 실패, 이메일 중복, 회사 ID 유효성 검사 실패 시
+ * @body {string} confirmPassword - 비밀번호 확인 (password와 일치해야 함)
+ * @body {string} companyName - 회사 이름 (필수)
+ * @body {string} bizNumber - 사업자 등록 번호 (필수, 고유해야 함)
+ * @returns {object} - 성공 메시지 및 생성된 사용자/회사 정보 (비밀번호 제외)
+ * @throws {HttpError} - 입력 유효성 검사 실패, 이메일/사업자 등록 번호 중복 시
  */
 authRouter.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { email, name, password, role, companyId } = req.body;
+    const { email, name, password, confirmPassword, role, companyName, bizNumber } = req.body;
 
-    // 역할 유효성 검사: Prisma의 Role enum에 포함된 값인지 확인
-    const isValidRole = Object.values(Role).includes(role as Role);
-
-    // 필수 필드 및 역할 유효성 검사
-    if (!email || !name || !password || companyId === undefined || !isValidRole) {
-      throw new HttpError('이메일, 이름, 비밀번호, 회사 ID, 유효한 역할을 모두 입력해야 합니다.', 400);
+    if (!email || !name || !password || !confirmPassword || !companyName || !bizNumber) {
+      throw new HttpError('이메일, 이름, 비밀번호, 비밀번호 확인, 회사 이름, 사업자 등록 번호를 모두 입력해야 합니다.', 400);
+    }
+    if (password !== confirmPassword) {
+      throw new HttpError('비밀번호와 비밀번호 확인이 일치하지 않습니다.', 400);
     }
 
-    // 이메일 중복 확인
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
-
     if (existingUser) {
-      throw new HttpError('이미 존재하는 이메일입니다.', 409); // Conflict
+      throw new HttpError('이미 존재하는 이메일입니다.', 409);
     }
 
-    // 비밀번호 해싱
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 회사 ID 유효성 검사 및 존재 여부 확인
-    const parsedCompanyId = parseInt(companyId, 10);
-    if (isNaN(parsedCompanyId)) {
-      throw new HttpError('유효하지 않은 회사 ID 형식입니다.', 400);
+    if (role && role !== Role.SUPER_ADMIN) {
+      throw new HttpError('이 엔드포인트는 최고 관리자(SUPER_ADMIN) 회원가입 전용입니다. 역할은 SUPER_ADMIN이어야 합니다.', 400);
     }
-    const existingCompany = await prisma.company.findUnique({
-      where: { id: parsedCompanyId },
+
+    const existingCompanyByBizNumber = await prisma.company.findUnique({
+      where: { bizNumber },
+    });
+    if (existingCompanyByBizNumber) {
+      throw new HttpError('이미 등록된 사업자 등록 번호입니다.', 409);
+    }
+
+    const transactionResult = await prisma.$transaction(async (prismaTransaction) => {
+      const createdCompany = await prismaTransaction.company.create({
+        data: {
+          name: companyName,
+          bizNumber: bizNumber,
+        },
+      });
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const createdUser = await prismaTransaction.user.create({
+        data: {
+          email,
+          name,
+          password: hashedPassword,
+          role: Role.SUPER_ADMIN,
+          companyId: createdCompany.id,
+        },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          companyId: true,
+        },
+      });
+      return { company: createdCompany, user: createdUser };
     });
 
-    if (!existingCompany) {
-      throw new HttpError('유효하지 않은 회사 ID입니다.', 400);
-    }
+    const newUser = transactionResult.user;
+    const registeredCompany = transactionResult.company;
 
-    // 새 사용자 생성
-    const newUser = await prisma.user.create({
-      data: {
-        email,
-        name,
-        password: hashedPassword,
-        role: role as Role,
-        companyId: parsedCompanyId,
+    console.log(`[회원가입 성공] 새 SUPER_ADMIN 사용자: ${newUser.email}, 회사: ${registeredCompany.name}`);
+
+    res.status(201).json({
+      message: '최고 관리자 회원가입이 성공적으로 등록되었습니다.',
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        role: newUser.role,
       },
-      select: { // 비밀번호를 제외한 사용자 정보만 반환
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        companyId: true,
+      company: {
+        id: registeredCompany.id,
+        name: registeredCompany.name,
       },
     });
 
-    console.log(`[회원가입 성공] 새 사용자: ${newUser.email} (${newUser.role})`);
-    res.status(201).json({ message: '사용자가 성공적으로 등록되었습니다.', user: newUser });
   } catch (error) {
     console.error('[회원가입 오류]', error);
-    next(error); // 에러 핸들링 미들웨어로 전달
+    next(error);
+  }
+});
+
+/**
+ * 초대 링크를 통한 사용자 회원가입 라우트
+ * 이 라우트는 사전 생성된 초대(Invite)를 통해 사용자가 비밀번호를 설정하고 회원가입을 완료합니다.
+ *
+ * @route POST /auth/signup/:inviteId
+ * @param {string} inviteId - 초대 링크의 고유 ID
+ * @body {string} password - 사용자 비밀번호
+ * @body {string} confirmPassword - 비밀번호 확인 (password와 일치해야 함)
+ * @returns {object} - 성공 메시지 및 생성된 사용자 정보 (비밀번호 제외)
+ * @throws {HttpError} - 입력 유효성 검사 실패, 유효하지 않거나 만료된 초대, 이미 사용된 초대, 이메일 중복 시
+ */
+authRouter.post('/signup/:inviteId', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { inviteId } = req.params;
+    const { password, confirmPassword } = req.body;
+
+    if (!password || !confirmPassword) {
+      throw new HttpError('비밀번호와 비밀번호 확인을 모두 입력해야 합니다.', 400);
+    }
+    if (password !== confirmPassword) {
+      throw new HttpError('비밀번호와 비밀번호 확인이 일치하지 않습니다.', 400);
+    }
+
+    const invite = await prisma.invite.findUnique({
+      where: { id: inviteId },
+    });
+
+    if (!invite) {
+      throw new HttpError('유효하지 않은 초대 링크입니다.', 404);
+    }
+    if (invite.isUsed) {
+      throw new HttpError('이미 사용된 초대 링크입니다.', 409);
+    }
+    if (invite.expiresAt && new Date() > invite.expiresAt) {
+      throw new HttpError('만료된 초대 링크입니다.', 410);
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email: invite.email },
+    });
+    if (existingUser) {
+      await prisma.invite.update({
+        where: { id: inviteId },
+        data: { isUsed: true },
+      });
+      console.log(`[초대 회원가입 오류] 이미 존재하는 사용자: ${invite.email} (초대 링크 사용 완료 처리)`);
+      res.status(200).json({
+        message: '이미 가입된 이메일입니다. 초대 링크가 사용 완료 처리되었습니다.',
+        user: {
+          id: existingUser.id,
+          email: existingUser.email,
+          name: existingUser.name,
+          role: existingUser.role,
+        },
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // 데이터 일관성을 위해 트랜잭션을 사용
+    const transactionResult = await prisma.$transaction(async (prismaTransaction) => {
+      const newUser = await prismaTransaction.user.create({
+        data: {
+          email: invite.email,
+          name: invite.name,
+          password: hashedPassword,
+          role: invite.role,
+          companyId: invite.companyId,
+        },
+        // 응답에 포함할 필드만 선택
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          companyId: true,
+        },
+      });
+
+      // 초대 상태를 사용 완료로 업데이트
+      await prismaTransaction.invite.update({
+        where: { id: inviteId },
+        data: { isUsed: true },
+      });
+
+      return newUser;
+    });
+
+    console.log(`[초대 회원가입 성공] 새 사용자: ${transactionResult.email} (${transactionResult.role})`);
+    res.status(201).json({
+      message: '회원가입이 성공적으로 완료되었습니다.',
+      user: {
+        id: transactionResult.id,
+        email: transactionResult.email,
+        name: transactionResult.name,
+        role: transactionResult.role,
+      },
+    });
+
+  } catch (error) {
+    console.error('[초대 회원가입 오류]', error);
+    next(error);
   }
 });
 
@@ -121,17 +230,14 @@ authRouter.post('/login', async (req: Request, res: Response, next: NextFunction
   try {
     const { email, password } = req.body;
 
-    // Prisma에서 제공하는 유틸리티 타입을 사용하여 쿼리 결과의 타입을 명시합니다. (핵심 변경!)
     type UserWithCompany = Prisma.UserGetPayload<{
       include: { company: true };
     }>;
 
-    // 사용자 존재 여부 확인 및 관련 company 정보 함께 가져오기
-    // 조회된 user 객체가 UserWithCompany 타입임을 명시합니다.
     const user: UserWithCompany | null = await prisma.user.findUnique({
       where: { email },
       include: {
-        company: true, // User 모델에 company 필드(관계)가 정의되어 있다고 가정합니다.
+        company: true,
       },
     });
 
@@ -139,36 +245,31 @@ authRouter.post('/login', async (req: Request, res: Response, next: NextFunction
       throw new HttpError('잘못된 이메일 또는 비밀번호입니다.', 400);
     }
 
-    // 비밀번호 일치 여부 확인
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new HttpError('잘못된 이메일 또는 비밀번호입니다.', 400);
     }
 
-    // 1. Access Token 생성 (단기 토큰)
     const accessToken = jwt.sign(
       { id: user.id, email: user.email, name: user.name, role: user.role },
       JWT_SECRET,
       { expiresIn: '15m' }
     );
 
-    // 2. Refresh Token 생성 (장기 토큰)
     const refreshToken = jwt.sign(
       { id: user.id },
       REFRESH_TOKEN_SECRET,
       { expiresIn: '7d' }
     );
 
-    // 3. Refresh Token 해싱 및 데이터베이스 저장 (보안 강화)
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await prisma.user.update({
       where: { id: user.id },
       data: { hashedRefreshToken },
     });
 
-    // 4. 토큰을 HTTP-only 쿠키로 설정하여 전송
-    const accessTokenExpires = new Date(Date.now() + 15 * 60 * 1000); // 15분 후 만료
-    const refreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7일 후 만료
+    const accessTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
+    const refreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
@@ -186,28 +287,24 @@ authRouter.post('/login', async (req: Request, res: Response, next: NextFunction
       path: '/',
     });
 
-    // 5. 클라이언트에게 사용자 정보 및 company 정보와 함께 성공 메시지 반환
     console.log(`[로그인 성공] 사용자: ${user.email} (${user.role}), 회사: ${user.company.name})`);
     res.status(200).json({
-      message: '로그인 성공',
+      message: '로그인이 성공적으로 처리 되었습니다.',
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
         role: user.role,
-        // user.company는 스키마와 쿼리에 의해 항상 존재하므로, 직접 접근해도 안전합니다.
         company: {
           id: user.company.id,
           name: user.company.name,
-          // 필요하다면 company 스키마에 정의된 다른 필드를 추가합니다.
-          // 예: bizNumber: user.company.bizNumber,
         },
       },
     });
 
   } catch (error) {
     console.error('[로그인 오류]', error);
-    next(error); // 에러 핸들링 미들웨어로 전달
+    next(error);
   }
 });
 
@@ -221,7 +318,6 @@ authRouter.post('/login', async (req: Request, res: Response, next: NextFunction
  */
 authRouter.post('/refresh-token', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // 요청 쿠키에서 refreshToken을 가져옵니다.
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
@@ -230,7 +326,6 @@ authRouter.post('/refresh-token', async (req: Request, res: Response, next: Next
 
     let decoded: { id: number; iat: number; exp: number };
     try {
-      // REFRESH_TOKEN_SECRET을 사용하여 refreshToken의 유효성을 검증합니다.
       decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as { id: number; iat: number; exp: number };
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
@@ -243,53 +338,41 @@ authRouter.post('/refresh-token', async (req: Request, res: Response, next: Next
       }
     }
 
-    // 데이터베이스에서 사용자 정보와 저장된 해시된 리프레시 토큰을 가져옵니다.
     const user = await prisma.user.findUnique({
       where: { id: String(decoded.id) },
     });
 
     if (!user || !user.hashedRefreshToken) {
-      // 사용자가 없거나 저장된 리프레시 토큰이 없는 경우
       throw new HttpError('사용자 또는 유효한 리프레시 토큰을 찾을 수 없습니다. 다시 로그인해주세요.', 401);
     }
 
-    // 저장된 해시된 리프레시 토큰과 현재 요청의 리프레시 토큰이 일치하는지 확인합니다.
-    // 이는 토큰 재사용 공격(Replay Attack)을 방지하는 데 도움이 됩니다.
     const isRefreshTokenValid = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
     if (!isRefreshTokenValid) {
-      // 토큰이 일치하지 않는 경우, 보안상의 이유로 해당 사용자의 모든 리프레시 토큰을 무효화할 수 있습니다.
-      // (여기서는 간단히 에러를 발생시키지만, 실제 프로덕션에서는 더 강력한 처리 필요)
       await prisma.user.update({
         where: { id: user.id },
-        data: { hashedRefreshToken: null }, // 해당 사용자의 모든 리프레시 토큰 무효화
+        data: { hashedRefreshToken: null },
       });
       throw new HttpError('유효하지 않거나 이미 사용된 리프레시 토큰입니다. 다시 로그인해주세요.', 403);
     }
 
-    // 새로운 Access Token 생성
     const newAccessToken = jwt.sign(
       { id: user.id, email: user.email, name: user.name, role: user.role },
       JWT_SECRET,
-      { expiresIn: '15m' } // 새로운 Access Token 만료 시간
+      { expiresIn: '15m' }
     );
 
-    // 새로운 Refresh Token 생성 (Refresh Token Rotation)
-    // - 매번 새로운 Refresh Token을 발급하여 이전 Refresh Token을 무효화합니다.
-    // - 이는 Refresh Token이 탈취되었을 때의 피해를 줄이는 데 도움이 됩니다.
     const newRefreshToken = jwt.sign(
       { id: user.id },
       REFRESH_TOKEN_SECRET,
-      { expiresIn: '7d' } // 새로운 Refresh Token 만료 시간
+      { expiresIn: '7d' }
     );
 
-    // 새로운 Refresh Token 해싱 및 데이터베이스 업데이트
     const newHashedRefreshToken = await bcrypt.hash(newRefreshToken, 10);
     await prisma.user.update({
       where: { id: user.id },
       data: { hashedRefreshToken: newHashedRefreshToken },
     });
 
-    // 새로운 Access Token과 Refresh Token을 HTTP-only 쿠키로 설정하여 전송
     const newAccessTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
     const newRefreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
@@ -325,18 +408,15 @@ authRouter.post('/refresh-token', async (req: Request, res: Response, next: Next
  */
 authRouter.post('/logout', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // authenticateToken 미들웨어를 통해 req.user에 사용자 정보가 설정되어 있는지 확인
     if (!req.user) {
       throw new HttpError('인증되지 않은 사용자입니다.', 401);
     }
 
-    // 데이터베이스에서 해당 사용자의 리프레시 토큰을 무효화 (null로 설정)
     await prisma.user.update({
       where: { id: String(req.user.id) },
       data: { hashedRefreshToken: null },
     });
 
-    // 클라이언트의 쿠키에서 accessToken과 refreshToken을 제거
     res.clearCookie('accessToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -366,25 +446,19 @@ authRouter.post('/logout', authenticateToken, async (req: Request, res: Response
  * @throws {HttpError} - 사용자 정보를 찾을 수 없거나 인증되지 않은 경우
  */
 authRouter.get('/me', authenticateToken, (req: Request, res: Response, next: NextFunction) => {
-  // authenticateToken 미들웨어를 통해 req.user에 사용자 정보가 설정됩니다.
-  // 이 시점에서는 req.user에 company 정보도 포함되어 있습니다.
   if (!req.user) {
-    // req.user가 없을 경우 (미들웨어에서 에러가 처리되지 않았거나 비정상적인 접근 시)
     return next(new HttpError('사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.', 401));
   }
 
-  // 이제 user 객체와 company 객체를 모두 포함하여 응답합니다.
   res.status(200).json({
-    user: { // "user" 키로 한 번 더 감싸서 응답 형식을 맞춥니다.
+    user: {
       id: req.user.id,
       email: req.user.email,
       name: req.user.name,
       role: req.user.role,
-      company: { // <-- **여기가 바로 회사 정보를 추가하는 부분입니다!**
+      company: {
         id: req.user.company.id,
         name: req.user.company.name,
-        // 필요하다면 company 스키마에 정의된 다른 필드를 여기에 추가할 수 있습니다.
-        // 예: bizNumber: req.user.company.bizNumber,
       },
     },
   });
