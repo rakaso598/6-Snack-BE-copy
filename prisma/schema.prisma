@@ -111,6 +111,7 @@ model Receipt {
 model Order {
   id             Int         @id @default(autoincrement())
   userId         String
+  approver       String?
   adminMessage   String?
   requestMessage String?
   totalPrice     Int
