@@ -1,4 +1,3 @@
-// src/services/auth.service.ts
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Role } from '@prisma/client';
@@ -15,10 +14,6 @@ if (REFRESH_TOKEN_SECRET === 'your_very_strong_and_secret_refresh_jwt_key_please
   console.warn('[경고]: REFRESH_TOKEN_SECRET 환경 변수가 설정되지 않았거나 기본값이 사용되고 있습니다. 프로덕션 환경에서는 반드시 변경하세요!');
 }
 
-/**
- * Auth 관련 비즈니스 로직을 처리하는 서비스 클래스입니다.
- * 이 클래스는 레포지토리를 사용하여 데이터베이스와 상호작용합니다.
- */
 export class AuthService {
   /**
    * 최고 관리자(SUPER_ADMIN) 회원가입 로직을 처리합니다.
@@ -78,7 +73,6 @@ export class AuthService {
 
     const existingUser = await AuthRepository.findUserByEmailWithCompany(invite.email);
     if (existingUser) {
-      // 이미 존재하는 이메일이라면 초대 링크만 사용 완료 처리하고 사용자 정보를 반환
       await AuthRepository.runInTransaction(async (prismaTransaction) => {
         await AuthRepository.updateInviteToUsed(inviteId, prismaTransaction);
       });
@@ -169,7 +163,6 @@ export class AuthService {
 
     const isRefreshTokenValid = await bcrypt.compare(currentRefreshToken, user.hashedRefreshToken);
     if (!isRefreshTokenValid) {
-      // 보안: 유효하지 않은 리프레시 토큰 사용 시 해당 사용자의 모든 리프레시 토큰 무효화
       await AuthRepository.updateUserRefreshToken(user.id, null);
       throw new HttpError('유효하지 않거나 이미 사용된 리프레시 토큰입니다. 다시 로그인해주세요.', 403);
     }

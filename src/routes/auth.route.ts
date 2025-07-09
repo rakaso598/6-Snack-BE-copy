@@ -1,13 +1,12 @@
-// src/routes/auth.route.ts
 import { Router, Request, Response, NextFunction } from 'express';
 import { Role, Prisma } from '@prisma/client';
-import authenticateToken from '../middlewares/jwtAuth.middleware'; // 기존 미들웨어 유지
-import { AuthService } from '../services/auth.service'; // 새로 생성된 서비스 임포트
+import authenticateToken from '../middlewares/jwtAuth.middleware';
+import { AuthService } from '../services/auth.service';
 import HttpError from '../utils/HttpError';
+import authorizeRoles from '../middlewares/authorizeRoles.middleware';
 
 const authRouter = Router();
 
-// Express Request 인터페이스에 user 속성 추가 (기존과 동일하게 유지)
 declare global {
   namespace Express {
     interface Request {
@@ -35,7 +34,6 @@ authRouter.post('/signup', async (req: Request, res: Response, next: NextFunctio
   try {
     const { email, name, password, confirmPassword, role, companyName, bizNumber } = req.body;
 
-    // 1. 입력 유효성 검사 (컨트롤러의 역할)
     if (!email || !name || !password || !confirmPassword || !companyName || !bizNumber) {
       throw new HttpError('이메일, 이름, 비밀번호, 비밀번호 확인, 회사 이름, 사업자 등록 번호를 모두 입력해야 합니다.', 400);
     }
@@ -46,7 +44,6 @@ authRouter.post('/signup', async (req: Request, res: Response, next: NextFunctio
       throw new HttpError('이 엔드포인트는 최고 관리자(SUPER_ADMIN) 회원가입 전용입니다. 역할은 SUPER_ADMIN이어야 합니다.', 400);
     }
 
-    // 2. 비즈니스 로직을 서비스 계층에 위임
     const transactionResult = await AuthService.signUpSuperAdmin({ email, name, password, companyName, bizNumber });
 
     const newUser = transactionResult.user;
@@ -54,7 +51,6 @@ authRouter.post('/signup', async (req: Request, res: Response, next: NextFunctio
 
     console.log(`[회원가입 성공] 새 SUPER_ADMIN 사용자: ${newUser.email}, 회사: ${registeredCompany.name}`);
 
-    // 3. 응답 전송
     res.status(201).json({
       message: '최고 관리자 회원가입이 성공적으로 등록되었습니다.',
       user: {
@@ -70,7 +66,7 @@ authRouter.post('/signup', async (req: Request, res: Response, next: NextFunctio
 
   } catch (error) {
     console.error('[회원가입 오류]', error);
-    next(error); // 에러 핸들링 미들웨어로 전달
+    next(error);
   }
 });
 
@@ -90,7 +86,6 @@ authRouter.post('/signup/:inviteId', async (req: Request, res: Response, next: N
     const { inviteId } = req.params;
     const { password, confirmPassword } = req.body;
 
-    // 1. 입력 유효성 검사
     if (!password || !confirmPassword) {
       throw new HttpError('비밀번호와 비밀번호 확인을 모두 입력해야 합니다.', 400);
     }
@@ -98,11 +93,10 @@ authRouter.post('/signup/:inviteId', async (req: Request, res: Response, next: N
       throw new HttpError('비밀번호와 비밀번호 확인이 일치하지 않습니다.', 400);
     }
 
-    // 2. 비즈니스 로직을 서비스 계층에 위임
     const newUser = await AuthService.signUpViaInvite(inviteId, password);
 
     console.log(`[초대 회원가입 성공] 새 사용자: ${newUser.email} (${newUser.role})`);
-    // 3. 응답 전송
+
     res.status(201).json({
       message: '회원가입이 성공적으로 완료되었습니다.',
       user: {
@@ -114,7 +108,6 @@ authRouter.post('/signup/:inviteId', async (req: Request, res: Response, next: N
     });
 
   } catch (error) {
-    // AuthService에서 이미 HttpError를 throw하므로, 여기서는 단순히 next로 전달
     console.error('[초대 회원가입 오류]', error);
     next(error);
   }
@@ -132,18 +125,15 @@ authRouter.post('/login', async (req: Request, res: Response, next: NextFunction
   try {
     const { email, password } = req.body;
 
-    // 1. 입력 유효성 검사
     if (!email || !password) {
       throw new HttpError('이메일과 비밀번호를 모두 입력해야 합니다.', 400);
     }
 
-    // 2. 비즈니스 로직을 서비스 계층에 위임
     const { user, accessToken, refreshToken } = await AuthService.login(email, password);
 
     const accessTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
     const refreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    // 3. 토큰을 쿠키로 설정 (컨트롤러/라우트의 역할)
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -161,7 +151,6 @@ authRouter.post('/login', async (req: Request, res: Response, next: NextFunction
     });
 
     console.log(`[로그인 성공] 사용자: ${user.email} (${user.role}), 회사: ${user.company.name})`);
-    // 4. 응답 전송
     res.status(200).json({
       message: '로그인이 성공적으로 처리 되었습니다.',
       user: {
@@ -194,18 +183,15 @@ authRouter.post('/refresh-token', async (req: Request, res: Response, next: Next
   try {
     const refreshToken = req.cookies.refreshToken;
 
-    // 1. 입력 유효성 검사
     if (!refreshToken) {
       throw new HttpError('리프레시 토큰이 제공되지 않았습니다. 다시 로그인해주세요.', 401);
     }
 
-    // 2. 비즈니스 로직을 서비스 계층에 위임
     const { newAccessToken, newRefreshToken, user } = await AuthService.refreshAccessToken(refreshToken);
 
     const newAccessTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
     const newRefreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    // 3. 새로운 토큰을 쿠키로 설정
     res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -223,7 +209,6 @@ authRouter.post('/refresh-token', async (req: Request, res: Response, next: Next
     });
 
     console.log(`[토큰 갱신 성공] 사용자: ${user.email}`);
-    // 4. 응답 전송
     res.status(200).json({ message: '새로운 Access Token이 발급되었습니다.' });
   } catch (error) {
     console.error('[토큰 갱신 오류]', error);
@@ -237,17 +222,14 @@ authRouter.post('/refresh-token', async (req: Request, res: Response, next: Next
  * @returns {object} - 성공 메시지
  * @throws {HttpError} - 인증되지 않은 사용자이거나 로그아웃 처리 중 오류 발생 시
  */
-authRouter.post('/logout', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
+authRouter.post('/logout', authenticateToken, authorizeRoles('SUPER_ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // authenticateToken 미들웨어를 통해 req.user가 설정됨
     if (!req.user) {
       throw new HttpError('인증되지 않은 사용자입니다.', 401);
     }
 
-    // 1. 비즈니스 로직을 서비스 계층에 위임
     await AuthService.logout(req.user.id);
 
-    // 2. 쿠키 삭제 (컨트롤러/라우트의 역할)
     res.clearCookie('accessToken', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -262,7 +244,6 @@ authRouter.post('/logout', authenticateToken, async (req: Request, res: Response
     });
 
     console.log(`[로그아웃 성공] 사용자: ${req.user.email}`);
-    // 3. 응답 전송
     res.status(200).json({ message: '성공적으로 로그아웃되었습니다.' });
   } catch (error) {
     console.error('[로그아웃 오류]', error);

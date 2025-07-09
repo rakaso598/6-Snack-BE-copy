@@ -1,12 +1,7 @@
-// src/repositories/auth.repository.ts
 import { PrismaClient, Prisma, Role } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-/**
- * Auth 관련 데이터베이스 작업을 위한 레포지토리 클래스입니다.
- * 이 클래스는 Prisma 클라이언트를 직접 사용하여 데이터베이스 쿼리를 수행합니다.
- */
 export class AuthRepository {
   /**
    * 주어진 이메일로 사용자를 조회하고, 회사 정보를 포함합니다.
