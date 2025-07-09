@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Role, Company, PrismaClient, Prisma } from '@prisma/client';
-import authenticateToken from '../middlewares/auth.middleware'; // 수정된 미들웨어 임포트
+import authenticateToken from '../middlewares/jwtAuth.middleware'; // 수정된 미들웨어 임포트
 import prisma from '../lib/prisma';
 import HttpError from '../utils/HttpError'; // HttpError 유틸리티 임포트
 
