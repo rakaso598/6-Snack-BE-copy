@@ -2,6 +2,7 @@ export const orderMockData = [
   {
     id: 1,
     userId: "user-1",
+    approver: "최고관리자",
     adminMessage: "스낵 주문이 승인되었습니다. 오후 2시에 배송됩니다.",
     requestMessage: "오늘 오후중으로만 승인 부탁드려요",
     totalPrice: 4500,
@@ -22,6 +23,7 @@ export const orderMockData = [
   {
     id: 3,
     userId: "user-3",
+    approver: "관리자",
     adminMessage: "일부 스낵 재고 부족으로 대체 상품으로 변경되었습니다.",
     requestMessage: "팀 회식용 스낵 주문합니다.",
     totalPrice: 3300,
