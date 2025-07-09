@@ -16,8 +16,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", indexRouter);
 app.use(errorHandler);
 
-// Error handling middleware (마지막에 추가)
-app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
