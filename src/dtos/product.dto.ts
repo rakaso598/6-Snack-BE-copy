@@ -29,3 +29,10 @@ export type TGetMyProductsQueryDto = {
 export type TProductIdParamsDto = {
   id: string; 
 };
+
+export type TUpdateProductDto = {
+  name: string;
+  price: string;
+  linkUrl: string;
+  categoryId: string;
+};

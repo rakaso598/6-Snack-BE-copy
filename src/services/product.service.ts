@@ -70,10 +70,31 @@ const countProducts = async (creatorId: string) => {
   return productRepository.countCreator(creatorId);
 };
 
+
+const updateProduct = async (
+  productId: number,
+  creatorId: string,
+  input: Partial<CreateProductParams>
+) => {
+  const existing = await productRepository.findProductById(productId);
+
+  if (!existing || existing.creatorId !== creatorId) {
+    throw new NotFoundError("수정할 수 있는 상품이 없거나 권한이 없습니다.");
+  }
+
+  return await productRepository.update(productId, input);
+};
+
+export const deleteProduct = async (id: number) => {
+  return await productRepository.softDeleteById(id);
+};
+
 export default {
   createProduct,
   getProductById,
   getProductList,
   getProductsCreator,
-  countProducts
+  countProducts,
+  updateProduct,
+  deleteProduct
 };

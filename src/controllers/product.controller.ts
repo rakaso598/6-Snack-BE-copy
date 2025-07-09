@@ -1,6 +1,13 @@
 import { RequestHandler } from "express";
 import productService from "../services/product.service";
-import { AppError, AuthenticationError, NotFoundError, ServerError } from "../types/error";
+import {
+  AppError,
+  AuthenticationError,
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+  ServerError,
+} from "../types/error";
 import { uploadImageToS3 } from "../utils/s3";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 import {
@@ -9,7 +16,9 @@ import {
   TGetMyProductsQueryDto,
   TGetProductsQueryDto,
   TProductIdParamsDto,
+  TUpdateProductDto,
 } from "../dtos/product.dto";
+import { Role } from "@prisma/client";
 
 //상품등록
 const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res) => {
@@ -37,7 +46,6 @@ const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res
       imageUrl,
       creatorId,
     };
-    console.log("최종 input 객체:", input);
     const product = await productService.createProduct(input);
     if (product) {
       res.status(201).location(`/products/${product.id}`).json(product);
@@ -48,7 +56,6 @@ const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res
     if (error instanceof AppError) {
       res.status(error.code || 500).json({ message: error.message, data: error.data });
     } else if (error instanceof Error) {
-      
       console.error("createProduct error:", error.message, error.stack);
       res.status(500).json({ message: error.message });
     } else {
@@ -127,25 +134,103 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
   }
 };
 
+//상품 상세 페이지
 export const getProductDetail: RequestHandler<TProductIdParamsDto> = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) {
-      res.status(400).json({ message: "상품 ID는 숫자여야 합니다." });
-      return;  
+      throw new BadRequestError("상품 ID는 숫자여야 합니다.");
     }
 
     const product = await productService.getProductById(id);
-    res.json(product); 
+    res.json(product);
   } catch (error) {
     next(error);
   }
 };
 
+//상품 수정
+export const updateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdateProductDto> = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      res.status(400).json({ message: "상품 ID는 숫자여야 합니다." });
+      return;
+    }
+
+    const { name, price, linkUrl, categoryId } = req.body;
+    const creatorId = req.user?.id;
+
+    if (!creatorId) {
+      throw new AuthenticationError("로그인이 필요합니다.");
+    }
+
+    const product = await productService.getProductById(id);
+    if (!product) {
+      throw new NotFoundError("상품을 찾을 수 없습니다.");
+    }
+
+    const priceNum = parseNumberOrThrow(price, "price");
+    const categoryIdNum = parseNumberOrThrow(categoryId, "categoryId");
+
+    let imageUrl: string | undefined;
+    if (req.file) {
+      imageUrl = await uploadImageToS3(req.file);
+    }
+
+    const input = {
+      name,
+      price: priceNum,
+      linkUrl,
+      categoryId: categoryIdNum,
+      ...(imageUrl && { imageUrl }),
+    };
+
+    const updated = await productService.updateProduct(id, creatorId, input);
+    if (updated) {
+      res.status(200).json(updated);
+    } else {
+      throw new ServerError("상품 수정에 실패했습니다.");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+//상품 삭제
+export const deleteProduct: RequestHandler<{ id: string }> = async (req, res, next) => {
+  try {
+    const productId = Number(req.params.id);
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+
+    if (isNaN(productId)) {
+      throw new BadRequestError("상품 ID는 숫자여야 합니다.");
+    }
+
+    const product = await productService.getProductById(productId);
+    if (!product) {
+      throw new NotFoundError("상품을 찾을 수 없습니다.");
+    }
+
+    const isAdmin = userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN
+    const isOwner = product.creatorId === userId;
+    if (!isOwner && !isAdmin) {
+      throw new ForbiddenError("본인이 등록한 상품만 삭제할 수 있습니다.");
+    }
+
+    await productService.deleteProduct(productId);
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
 
 export default {
   createProduct,
   getProducts,
   getMyProducts,
-  getProductDetail
+  getProductDetail,
+  updateProduct,
+  deleteProduct,
 };
