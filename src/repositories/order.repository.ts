@@ -1,19 +1,40 @@
-import { Order } from "@prisma/client";
+import { Order, Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 
-const getApprovedOrders = async () => {
+const getApprovedOrders = async (
+  offset: number,
+  limit: number,
+  orderBy: "latest" | "priceLow" | "priceHigh" = "latest",
+) => {
+  const sortOptions: Record<"latest" | "priceLow" | "priceHigh", Prisma.OrderOrderByWithRelationInput> = {
+    latest: { createdAt: "desc" },
+    priceLow: { totalPrice: "asc" },
+    priceHigh: { totalPrice: "desc" },
+  };
+
   return await prisma.order.findMany({
     where: { status: "APPROVED" },
+    skip: offset,
+    take: limit,
+    orderBy: sortOptions[orderBy] || sortOptions["latest"],
+    include: {
+      user: true,
+      orderedItems: { include: { receipt: true } },
+    },
   });
 };
 
-const getById = async (id: Order["id"]) => {
-  return await prisma.order.findUnique({
-    where: { id },
+const getApprovedById = async (id: Order["id"]) => {
+  return await prisma.order.findFirst({
+    where: { id, status: "APPROVED" },
+    include: {
+      user: true,
+      orderedItems: { include: { receipt: true } },
+    },
   });
 };
 
 export default {
   getApprovedOrders,
-  getById,
+  getApprovedById,
 };
