@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String
-  password  String
-  companyId Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  name               String
+  password           String
+  companyId          Int
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  hashedRefreshToken String?
 
   role      Role
   cartItems CartItem[]
@@ -93,6 +94,8 @@ model CartItem {
 
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
 }
 
 model Receipt {
