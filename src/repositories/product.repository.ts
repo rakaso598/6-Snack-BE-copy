@@ -99,7 +99,7 @@ export const findProductById = async (id: number) => {
     include: {
       category: true,
       creator: true,
-      // 필요하면 likes, cart 등 관계도 같이 포함 가능
+      
     },
   });
 };
