@@ -3,9 +3,10 @@ import productService from "../services/product.service";
 import { AppError, AuthenticationError, ServerError } from "../types/error";
 import { uploadImageToS3 } from "../utils/s3";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
+import { TCreateProductDto, TGetMyProductsDto, TGetMyProductsQueryDto, TGetProductsQueryDto } from "../dtos/product.dto";
 
 //상품등록
-const createProduct: RequestHandler = async (req, res) => {
+const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res) => {
   try {
     const { name, price, linkUrl, categoryId } = req.body;
     const creatorId = req.user?.id;
@@ -32,7 +33,11 @@ const createProduct: RequestHandler = async (req, res) => {
     };
 
     const product = await productService.createProduct(input);
-    res.status(201).location(`/products/${product!.id}`).json(product);
+    if (product) {
+      res.status(201).location(`/products/${product.id}`).json(product);
+    } else {
+      throw new ServerError("상품 생성에 실패했습니다.");
+    }
   } catch (error) {
     if (error instanceof AppError) {
       res.status(error.code || 500).json({ message: error.message, data: error.data });
@@ -44,18 +49,19 @@ const createProduct: RequestHandler = async (req, res) => {
 };
 
 //상품 조회
-const getProducts: RequestHandler = async (req, res, next) => {
+const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req, res, next) => {
   try {
     const { sort = "latest", category, cursor, limit } = req.query;
 
-    const take = limit ? Math.min(parseNumberOrThrow(limit as string, "limit"), 50) : 9;
-
-    const cursorId = cursor ? parseNumberOrThrow(cursor as string, "cursor") : undefined;
-    const categoryId = category ? parseNumberOrThrow(category as string, "category") : undefined;
+    const take = limit ? Math.min(parseNumberOrThrow(limit!, "limit"), 50) : 9;
+    const cursorId = cursor ? parseNumberOrThrow(cursor!, "cursor") : undefined;
+    const categoryId = category ? parseNumberOrThrow(category!, "category") : undefined;
 
     const rawSort = String(sort);
     const validSorts = ["latest", "popular", "low", "high"] as const;
-    const sortOption = validSorts.includes(rawSort as any) ? (rawSort as (typeof validSorts)[number]) : "latest";
+    const sortOption = validSorts.includes(rawSort as any)
+      ? (rawSort as (typeof validSorts)[number])
+      : "latest";
 
     const cursorObj = cursorId ? { id: cursorId } : undefined;
 
@@ -73,7 +79,7 @@ const getProducts: RequestHandler = async (req, res, next) => {
 };
 
 //유저가 등록한상품 목록
-const getMyProducts: RequestHandler = async (req, res) => {
+const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async (req, res) => {
   try {
     const creatorId = req.user?.id;
 
@@ -82,23 +88,31 @@ const getMyProducts: RequestHandler = async (req, res) => {
       return;
     }
 
-    const page = req.query.page ? parseNumberOrThrow(req.query.page as string, "page") : 1;
-    const limit = req.query.limit ? parseNumberOrThrow(req.query.limit as string, "limit") : 10;
-
+    const page = req.query.page ? parseNumberOrThrow(req.query.page, "page") : 1;
+    const limit = req.query.limit ? parseNumberOrThrow(req.query.limit, "limit") : 10;
     const skip = (page - 1) * limit;
 
- const [items, totalCount] = await Promise.all([
-      productService.getProductsCreator({ creatorId, skip, take: limit }),
-      productService.countProducts(creatorId),
+    const params: TGetMyProductsDto = {
+      creatorId,
+      page,
+      limit,
+      skip,
+    };
+
+    const [items, totalCount] = await Promise.all([
+      productService.getProductsCreator({ creatorId: params.creatorId, skip: params.skip, take: params.limit }),
+      productService.countProducts(params.creatorId),
     ]);
 
-    res.json({ items, 
+    res.json({
+      items,
       meta: {
         totalCount,
-        currentPage: page,
-        itemsPerPage: limit,
-        totalPages: Math.ceil(totalCount / limit),
-      }, });
+        currentPage: params.page,
+        itemsPerPage: params.limit,
+        totalPages: Math.ceil(totalCount / params.limit),
+      },
+    });
   } catch (error) {
     console.error("getMyProducts error:", error);
     res.status(500).json({ message: "서버 에러 발생" });

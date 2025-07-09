@@ -1,16 +1,27 @@
 export type TCreateProductDto = {
-  categoryId: number;
+  categoryId: string;
   creatorId: string;
   name: string;
-  price: number;
+  price: string;
   imageUrl: string;
   linkUrl: string;
 };
 
-export type TCreateProductInput = {
-  name: string;
-  price: string; 
-  categoryId: string;
-  imageUrl?: string;
-  linkUrl: string;
+export type TGetProductsQueryDto = {
+  sort: string;
+  category: string;
+  cursor: string;
+  limit: string;
+};
+
+export type TGetMyProductsDto = {
+  creatorId: string;
+  page: number;
+  limit: number;
+  skip: number;
+};
+
+export type TGetMyProductsQueryDto = {
+  page: string;
+  limit: string;
 };
