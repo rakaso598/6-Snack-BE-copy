@@ -1,0 +1,15 @@
+import { RequestHandler } from "express";
+import { TUpdateMonthlyBudgetBody } from "../types/budget.type";
+import { ValidationError } from "../types/error";
+
+const validatedBudgetBody: RequestHandler<{}, {}, TUpdateMonthlyBudgetBody> = (req, res, next) => {
+  const { currentMonthBudget, monthlyBudget } = req.body;
+
+  if (typeof currentMonthBudget === "string" || typeof monthlyBudget === "string") {
+    throw new ValidationError("이번 달 예산 또는 매달 예산에는 숫자만 입력해주세요.");
+  }
+
+  next();
+};
+
+export default validatedBudgetBody;
