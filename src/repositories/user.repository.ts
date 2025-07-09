@@ -1,4 +1,5 @@
 import prisma from "../config/prisma";
+import { UserRole } from "../dtos/user.dto";
 
 const findActiveUserById = async (id: string) => {
   return await prisma.user.findUnique({
@@ -24,4 +25,21 @@ const deleteUser = async (id: string) => {
   });
 };
 
-export default { findActiveUserById, deleteUser };
+// 유저 권한 업데이트
+const updateUserRole = async (id: string, role: UserRole) => {
+  return await prisma.user.update({
+    where: { id },
+    data: { role },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      companyId: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+};
+
+export default { findActiveUserById, deleteUser, updateUserRole };

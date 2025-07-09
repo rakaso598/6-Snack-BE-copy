@@ -6,5 +6,11 @@ import userController from "../controllers/user.controller";
 const superAdminRouter = Router();
 
 superAdminRouter.delete("/users/:userId", authenticateToken, authorizeRoles("SUPER_ADMIN"), userController.deleteUser);
+superAdminRouter.patch(
+  "/users/:userId/role",
+  authenticateToken,
+  authorizeRoles("SUPER_ADMIN"),
+  userController.updateRole,
+);
 
 export default superAdminRouter;
