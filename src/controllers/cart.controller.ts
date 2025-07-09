@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import cartService from "../services/cart.service";
 import { TAddToCartDto, TDeleteCartItemsDto, TToggleCheckDto, TToggleParamsDto } from "../dtos/cart.dto";
+import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 
 const getMyCart: RequestHandler = async (req, res, next) => {
   try {
@@ -31,7 +32,7 @@ const deleteSelectedItems: RequestHandler<{}, {}, TDeleteCartItemsDto> = async (
 
 const deleteCartItem: RequestHandler = async (req, res, next) => {
   try {
-    const itemId = parseInt(req.params.item, 10);
+    const itemId = parseNumberOrThrow(req.params.item, "itemId");
     await cartService.deleteCartItem(req.user!.id, itemId);
     res.status(204).send();
   } catch (err) {
@@ -41,7 +42,7 @@ const deleteCartItem: RequestHandler = async (req, res, next) => {
 
 const toggleCheckItem: RequestHandler<TToggleParamsDto, {}, TToggleCheckDto> = async (req, res, next) => {
   try {
-    const itemId = parseInt(req.params.item, 10);
+    const itemId = parseNumberOrThrow(req.params.item, "itemId");
     await cartService.toggleCheckCartItem(req.user!.id, itemId, req.body);
     res.status(204).send();
   } catch (err) {
