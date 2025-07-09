@@ -1,62 +1,40 @@
 import { RequestHandler } from "express";
-import { CreateProductDto } from "../dtos/product.dto";
+import { CreateProductInput } from "../dtos/product.dto";
 import productService from "../services/product.service";
-import { BadRequestError, ServerError } from "../types/error";
+import { AppError, BadRequestError, ServerError } from "../types/error";
+import { uploadImageToS3 } from "../utils/s3";
 
-//미완성: 상품 등록
-// const createProduct: RequestHandler = async (req, res) => {
-//   const { name, price, linkUrl, categoryId, imageUrl } = req.body;
+//상품등록
+const createProduct: RequestHandler = async (req, res) => {
+  try {
+    const { name, price, linkUrl, categoryId } = req.body;
+    const creatorId = req.user?.id;
+    
+    let imageUrl = "";
+    if (req.file) {
+      imageUrl = await uploadImageToS3(req.file);
+    }
 
-//   const token = req.cookies?.accessToken || req.headers["authorization"];
-//   const creatorId = token ? "test-user-uuid" : null;
+    const input: CreateProductInput & { creatorId?: string } = {
+      name,
+      price,
+      linkUrl,
+      categoryId,
+      imageUrl,
+      creatorId,
+    };
 
-//   if (!creatorId) {
-//     res.status(401).json({ message: "로그인 정보가 필요합니다." });
-//     return;
-//   }
-
-//   if (!name || !categoryId) {
-//     res.status(400).json({ message: "name과 categoryId는 필수입니다." });
-//     return;
-//   }
-
-//   const priceNum = Number(price);
-//   if (isNaN(priceNum)) {
-//     res.status(400).json({ message: "price가 유효한 숫자가 아닙니다." });
-//     return;
-//   }
-
-//   const categoryIdNum = Number(categoryId);
-//   if (isNaN(categoryIdNum)) {
-//     res.status(400).json({ message: "categoryId가 유효한 숫자가 아닙니다." });
-//     return;
-//   }
-
-//   const dto: CreateProductDto = {
-//     name,
-//     price: priceNum,
-//     linkUrl,
-//     imageUrl: imageUrl ?? "",
-//     categoryId: categoryIdNum,
-//     creatorId,
-//   };
-
-//   try {
-//     const product = await productService.createProduct(dto);
-
-//     if (!product) {
-//       res.status(500).json({ message: "상품 생성 실패" });
-//       return;
-//     }
-
-//     res.status(201).location(`/products/${product.id}`).json(product);
-//     return;
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "서버 에러 발생" });
-//     return;
-//   }
-// };
+    const product = await productService.createProduct(input);
+    res.status(201).location(`/products/${product!.id}`).json(product);
+  } catch (error) {
+    if (error instanceof AppError) {
+      res.status(error.code || 500).json({ message: error.message, data: error.data });
+    } else {
+      console.error(error);
+      res.status(500).json({ message: "서버 에러 발생" });
+    }
+  }
+};
 
 //상품 조회
 const getProducts: RequestHandler = async (req, res, next) => {
@@ -104,35 +82,35 @@ const getProducts: RequestHandler = async (req, res, next) => {
 
 
 
-// //미완성: 유저가 등록한상품 목록
-// const getMyProducts: RequestHandler = async (req, res) => {
-//   try {
-//     const creatorId = "test-user-uuid";
+//미완성: 유저가 등록한상품 목록 아직 안보셔도 됩니다.
+const getMyProducts: RequestHandler = async (req, res) => {
+  try {
+    const creatorId = "test-user-uuid";
 
-//     if (!creatorId) {
-//       res.status(401).json({ message: "로그인 정보가 필요합니다." });
-//       return;
-//     }
+    if (!creatorId) {
+      res.status(401).json({ message: "로그인 정보가 필요합니다." });
+      return;
+    }
 
-//     const page = Number(req.query.page) || 1;
-//     const limit = Number(req.query.limit) || 10;
-//     const skip = (page - 1) * limit;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-//     const items = await productService.getProductsByCreator({
-//       creatorId,
-//       skip,
-//       take: limit,
-//     });
+    const items = await productService.getProductsByCreator({
+      creatorId,
+      skip,
+      take: limit,
+    });
 
-//     res.json({ items });
-//   } catch (error) {
-//     console.error("getMyProducts error:", error);
-//     res.status(500).json({ message: "서버 에러 발생" });
-//   }
-// };
+    res.json({ items });
+  } catch (error) {
+    console.error("getMyProducts error:", error);
+    res.status(500).json({ message: "서버 에러 발생" });
+  }
+};
 
 export default {
-  // createProduct,
+  createProduct,
   getProducts,
-  // getMyProducts,
+  getMyProducts,
 };

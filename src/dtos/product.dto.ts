@@ -6,3 +6,11 @@ export type CreateProductDto = {
   imageUrl: string;
   linkUrl: string;
 };
+
+export type CreateProductInput = {
+  name: string;
+  price: string; 
+  categoryId: string;
+  imageUrl?: string;
+  linkUrl: string;
+};

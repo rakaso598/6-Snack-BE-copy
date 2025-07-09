@@ -1,14 +1,14 @@
 POST http://localhost:8080/products
-Content-Type: application/json
-Cookie: accessToken=your_token_here  
+Content-Type: multipart/form-data
+Cookie: accessToken=your_token_here
 
-{
-  "name": "포도",
-  "categoryId": 28,
-  "price": 5000,
-  "imageUrl": "https://example.com/images.jpg",
-  "linkUrl": "https://external-shop.com/"
-}
+FormData:
+- name: 포도
+- categoryId: 28
+- price: 5000
+- linkUrl: https://external-shop.com/
+- image: [파일 선택: grape.jpg] 
+
 
 ### 유저가 등록한 상품 목록
 GET http://localhost:8080/my/products
