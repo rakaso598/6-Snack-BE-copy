@@ -5,8 +5,8 @@ POST http://localhost:8080/auth/signup
 Content-Type: application/json
 
 {
-    "email": "testuser@example.com",
-    "name": "Test User",
+    "email": "testuser1@example.com",
+    "name": "Test User1",
     "password": "password123",
     "role": "USER",
     "companyId": 1
@@ -17,7 +17,7 @@ POST http://localhost:8080/auth/login
 Content-Type: application/json
 
 {
-    "email": "testuser@example.com",
+    "email": "testuser1@example.com",
     "password": "password123"
 }
 
