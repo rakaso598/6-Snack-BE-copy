@@ -2,7 +2,7 @@ export const monthlyBudgetMockData = [
   {
     id: 1,
     companyId: 1,
-    totalExpense: 4500,
+    currentMonthExpense: 4500,
     currentMonthBudget: 2000000,
     monthlyBudget: 2000000,
     year: "2025",
@@ -14,7 +14,7 @@ export const monthlyBudgetMockData = [
   {
     id: 2,
     companyId: 1,
-    totalExpense: 5700,
+    currentMonthExpense: 5700,
     currentMonthBudget: 3500000,
     monthlyBudget: 2000000,
     year: "2025",

@@ -41,17 +41,17 @@ model Company {
 
 // 월별 지출&예산
 model MonthlyBudget {
-  id                 Int       @id @default(autoincrement())
-  companyId          Int
-  totalExpense       Int       @default(0) // 총 지출액
-  currentMonthBudget Int       @default(0) // 이번 달 예산
-  monthlyBudget      Int       @default(0) // 매달 고정 예산
-  year               String
-  month              String
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  deletedAt          DateTime?
-  company            Company   @relation(fields: [companyId], references: [id])
+  id                  Int       @id @default(autoincrement())
+  companyId           Int
+  currentMonthExpense Int       @default(0) // 이번 달 총 지출액
+  currentMonthBudget  Int       @default(0) // 이번 달 예산
+  monthlyBudget       Int       @default(0) // 매달 고정 예산
+  year                String
+  month               String
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+  company             Company   @relation(fields: [companyId], references: [id])
 
   @@unique([companyId, year, month])
 }
@@ -92,14 +92,26 @@ model CartItem {
   isChecked Boolean   @default(true)
   deletedAt DateTime?
 
-  user        User          @relation(fields: [userId], references: [id])
-  product     Product       @relation(fields: [productId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+}
+
+model Receipt {
+  id          Int    @id @default(autoincrement())
+  productName String
+  price       Int
+  imageUrl    String
+  quantity    Int
+
   OrderedItem OrderedItem[]
 }
 
 model Order {
   id             Int         @id @default(autoincrement())
   userId         String
+  approver       String?
   adminMessage   String?
   requestMessage String?
   totalPrice     Int
@@ -112,12 +124,12 @@ model Order {
 }
 
 model OrderedItem {
-  id      Int @id @default(autoincrement())
-  orderId Int
-  cartId  Int
+  id        Int @id @default(autoincrement())
+  orderId   Int
+  receiptId Int
 
-  order    Order    @relation(fields: [orderId], references: [id])
-  cartItem CartItem @relation(fields: [cartId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
+  receipt Receipt @relation(fields: [receiptId], references: [id])
 }
 
 model Invite {

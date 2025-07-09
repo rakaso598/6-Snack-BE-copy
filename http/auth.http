@@ -9,6 +9,7 @@ POST {{url}}/auth/signup
 Content-Type: application/json
 
 {
+<<<<<<< HEAD
   "email": "admin@example.com",
   "name": "관리자",
   "password": "adminpass123",
@@ -37,6 +38,13 @@ Content-Type: application/json
 {
   "password": "password123",
   "confirmPassword": "password123"
+=======
+    "email": "testuser1@example.com",
+    "name": "Test User1",
+    "password": "password123",
+    "role": "USER",
+    "companyId": 1
+>>>>>>> 912d7162c0fed2cfa798108dd27170693f91e7f8
 }
 
 ### 로그인
@@ -44,8 +52,13 @@ POST {{url}}/auth/login
 Content-Type: application/json
 
 {
+<<<<<<< HEAD
     "email": "admin@example.com",
     "password": "adminpass123"
+=======
+    "email": "testuser1@example.com",
+    "password": "password123"
+>>>>>>> 912d7162c0fed2cfa798108dd27170693f91e7f8
 }
 
 ### 내 정보 조회
