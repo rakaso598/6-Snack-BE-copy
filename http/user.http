@@ -1,30 +1,36 @@
-@superAdminToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLQutC-0L_QvtC70YzQt9C-0LLQsNC9Iiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzUxOTU4Mzk5LCJleHAiOjE3NTE5NjE5OTl9.example_signature
+### 1. SUPER_ADMIN 로그인 (쿠키 획득)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
 
-### 1. SUPER_ADMIN이 일반 유저 삭제 (성공 케이스)
+{
+    "email": "super_admin@codeit.com",
+    "password": "11111111"
+}
+
+### 2. SUPER_ADMIN이 일반 유저 삭제 (성공 케이스)
 DELETE http://localhost:8080/super-admin/users/user-3
-Authorization: Bearer {{superAdminToken}}
 
-### 2. SUPER_ADMIN이 관리자 삭제 (성공 케이스)
+### 3. SUPER_ADMIN이 관리자 삭제 (성공 케이스)
 DELETE http://localhost:8080/super-admin/users/user-2
-Authorization: Bearer {{superAdminToken}}
 
-### 3. 존재하지 않는 유저 삭제 시도 (실패 케이스)
+### 4. 존재하지 않는 유저 삭제 시도 (실패 케이스)
 DELETE http://localhost:8080/super-admin/users/non-existent-user
-Authorization: Bearer {{superAdminToken}}
 
-### 4. SUPER_ADMIN이 자기 자신 삭제 시도 (실패 케이스)
+### 5. SUPER_ADMIN이 자기 자신 삭제 시도 (실패 케이스)
 DELETE http://localhost:8080/super-admin/users/user-1
-Authorization: Bearer {{superAdminToken}}
 
-### 5. 토큰 없이 삭제 시도 (실패 케이스)
+### 6. 쿠키 없이 삭제 시도 (실패 케이스- 이거는 로컬에서 테스트 불가 - 쿠키인증 방식때문, 추후에 브라우저에서 테스트예정))
 DELETE http://localhost:8080/super-admin/users/user-3
 
-### 6. 잘못된 토큰으로 삭제 시도 (실패 케이스)
-DELETE http://localhost:8080/super-admin/users/user-3
-Authorization: Bearer invalid_token
+### 7. ADMIN 로그인 후 삭제 시도 (실패 케이스- (이거는 로컬에서 테스트 불가 - 쿠키인증 방식때문, 추후에 브라우저에서 테스트예정))
+# @name adminLogin
+POST http://localhost:8080/auth/login
+Content-Type: application/json
 
-### 7. ADMIN 권한으로 삭제 시도 (실패 케이스)
-@adminToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMiIsImVtYWlsIjoiYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLQutC-0L_QvtC70YzQt9C-0LLQsNC9Iiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzUxOTU4Mzk5LCJleHAiOjE3NTE5NjE5OTl9.example_signature
+{
+    "email": "admin@codeit.com",
+    "password": "11111111"
+}
 
-DELETE http://localhost:8080/super-admin/users/user-3
-Authorization: Bearer {{adminToken}}
+### 
+DELETE http://localhost:8080/super-admin/users/user-4
