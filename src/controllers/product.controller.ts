@@ -37,7 +37,7 @@ const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res
       imageUrl,
       creatorId,
     };
-
+    console.log("최종 input 객체:", input);
     const product = await productService.createProduct(input);
     if (product) {
       res.status(201).location(`/products/${product.id}`).json(product);
@@ -47,8 +47,12 @@ const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res
   } catch (error) {
     if (error instanceof AppError) {
       res.status(error.code || 500).json({ message: error.message, data: error.data });
+    } else if (error instanceof Error) {
+      
+      console.error("createProduct error:", error.message, error.stack);
+      res.status(500).json({ message: error.message });
     } else {
-      console.error(error);
+      console.error("Unknown createProduct error:", error);
       res.status(500).json({ message: "서버 에러 발생" });
     }
   }
@@ -126,10 +130,13 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
 export const getProductDetail: RequestHandler<TProductIdParamsDto> = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: "상품 ID는 숫자여야 합니다." });
+    if (isNaN(id)) {
+      res.status(400).json({ message: "상품 ID는 숫자여야 합니다." });
+      return;  
+    }
 
     const product = await productService.getProductById(id);
-    res.json(product);
+    res.json(product); 
   } catch (error) {
     next(error);
   }

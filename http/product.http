@@ -1,6 +1,6 @@
 POST http://localhost:8080/products
 Content-Type: multipart/form-data
-Cookie: accessToken=your_token_here
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUwNWEyOTdhLTNhMjQtNGNiMS04MWIyLWVmYmUzMmEzZTRkZiIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNTI3NTMsImV4cCI6MTc1MjA1MzY1M30.8RkX8B2fRsa77cnZ42qUBMnF9r9JVlT6SNvVlewKXhY;
 
 FormData:
 - name: 포도
@@ -12,7 +12,12 @@ FormData:
 
 ### 유저가 등록한 상품 목록
 GET http://localhost:8080/my/products
-Cookie: accessToken=<YOUR_ACCESS_TOKEN_HERE>
+Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MDBhMTRlLTYyNWMtNDlkOC05ZTQ3LTVmMTAzMGRkNmFiYyIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNjQ4OTQsImV4cCI6MTc1MjA2NTc5NH0.d8cNZOgcNrazWsniR88gQw8H0yomZfFqWTvbecOmhGM;
+
+###
+GET http://localhost:8080/products/5
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5OWQ0NjYwLWU5M2MtNDA1My04MjUwLWIyMzE4MThlODgzZiIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNzM0MDUsImV4cCI6MTc1MjA3NDMwNX0.kSrVrR-c_0P4_bRB_yBq50SE0SYmZd1aN5S54e8GT74;
 
 ### 상품 전체 요청 
 GET http://localhost:8080/products
