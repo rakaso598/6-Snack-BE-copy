@@ -92,10 +92,23 @@ const countCreator = (creatorId: string) => {
   });
 };
 
+
+export const findProductById = async (id: number) => {
+  return await prisma.product.findUnique({
+    where: { id },
+    include: {
+      category: true,
+      creator: true,
+      // 필요하면 likes, cart 등 관계도 같이 포함 가능
+    },
+  });
+};
+
 export default {
   create,
   findById,
   findManyAll,
   findManyCreator,
-  countCreator
+  countCreator,
+  findProductById
 };

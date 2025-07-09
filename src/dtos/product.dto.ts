@@ -25,3 +25,7 @@ export type TGetMyProductsQueryDto = {
   page: string;
   limit: string;
 };
+
+export type TProductIdParamsDto = {
+  id: string; 
+};

@@ -1,5 +1,5 @@
 import productRepository from "../repositories/product.repository";
-import { AuthenticationError, ServerError, ValidationError } from "../types/error";
+import { AuthenticationError, NotFoundError, ServerError, ValidationError } from "../types/error";
 import { ProductQueryOptions, CreateProductParams } from "../types/product.types";
 
 // 상품 등록
@@ -38,7 +38,13 @@ const createProduct = async (input: CreateProductParams) => {
 
 // 상품 ID로 단일 상품 조회
 const getProductById = async (id: number) => {
-  return productRepository.findById(id);
+  const product = await productRepository.findProductById(id);
+
+  if (!product) {
+    throw new NotFoundError("상품을 찾을 수 없습니다.");
+  }
+
+  return product;
 };
 
 // 옵션에 따라 여러 상품 목록 조회

@@ -1,9 +1,15 @@
 import { RequestHandler } from "express";
 import productService from "../services/product.service";
-import { AppError, AuthenticationError, ServerError } from "../types/error";
+import { AppError, AuthenticationError, NotFoundError, ServerError } from "../types/error";
 import { uploadImageToS3 } from "../utils/s3";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
-import { TCreateProductDto, TGetMyProductsDto, TGetMyProductsQueryDto, TGetProductsQueryDto } from "../dtos/product.dto";
+import {
+  TCreateProductDto,
+  TGetMyProductsDto,
+  TGetMyProductsQueryDto,
+  TGetProductsQueryDto,
+  TProductIdParamsDto,
+} from "../dtos/product.dto";
 
 //상품등록
 const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res) => {
@@ -59,9 +65,7 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
 
     const rawSort = String(sort);
     const validSorts = ["latest", "popular", "low", "high"] as const;
-    const sortOption = validSorts.includes(rawSort as any)
-      ? (rawSort as (typeof validSorts)[number])
-      : "latest";
+    const sortOption = validSorts.includes(rawSort as any) ? (rawSort as (typeof validSorts)[number]) : "latest";
 
     const cursorObj = cursorId ? { id: cursorId } : undefined;
 
@@ -119,8 +123,22 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
   }
 };
 
+export const getProductDetail: RequestHandler<TProductIdParamsDto> = async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ message: "상품 ID는 숫자여야 합니다." });
+
+    const product = await productService.getProductById(id);
+    res.json(product);
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 export default {
   createProduct,
   getProducts,
   getMyProducts,
+  getProductDetail
 };
