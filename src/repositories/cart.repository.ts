@@ -9,34 +9,6 @@ const getCartItemsByUserId = async (userId: string) => {
   });
 };
 
-// 기존 방식 find, create 사용 upsert사용시 해당 부분 삭제
-const addCartItem = async (userId: string, productId: number, quantity: number) => {
-  const existing = await prisma.cartItem.findFirst({
-    where: { userId, productId, deletedAt: null },
-  });
-
-  if (existing) {
-    return await prisma.cartItem.update({
-      where: { id: existing.id },
-      data: {
-        quantity: { increment: quantity },
-        deletedAt: null,
-      },
-    });
-  }
-
-  return await prisma.cartItem.create({
-    data: {
-      userId,
-      productId,
-      quantity,
-    },
-  });
-};
-
-/*
-cartItem 에서 unique 적용 후 사용 가능 upsert를 사용하는 방법 
-
 const addCartItem = async (userId: string, productId: number, quantity: number) => {
   return await prisma.cartItem.upsert({
     where: {
@@ -58,7 +30,7 @@ const addCartItem = async (userId: string, productId: number, quantity: number) 
     },
   });
 };
-*/
+
 const deleteCartItems = async (userId: string, itemIds: number[]) => {
   return await prisma.cartItem.updateMany({
     where: {

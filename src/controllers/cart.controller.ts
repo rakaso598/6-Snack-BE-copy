@@ -1,7 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { RequestHandler } from "express";
 import cartService from "../services/cart.service";
+import { TAddToCartDto, TDeleteCartItemsDto, TToggleCheckDto, TToggleParamsDto } from "../dtos/cart.dto";
 
-const getMyCart = async (req: Request, res: Response, next: NextFunction) => {
+const getMyCart: RequestHandler = async (req, res, next) => {
   try {
     const cart = await cartService.getMyCart(req.user!.id);
     res.json(cart);
@@ -10,7 +11,7 @@ const getMyCart = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const addToCart = async (req: Request, res: Response, next: NextFunction) => {
+const addToCart: RequestHandler<{}, {}, TAddToCartDto> = async (req, res, next) => {
   try {
     const result = await cartService.addToCart(req.user!.id, req.body);
     res.status(201).json(result);
@@ -19,7 +20,7 @@ const addToCart = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const deleteSelectedItems = async (req: Request, res: Response, next: NextFunction) => {
+const deleteSelectedItems: RequestHandler<{}, {}, TDeleteCartItemsDto> = async (req, res, next) => {
   try {
     await cartService.deleteSelectedItems(req.user!.id, req.body);
     res.status(204).send();
@@ -28,7 +29,7 @@ const deleteSelectedItems = async (req: Request, res: Response, next: NextFuncti
   }
 };
 
-const deleteCartItem = async (req: Request, res: Response, next: NextFunction) => {
+const deleteCartItem: RequestHandler = async (req, res, next) => {
   try {
     const itemId = parseInt(req.params.item, 10);
     await cartService.deleteCartItem(req.user!.id, itemId);
@@ -38,12 +39,10 @@ const deleteCartItem = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-const toggleCheckItem = async (req: Request, res: Response, next: NextFunction) => {
+const toggleCheckItem: RequestHandler<TToggleParamsDto, {}, TToggleCheckDto> = async (req, res, next) => {
   try {
     const itemId = parseInt(req.params.item, 10);
-    const { isChecked } = req.body;
-
-    await cartService.toggleCheckCartItem(req.user!.id, itemId, isChecked);
+    await cartService.toggleCheckCartItem(req.user!.id, itemId, req.body);
     res.status(204).send();
   } catch (err) {
     next(err);
