@@ -9,12 +9,12 @@ POST {{url}}/auth/signup
 Content-Type: application/json
 
 {
-  "email": "admin3@example.com",
+  "email": "admin@example.com",
   "name": "관리자",
   "password": "adminpass123",
   "confirmPassword": "adminpass123",
   "companyName": "MyCompany Inc.",
-  "bizNumber": "1234567893"
+  "bizNumber": "1234567899"
 }
 
 ### 초대 링크 생성
@@ -22,8 +22,8 @@ POST {{url}}/invite
 Content-Type: application/json
 
 {
-  "email": "newuser6@xample.com",
-  "name": "새로운 사용자6",
+  "email": "newuser@example.com",
+  "name": "새로운 사용자",
   "role": "USER",
   "companyId": 1,
   "invitedById": "user-1",
@@ -48,8 +48,8 @@ Content-Type: application/json
     "password": "adminpass123"
 }
 
-### 사용자 정보 조회
-GET {{url}}/auth/me
+### 내 정보 조회
+GET {{url}}/users/me
 Content-Type: application/json
 Cookie: accessToken={{accessToken}}
 
