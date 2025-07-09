@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 import { companyMockData } from "./mocks/company.mock";
 import { userMockData } from "./mocks/user.mock";
 import { monthlyBudgetMockData } from "./mocks/monthly-budget.mock";
@@ -74,11 +75,16 @@ async function main() {
 
   // 2. User 데이터 삽입
   console.log("👥 Seeding users...");
-  await prisma.user.createMany({
-    data: userMockData.map((user) => ({
+  const hashedUserData = await Promise.all(
+    userMockData.map(async (user) => ({
       ...user,
+      password: await bcrypt.hash(user.password, 10),
       role: user.role as any, // Role enum으로 캐스팅
     })),
+  );
+
+  await prisma.user.createMany({
+    data: hashedUserData,
     skipDuplicates: true,
   });
 

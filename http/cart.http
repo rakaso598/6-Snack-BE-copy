@@ -1,0 +1,45 @@
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NTgzOTksImV4cCI6MTc1MTk2MTk5OX0.T1iIV0VSadnAbb_Nm-okXCQ8mVd8CLrjufjx2EKFPYw
+
+### 1. 내 장바구니 조회
+GET http://localhost:8080/cart
+Authorization: Bearer {{token}}
+
+###
+
+### 2. 장바구니에 상품 추가
+POST http://localhost:8080/cart
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "productId": 1,
+  "quantity": 2
+}
+
+###
+
+### 3. 장바구니 항목 일괄 삭제
+DELETE http://localhost:8080/cart
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "itemIds": [1, 2, 3]
+}
+
+###
+
+### 4. 장바구니 개별 항목 삭제
+DELETE http://localhost:8080/cart/1
+Authorization: Bearer {{token}}
+
+###
+
+### 5. 장바구니 항목 체크 상태 변경
+PATCH http://localhost:8080/cart/1/check
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "isChecked": false
+}
