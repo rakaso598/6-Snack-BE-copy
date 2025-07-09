@@ -1,38 +1,77 @@
+@url=http://localhost:8080
 @token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NTgzOTksImV4cCI6MTc1MTk2MTk5OX0.T1iIV0VSadnAbb_Nm-okXCQ8mVd8CLrjufjx2EKFPYw
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NjMzMzIsImV4cCI6MTc1MTk2NDIzMn0.qtpZKSF6RsxaGqCogwPBvvFKVwVhAPanxPIqVNcV48k
+@refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1ODE0OTZkLWQzNWEtNGI3Ny1iMmVkLTNhNGZiNGFlZWUwYyIsImlhdCI6MTc1MjAzOTcyNiwiZXhwIjoxNzUyNjQ0NTI2fQ.KVM4FvB5-pj60hKByYkYnhmXk0LO8T_RgT7C8I_FlBk
+@inviteId=ce1e2d8e-7e62-4bc3-a44c-2984075a27ca
 
-### 회원가입
-POST http://localhost:8080/auth/signup
+### 회원가입 (최고 관리자)
+POST {{url}}/auth/signup
 Content-Type: application/json
 
 {
+<<<<<<< HEAD
+  "email": "admin@example.com",
+  "name": "관리자",
+  "password": "adminpass123",
+  "confirmPassword": "adminpass123",
+  "companyName": "MyCompany Inc.",
+  "bizNumber": "1234567899"
+}
+
+### 초대 링크 생성
+POST {{url}}/invite
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "name": "새로운 사용자",
+  "role": "USER",
+  "companyId": 1,
+  "invitedById": "user-1",
+  "expiresInDays": 7
+}
+
+### 회원가입 (일반유저, 관리자) - 초대 링크 사용
+POST {{url}}/auth/signup/{{inviteId}}
+Content-Type: application/json
+
+{
+  "password": "password123",
+  "confirmPassword": "password123"
+=======
     "email": "testuser1@example.com",
     "name": "Test User1",
     "password": "password123",
     "role": "USER",
     "companyId": 1
+>>>>>>> 912d7162c0fed2cfa798108dd27170693f91e7f8
 }
 
 ### 로그인
-POST http://localhost:8080/auth/login
+POST {{url}}/auth/login
 Content-Type: application/json
 
 {
+<<<<<<< HEAD
+    "email": "admin@example.com",
+    "password": "adminpass123"
+=======
     "email": "testuser1@example.com",
     "password": "password123"
+>>>>>>> 912d7162c0fed2cfa798108dd27170693f91e7f8
 }
 
-### 인증된 사용자 정보 조회
-GET http://localhost:8080/auth/me
-Authorization: Bearer {{token}}
+### 내 정보 조회
+GET {{url}}/users/me
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
 
-{
-    "user": {
-        "id": "user_id",
-        "username": "testuser",
-        "email": "testuser@example.com",
-        "name": "Test User",
-        "role": "USER"
-    }
-}
+### 토큰 갱신
+POST {{url}}/auth/refresh-token
+Content-Type: application/json
+Cookie: refreshToken={{refreshToken}}
 
-###
+### 로그아웃
+POST {{url}}/auth/logout
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
