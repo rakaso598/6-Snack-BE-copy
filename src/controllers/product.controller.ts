@@ -1,25 +1,34 @@
 import { RequestHandler } from "express";
-import { CreateProductInput } from "../dtos/product.dto";
+import { TCreateProductInput } from "../dtos/product.dto";
 import productService from "../services/product.service";
-import { AppError, BadRequestError, ServerError } from "../types/error";
+import { AppError, AuthenticationError, BadRequestError, ServerError } from "../types/error";
 import { uploadImageToS3 } from "../utils/s3";
+import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 
 //상품등록
 const createProduct: RequestHandler = async (req, res) => {
   try {
     const { name, price, linkUrl, categoryId } = req.body;
     const creatorId = req.user?.id;
-    
+
+    // 숫자 변환 + 유효성 검사
+    const priceNum = parseNumberOrThrow(price, "price");
+    const categoryIdNum = parseNumberOrThrow(categoryId, "categoryId");
+
+    if (!creatorId) {
+      throw new AuthenticationError("로그인이 필요합니다.");
+    }
+
     let imageUrl = "";
     if (req.file) {
       imageUrl = await uploadImageToS3(req.file);
     }
 
-    const input: CreateProductInput & { creatorId?: string } = {
+    const input = {
       name,
-      price,
+      price: priceNum,
       linkUrl,
-      categoryId,
+      categoryId: categoryIdNum,
       imageUrl,
       creatorId,
     };
@@ -41,35 +50,20 @@ const getProducts: RequestHandler = async (req, res, next) => {
   try {
     const { sort = "latest", category, cursor, limit } = req.query;
 
-    const take = limit ? Math.min(Number(limit), 50) : 9;
+    const take = limit ? Math.min(parseNumberOrThrow(limit as string, "limit"), 50) : 9;
 
-
-    const cursorIdRaw = Number(cursor);
-    const categoryIdRaw = Number(category);
-    const limitRaw = Number(limit);
-
-    if (cursor && isNaN(cursorIdRaw)) {
-      throw new BadRequestError("cursor 값이 유효하지 않습니다.");
-    }
-    if (category && isNaN(categoryIdRaw)) {
-      throw new BadRequestError("category 값이 유효하지 않습니다.");
-    }
-    if (limit && (isNaN(limitRaw) || limitRaw <= 0)) {
-      throw new BadRequestError("limit 값이 유효하지 않습니다.");
-    }
+    const cursorId = cursor ? parseNumberOrThrow(cursor as string, "cursor") : undefined;
+    const categoryId = category ? parseNumberOrThrow(category as string, "category") : undefined;
 
     const rawSort = String(sort);
     const validSorts = ["latest", "popular", "low", "high"] as const;
-    const sortOption = validSorts.includes(rawSort as any)
-      ? (rawSort as typeof validSorts[number])
-      : "latest";
+    const sortOption = validSorts.includes(rawSort as any) ? (rawSort as (typeof validSorts)[number]) : "latest";
 
-
-    const cursorObj = cursor ? { id: Number(cursor) } : undefined;
+    const cursorObj = cursorId ? { id: cursorId } : undefined;
 
     const items = await productService.getProductList({
       sort: sortOption,
-      category: category ? Number(category) : undefined,
+      category: categoryId,
       take,
       cursor: cursorObj,
     });
@@ -80,9 +74,7 @@ const getProducts: RequestHandler = async (req, res, next) => {
   }
 };
 
-
-
-//미완성: 유저가 등록한상품 목록 아직 안보셔도 됩니다.
+//미완성: 유저가 등록한상품 목록
 const getMyProducts: RequestHandler = async (req, res) => {
   try {
     const creatorId = "test-user-uuid";
@@ -92,8 +84,9 @@ const getMyProducts: RequestHandler = async (req, res) => {
       return;
     }
 
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const page = req.query.page ? parseNumberOrThrow(req.query.page as string, "page") : 1;
+    const limit = req.query.limit ? parseNumberOrThrow(req.query.limit as string, "limit") : 10;
+
     const skip = (page - 1) * limit;
 
     const items = await productService.getProductsByCreator({

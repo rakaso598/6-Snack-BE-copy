@@ -1,10 +1,9 @@
-import { CreateProductDto, CreateProductInput } from "../dtos/product.dto";
 import productRepository from "../repositories/product.repository";
 import { AuthenticationError, ServerError, ValidationError } from "../types/error";
-import { ProductQueryOptions } from "../types/product.types";
+import { ProductQueryOptions, CreateProductParams } from "../types/product.types";
 
 // 상품 등록
-const createProduct = async (input: CreateProductInput & { creatorId?: string }) => {
+const createProduct = async (input: CreateProductParams) => {
   const { name, price, linkUrl, imageUrl, categoryId, creatorId } = input;
 
   const errors: Record<string, string> = {};
@@ -17,13 +16,11 @@ const createProduct = async (input: CreateProductInput & { creatorId?: string })
     errors["name"] = "상품 이름은 필수 항목이며, 최소 2자 이상이어야 합니다.";
   }
 
-  const priceNum = Number(price);
-  if (isNaN(priceNum) || priceNum <= 0) {
+  if (isNaN(price) || price <= 0) {
     errors["price"] = "가격은 0보다 커야 합니다.";
   }
 
-  const categoryIdNum = Number(categoryId);
-  if (isNaN(categoryIdNum)) {
+  if (isNaN(categoryId)) {
     errors["categoryId"] = "유효하지 않은 카테고리 ID입니다.";
   }
 
@@ -31,16 +28,7 @@ const createProduct = async (input: CreateProductInput & { creatorId?: string })
     throw new ValidationError("요청 데이터가 유효하지 않습니다.", errors);
   }
 
-  const dto: CreateProductDto = {
-    name,
-    price: priceNum,
-    linkUrl,
-    imageUrl: imageUrl ?? "",
-    categoryId: categoryIdNum,
-    creatorId,
-  };
-
-  const product = await productRepository.create(dto);
+  const product = await productRepository.create(input);
   if (!product) {
     throw new ServerError("상품 생성에 실패했습니다.");
   }

@@ -1,4 +1,4 @@
-export type CreateProductDto = {
+export type TCreateProductDto = {
   categoryId: number;
   creatorId: string;
   name: string;
@@ -7,7 +7,7 @@ export type CreateProductDto = {
   linkUrl: string;
 };
 
-export type CreateProductInput = {
+export type TCreateProductInput = {
   name: string;
   price: string; 
   categoryId: string;

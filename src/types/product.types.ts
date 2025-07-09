@@ -15,3 +15,12 @@ export type CreatorQueryOptions = {
   skip?: number;
   take?: number;
 };
+
+export type CreateProductParams = {
+  name: string;
+  price: number;
+  linkUrl: string;
+  imageUrl: string; 
+  categoryId: number;
+  creatorId: string;
+};

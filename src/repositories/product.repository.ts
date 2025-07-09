@@ -1,7 +1,6 @@
 import prisma from "../config/prisma";
-import { CreateProductDto } from "../dtos/product.dto";
 import { Prisma } from "@prisma/client";
-import type { ProductQueryOptions, CreatorQueryOptions } from "../types/product.types";
+import type { ProductQueryOptions, CreatorQueryOptions, CreateProductParams } from "../types/product.types";
 
 const findManyAll = async (
   options: ProductQueryOptions = {},
@@ -63,8 +62,8 @@ const findById = (id: number) => {
   });
 };
 
-const create = (dto: CreateProductDto) => {
-  return prisma.product.create({ data: dto });
+const create = (data: CreateProductParams) => {
+  return prisma.product.create({ data });
 };
 
 const findManyByCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions) => {
