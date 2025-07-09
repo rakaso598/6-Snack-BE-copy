@@ -6,16 +6,6 @@ import { AppError } from '../types/error';
 
 const authRouter = Router();
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: Prisma.UserGetPayload<{
-        include: { company: true };
-      }>;
-    }
-  }
-}
-
 /**
  * 최고 관리자(SUPER_ADMIN) 회원가입 라우트
  * 이 라우트는 새로운 회사를 생성하고 해당 회사의 최고 관리자로 유저를 등록합니다.

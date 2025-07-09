@@ -5,16 +5,6 @@ import { AppError } from '../types/error';
 
 const prisma = new PrismaClient();
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: Prisma.UserGetPayload<{
-        include: { company: true };
-      }>;
-    }
-  }
-}
-
 const JWT_SECRET = process.env.JWT_SECRET || 'your_very_strong_jwt_secret_key_please_change_this_in_production';
 
 /**
