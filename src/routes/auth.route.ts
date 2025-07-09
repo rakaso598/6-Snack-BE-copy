@@ -222,7 +222,7 @@ authRouter.post('/refresh-token', async (req: Request, res: Response, next: Next
  * @returns {object} - 성공 메시지
  * @throws {HttpError} - 인증되지 않은 사용자이거나 로그아웃 처리 중 오류 발생 시
  */
-authRouter.post('/logout', authenticateToken, authorizeRoles('SUPER_ADMIN'), async (req: Request, res: Response, next: NextFunction) => {
+authRouter.post('/logout', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       throw new HttpError('인증되지 않은 사용자입니다.', 401);
