@@ -438,30 +438,4 @@ authRouter.post('/logout', authenticateToken, async (req: Request, res: Response
   }
 });
 
-/**
- * 현재 로그인된 사용자 정보 조회 라우트
- * @route GET /auth/me
- * @middleware authenticateToken - Access Token 유효성 검사
- * @returns {object} - 현재 로그인된 사용자 정보 (ID, 이메일, 이름, 역할, 회사 정보 포함)
- * @throws {HttpError} - 사용자 정보를 찾을 수 없거나 인증되지 않은 경우
- */
-authRouter.get('/me', authenticateToken, (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    return next(new HttpError('사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.', 401));
-  }
-
-  res.status(200).json({
-    user: {
-      id: req.user.id,
-      email: req.user.email,
-      name: req.user.name,
-      role: req.user.role,
-      company: {
-        id: req.user.company.id,
-        name: req.user.company.name,
-      },
-    },
-  });
-});
-
 export default authRouter;
