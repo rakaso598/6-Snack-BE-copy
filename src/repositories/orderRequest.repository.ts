@@ -1,7 +1,6 @@
-import { PrismaClient, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import type { TCreateOrderRequest, TCreateOrderResponse } from '../types/orderRequest.types';
-
-const prisma = new PrismaClient();
+import prisma from "../config/prisma";
 
 const createOrder = async (orderData: TCreateOrderRequest, tx?: Prisma.TransactionClient): Promise<TCreateOrderResponse> => {
   const client = tx || prisma;

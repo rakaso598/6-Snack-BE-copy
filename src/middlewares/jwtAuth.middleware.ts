@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { PrismaClient, Prisma, Role } from '@prisma/client';
+import { Role } from '@prisma/client';
 import { AppError } from '../types/error';
-
-const prisma = new PrismaClient();
+import prisma from "../config/prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_very_strong_jwt_secret_key_please_change_this_in_production';
 
