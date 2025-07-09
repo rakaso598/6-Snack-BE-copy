@@ -1,7 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { v4 as uuidv4 } from 'uuid';
-import HttpError from '../utils/HttpError';
+import { AppError } from '../types/error';
 
 const prisma = new PrismaClient();
 const inviteRouter = Router();
@@ -11,21 +10,21 @@ inviteRouter.post('/', async (req: Request, res: Response, next: NextFunction) =
     const { email, name, role, companyId, invitedById, expiresInDays } = req.body;
 
     if (!email || !name || !role || !companyId || !invitedById) {
-      throw new HttpError('이메일, 이름, 역할, 회사 ID, 초대자 ID는 필수 입력값입니다.', 400);
+      throw new AppError('이메일, 이름, 역할, 회사 ID, 초대자 ID는 필수 입력값입니다.', 400);
     }
 
     const validRoles = ['USER', 'ADMIN', 'SUPER_ADMIN'];
     if (!validRoles.includes(role)) {
-      throw new HttpError(`유효하지 않은 역할입니다. 허용된 역할: ${validRoles.join(', ')}`, 400);
+      throw new AppError(`유효하지 않은 역할입니다. 허용된 역할: ${validRoles.join(', ')}`, 400);
     }
 
     const existingCompany = await prisma.company.findUnique({ where: { id: companyId } });
     if (!existingCompany) {
-      throw new HttpError('존재하지 않는 회사 ID입니다.', 404);
+      throw new AppError('존재하지 않는 회사 ID입니다.', 404);
     }
     const invitingUser = await prisma.user.findUnique({ where: { id: invitedById } });
     if (!invitingUser) {
-      throw new HttpError('존재하지 않는 초대자 ID입니다.', 404);
+      throw new AppError('존재하지 않는 초대자 ID입니다.', 404);
     }
 
     const days = expiresInDays && typeof expiresInDays === 'number' ? expiresInDays : 7;

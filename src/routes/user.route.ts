@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import authenticateToken from '../middlewares/jwtAuth.middleware';
-import HttpError from '../utils/HttpError';
+import { AppError } from '../types/error';
 
 const JWT_SECRET: string = process.env.JWT_SECRET || 'your_very_strong_and_secret_jwt_key_please_change_this_in_production';
 const REFRESH_TOKEN_SECRET: string = process.env.REFRESH_TOKEN_SECRET || 'your_very_strong_and_secret_refresh_jwt_key_please_change_this_in_production';
@@ -19,11 +19,11 @@ const userRouter = Router();
  * @route GET /users/me
  * @middleware authenticateToken - Access Token 유효성 검사
  * @returns {object} - 현재 로그인된 사용자 정보 (ID, 이메일, 이름, 역할, 회사 정보 포함)
- * @throws {HttpError} - 사용자 정보를 찾을 수 없거나 인증되지 않은 경우
+ * @throws {AppError} - 사용자 정보를 찾을 수 없거나 인증되지 않은 경우
  */
 userRouter.get('/me', authenticateToken, (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return next(new HttpError('사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.', 401));
+    return next(new AppError('사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.', 401));
   }
 
   res.status(200).json({

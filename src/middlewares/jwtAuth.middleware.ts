@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { PrismaClient, Prisma, Role } from '@prisma/client';
-import HttpError from '../utils/HttpError';
+import { AppError } from '../types/error';
 
 const prisma = new PrismaClient();
 
@@ -30,7 +30,7 @@ const authenticateToken = async (req: Request, res: Response, next: NextFunction
   const accessToken = req.cookies.accessToken;
 
   if (!accessToken) {
-    return next(new HttpError('인증 토큰이 제공되지 않았습니다.', 401));
+    return next(new AppError('인증 토큰이 제공되지 않았습니다.', 401));
   }
 
   try {
@@ -51,7 +51,7 @@ const authenticateToken = async (req: Request, res: Response, next: NextFunction
     });
 
     if (!userWithCompany) {
-      return next(new HttpError('사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.', 404));
+      return next(new AppError('사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.', 404));
     }
 
     req.user = userWithCompany;
@@ -59,12 +59,12 @@ const authenticateToken = async (req: Request, res: Response, next: NextFunction
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      return next(new HttpError('인증 토큰이 만료되었습니다.', 401));
+      return next(new AppError('인증 토큰이 만료되었습니다.', 401));
     } else if (error instanceof jwt.JsonWebTokenError) {
-      return next(new HttpError('유효하지 않은 인증 토큰입니다.', 403));
+      return next(new AppError('유효하지 않은 인증 토큰입니다.', 403));
     } else {
       console.error('[인증 미들웨어 오류]', error);
-      return next(new HttpError('인증 중 알 수 없는 오류가 발생했습니다.', 500));
+      return next(new AppError('인증 중 알 수 없는 오류가 발생했습니다.', 500));
     }
   }
 };

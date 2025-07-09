@@ -2,8 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { Role, Prisma } from '@prisma/client';
 import authenticateToken from '../middlewares/jwtAuth.middleware';
 import { AuthService } from '../services/auth.service';
-import HttpError from '../utils/HttpError';
-import authorizeRoles from '../middlewares/authorizeRoles.middleware';
+import { AppError } from '../types/error';
 
 const authRouter = Router();
 
@@ -28,20 +27,20 @@ declare global {
  * @body {string} companyName - 회사 이름 (필수)
  * @body {string} bizNumber - 사업자 등록 번호 (필수, 고유해야 함)
  * @returns {object} - 성공 메시지 및 생성된 사용자/회사 정보 (비밀번호 제외)
- * @throws {HttpError} - 입력 유효성 검사 실패, 이메일/사업자 등록 번호 중복 시
+ * @throws {AppError} - 입력 유효성 검사 실패, 이메일/사업자 등록 번호 중복 시
  */
 authRouter.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, name, password, confirmPassword, role, companyName, bizNumber } = req.body;
 
     if (!email || !name || !password || !confirmPassword || !companyName || !bizNumber) {
-      throw new HttpError('이메일, 이름, 비밀번호, 비밀번호 확인, 회사 이름, 사업자 등록 번호를 모두 입력해야 합니다.', 400);
+      throw new AppError('이메일, 이름, 비밀번호, 비밀번호 확인, 회사 이름, 사업자 등록 번호를 모두 입력해야 합니다.', 400);
     }
     if (password !== confirmPassword) {
-      throw new HttpError('비밀번호와 비밀번호 확인이 일치하지 않습니다.', 400);
+      throw new AppError('비밀번호와 비밀번호 확인이 일치하지 않습니다.', 400);
     }
     if (role && role !== Role.SUPER_ADMIN) {
-      throw new HttpError('이 엔드포인트는 최고 관리자(SUPER_ADMIN) 회원가입 전용입니다. 역할은 SUPER_ADMIN이어야 합니다.', 400);
+      throw new AppError('이 엔드포인트는 최고 관리자(SUPER_ADMIN) 회원가입 전용입니다. 역할은 SUPER_ADMIN이어야 합니다.', 400);
     }
 
     const transactionResult = await AuthService.signUpSuperAdmin({ email, name, password, companyName, bizNumber });
@@ -79,7 +78,7 @@ authRouter.post('/signup', async (req: Request, res: Response, next: NextFunctio
  * @body {string} password - 사용자 비밀번호
  * @body {string} confirmPassword - 비밀번호 확인 (password와 일치해야 함)
  * @returns {object} - 성공 메시지 및 생성된 사용자 정보 (비밀번호 제외)
- * @throws {HttpError} - 입력 유효성 검사 실패, 유효하지 않거나 만료된 초대, 이미 사용된 초대, 이메일 중복 시
+ * @throws {AppError} - 입력 유효성 검사 실패, 유효하지 않거나 만료된 초대, 이미 사용된 초대, 이메일 중복 시
  */
 authRouter.post('/signup/:inviteId', async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -87,10 +86,10 @@ authRouter.post('/signup/:inviteId', async (req: Request, res: Response, next: N
     const { password, confirmPassword } = req.body;
 
     if (!password || !confirmPassword) {
-      throw new HttpError('비밀번호와 비밀번호 확인을 모두 입력해야 합니다.', 400);
+      throw new AppError('비밀번호와 비밀번호 확인을 모두 입력해야 합니다.', 400);
     }
     if (password !== confirmPassword) {
-      throw new HttpError('비밀번호와 비밀번호 확인이 일치하지 않습니다.', 400);
+      throw new AppError('비밀번호와 비밀번호 확인이 일치하지 않습니다.', 400);
     }
 
     const newUser = await AuthService.signUpViaInvite(inviteId, password);
@@ -119,14 +118,14 @@ authRouter.post('/signup/:inviteId', async (req: Request, res: Response, next: N
  * @body {string} email - 사용자 이메일
  * @body {string} password - 사용자 비밀번호
  * @returns {object} - 성공 메시지, 사용자 정보 (ID, 이메일, 이름, 역할, 회사 정보) 및 토큰 (쿠키로 전송)
- * @throws {HttpError} - 이메일 또는 비밀번호 불일치 시
+ * @throws {AppError} - 이메일 또는 비밀번호 불일치 시
  */
 authRouter.post('/login', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      throw new HttpError('이메일과 비밀번호를 모두 입력해야 합니다.', 400);
+      throw new AppError('이메일과 비밀번호를 모두 입력해야 합니다.', 400);
     }
 
     const { user, accessToken, refreshToken } = await AuthService.login(email, password);
@@ -177,14 +176,14 @@ authRouter.post('/login', async (req: Request, res: Response, next: NextFunction
  * @route POST /auth/refresh-token
  * @body {string} refreshToken (쿠키로 전송됨) - 갱신할 Refresh Token
  * @returns {object} - 새로운 Access Token (쿠키로 전송)
- * @throws {HttpError} - Refresh Token이 없거나 유효하지 않거나 만료된 경우
+ * @throws {AppError} - Refresh Token이 없거나 유효하지 않거나 만료된 경우
  */
 authRouter.post('/refresh-token', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      throw new HttpError('리프레시 토큰이 제공되지 않았습니다. 다시 로그인해주세요.', 401);
+      throw new AppError('리프레시 토큰이 제공되지 않았습니다. 다시 로그인해주세요.', 401);
     }
 
     const { newAccessToken, newRefreshToken, user } = await AuthService.refreshAccessToken(refreshToken);
@@ -220,12 +219,12 @@ authRouter.post('/refresh-token', async (req: Request, res: Response, next: Next
  * 사용자 로그아웃 라우트
  * @route POST /auth/logout
  * @returns {object} - 성공 메시지
- * @throws {HttpError} - 인증되지 않은 사용자이거나 로그아웃 처리 중 오류 발생 시
+ * @throws {AppError} - 인증되지 않은 사용자이거나 로그아웃 처리 중 오류 발생 시
  */
 authRouter.post('/logout', authenticateToken, async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
-      throw new HttpError('인증되지 않은 사용자입니다.', 401);
+      throw new AppError('인증되지 않은 사용자입니다.', 401);
     }
 
     await AuthService.logout(req.user.id);
