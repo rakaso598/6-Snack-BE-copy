@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 
 const findActiveUserById = async (id: string) => {
@@ -18,7 +17,7 @@ const findActiveUserById = async (id: string) => {
 };
 
 // 유저 삭제 (soft delete)
-const deleteUser = async (id: string ) => {
+const deleteUser = async (id: string) => {
   return await prisma.user.update({
     where: { id },
     data: { deletedAt: new Date() },
