@@ -5,6 +5,11 @@ import authorizeRoles from "../middlewares/authorizeRoles.middleware";
 
 const adminBudgetRouter = Router({ mergeParams: true });
 
-adminBudgetRouter.get("/", authenticateToken, authorizeRoles("SUPER_ADMIN"), budgetController.getMonthlyBudget);
+adminBudgetRouter.get(
+  "/",
+  authenticateToken,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  budgetController.getMonthlyBudget,
+);
 
 export default adminBudgetRouter;

@@ -3,16 +3,11 @@ import budgetRepository from "../repositories/budget.repository";
 import { formatInTimeZone } from "date-fns-tz";
 import { subMonths, subYears } from "date-fns";
 import { NotFoundError } from "../types/error";
+import getDateForBudget from "../utils/date";
 
 // 예산 및 지출 현황 조회
 const getMonthlyBudget = async (companyId: MonthlyBudget["companyId"]) => {
-  const date = new Date();
-  const timeZone = "Asia/Seoul";
-
-  const year = formatInTimeZone(date, timeZone, "yyyy");
-  const month = formatInTimeZone(date, timeZone, "MM");
-  const previousYear = formatInTimeZone(subYears(date, 1), timeZone, "yyyy");
-  const previousMonth = formatInTimeZone(subMonths(date, 1), timeZone, "MM");
+  const { year, month, previousYear, previousMonth } = getDateForBudget();
 
   const currentMonthBudget = await budgetRepository.getMonthlyBudget(companyId, year, month);
 
