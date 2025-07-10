@@ -1,46 +1,38 @@
 ### 구매 요청 생성
-POST http://localhost:8080/orders
+POST http://localhost:3000/order-request
 Content-Type: application/json
+Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
 {
-  "userId": "user-1",
-  "adminMessage": "테스트 주문",
-  "requestMessage": "테스트 요청",
-  "cartItemIds": [1, 2]
+  "cartItemIds": [1, 2, 3],
+  "adminMessage": "관리자에게 남길 메시지",
+  "requestMessage": "요청 메시지"
 }
 
-### 내 구매 요청 리스트
-GET http://localhost:8080/orders
-Content-Type: application/json
-
-{
-  "userId": "user-1"
-}
+### 내 구매 요청 리스트 조회
+GET http://localhost:3000/order-request
+Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
 ### 구매 요청 상세 조회
-GET http://localhost:8080/orders/1
-Content-Type: application/json
-
-{
-  "userId": "user-1"
-}
+GET http://localhost:3000/order-request/1
+Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
 ### 구매 요청 취소
-PATCH http://localhost:8080/orders/1
+PATCH http://localhost:3000/order-request/1
 Content-Type: application/json
+Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
 {
-  "userId": "user-1",
   "status": "CANCELED"
 }
 
 ### 즉시 구매
-POST http://localhost:8080/orders/instant
+POST http://localhost:3000/order-request/instant
 Content-Type: application/json
+Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
 {
-  "userId": "user-1",
-  "adminMessage": "즉시 구매 테스트",
-  "requestMessage": "즉시 구매 요청",
-  "cartItemIds": [3]
+  "cartItemIds": [1, 2],
+  "adminMessage": "즉시구매 관리자 메모",
+  "requestMessage": "즉시구매 요청"
 } 

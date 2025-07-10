@@ -1,14 +1,23 @@
 import { Request, Response, NextFunction } from 'express';
 import orderRequestService from '../services/orderRequest.service';
 import type { TCreateOrderRequest } from '../types/orderRequest.types';
+import { AuthenticationError } from '../types/error';
 
 const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orderData: TCreateOrderRequest = req.body;
     
-    // TODO: 실제 인증 미들웨어에서 userId를 가져와야 함
-    // 현재는 임시로 body에서 가져옴
-    const result = await orderRequestService.createOrder(orderData);
+    if (!req.user?.id) {
+      throw new AuthenticationError('로그인이 필요합니다.');
+    }
+    
+    // 인증된 사용자의 ID를 사용
+    const authenticatedOrderData: TCreateOrderRequest = {
+      ...orderData,
+      userId: req.user.id
+    };
+    
+    const result = await orderRequestService.createOrder(authenticatedOrderData);
     
     res.status(201).json({
       message: '구매 요청이 성공적으로 생성되었습니다.',
@@ -22,9 +31,12 @@ const createOrder = async (req: Request, res: Response, next: NextFunction) => {
 const getOrderById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orderId = parseInt(req.params.orderId);
-    const userId = req.body.userId; // TODO: 실제 인증 미들웨어에서 가져와야 함
     
-    const result = await orderRequestService.getOrderById(orderId, userId);
+    if (!req.user?.id) {
+      throw new AuthenticationError('로그인이 필요합니다.');
+    }
+    
+    const result = await orderRequestService.getOrderById(orderId, req.user.id);
     
     res.status(200).json({
       message: '구매 요청 조회가 완료되었습니다.',
@@ -37,14 +49,11 @@ const getOrderById = async (req: Request, res: Response, next: NextFunction) => 
 
 const getOrdersByUserId = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = req.body.userId; // body에서 userId 추출
-
-    if (!userId) {
-      res.status(400).json({ message: 'userId가 필요합니다.' });
-      return;
+    if (!req.user?.id) {
+      throw new AuthenticationError('로그인이 필요합니다.');
     }
 
-    const result = await orderRequestService.getOrdersByUserId(userId);
+    const result = await orderRequestService.getOrdersByUserId(req.user.id);
 
     res.status(200).json({
       message: '구매 요청 목록 조회가 완료되었습니다.',
@@ -58,8 +67,11 @@ const getOrdersByUserId = async (req: Request, res: Response, next: NextFunction
 const cancelOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orderId = parseInt(req.params.orderId);
-    const userId = req.body.userId; // TODO: 실제 인증 미들웨어에서 가져와야 함
     const { status } = req.body;
+    
+    if (!req.user?.id) {
+      throw new AuthenticationError('로그인이 필요합니다.');
+    }
     
     if (status !== 'CANCELED') {
       res.status(400).json({
@@ -68,7 +80,7 @@ const cancelOrder = async (req: Request, res: Response, next: NextFunction) => {
       return;
     }
     
-    const result = await orderRequestService.cancelOrder(orderId, userId);
+    const result = await orderRequestService.cancelOrder(orderId, req.user.id);
     
     res.status(200).json({
       message: '구매 요청이 성공적으로 취소되었습니다.',
@@ -83,8 +95,17 @@ const createInstantOrder = async (req: Request, res: Response, next: NextFunctio
   try {
     const orderData = req.body;
     
-    // TODO: 실제 인증 미들웨어에서 userId를 가져와야 함
-    const result = await orderRequestService.createInstantOrder(orderData);
+    if (!req.user?.id) {
+      throw new AuthenticationError('로그인이 필요합니다.');
+    }
+    
+    // 인증된 사용자의 ID를 사용
+    const authenticatedOrderData: TCreateOrderRequest = {
+      ...orderData,
+      userId: req.user.id
+    };
+    
+    const result = await orderRequestService.createInstantOrder(authenticatedOrderData);
     
     res.status(201).json({
       message: '즉시 구매가 성공적으로 완료되었습니다.',

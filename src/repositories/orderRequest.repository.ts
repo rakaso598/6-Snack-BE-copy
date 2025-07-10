@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma } from '@prisma/client';
 import type { TCreateOrderRequest, TCreateOrderResponse } from '../types/orderRequest.types';
+import { NotFoundError } from '../types/error';
 
 const prisma = new PrismaClient();
 
@@ -17,7 +18,7 @@ const createOrder = async (orderData: TCreateOrderRequest, tx?: Prisma.Transacti
   });
 
   if (cartItems.length !== orderData.cartItemIds.length) {
-    throw new Error('일부 카트 아이템을 찾을 수 없습니다.');
+    throw new NotFoundError('일부 카트 아이템을 찾을 수 없습니다.');
   }
 
   // 2. 각 카트 아이템으로부터 receipt 생성
@@ -82,13 +83,17 @@ const createOrder = async (orderData: TCreateOrderRequest, tx?: Prisma.Transacti
     }
   });
 
-  return result as TCreateOrderResponse;
+  if (!result) {
+    throw new NotFoundError('생성된 주문을 찾을 수 없습니다.');
+  }
+
+  return result;
 };
 
 const getOrderById = async (orderId: number, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
 
-  return await client.order.findUnique({
+  const order = await client.order.findUnique({
     where: { id: orderId },
     include: {
       orderedItems: {
@@ -106,6 +111,12 @@ const getOrderById = async (orderId: number, tx?: Prisma.TransactionClient) => {
       }
     }
   });
+
+  if (!order) {
+    throw new NotFoundError(`ID ${orderId}인 주문을 찾을 수 없습니다.`);
+  }
+
+  return order;
 };
 
 const getOrdersByUserId = async (userId: string, tx?: Prisma.TransactionClient) => {
@@ -135,25 +146,34 @@ const getOrdersByUserId = async (userId: string, tx?: Prisma.TransactionClient) 
 const updateOrderStatus = async (orderId: number, status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELED', tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
 
-  return await client.order.update({
-    where: { id: orderId },
-    data: { status },
-    include: {
-      orderedItems: {
-        include: {
-          receipt: {
-            select: {
-              id: true,
-              productName: true,
-              price: true,
-              imageUrl: true,
-              quantity: true
+  try {
+    const updatedOrder = await client.order.update({
+      where: { id: orderId },
+      data: { status },
+      include: {
+        orderedItems: {
+          include: {
+            receipt: {
+              select: {
+                id: true,
+                productName: true,
+                price: true,
+                imageUrl: true,
+                quantity: true
+              }
             }
           }
         }
       }
+    });
+
+    return updatedOrder;
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      throw new NotFoundError(`ID ${orderId}인 주문을 찾을 수 없습니다.`);
     }
-  });
+    throw error;
+  }
 };
 
 export default {

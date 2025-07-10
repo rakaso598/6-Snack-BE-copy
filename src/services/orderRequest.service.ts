@@ -12,7 +12,7 @@ const createOrder = async (orderData: TCreateOrderRequest): Promise<TCreateOrder
   }
 
   if (!orderData.cartItemIds || orderData.cartItemIds.length === 0) {
-    throw new ValidationError('카트 아이템이 필요합니다.');
+    throw new NotFoundError('카트 아이템이 필요합니다.');
   }
 
   // 트랜잭션으로 주문 생성
