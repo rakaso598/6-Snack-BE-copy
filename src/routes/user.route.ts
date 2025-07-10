@@ -52,7 +52,6 @@ userRouter.get("/me", authenticateToken, (req: Request, res: Response, next: Nex
 userRouter.patch(
   "/:userId/password",
   authenticateToken,
-  authorizeRoles("SUPER_ADMIN", "ADMIN", "USER"),
   userController.updatePassword,
 );
 export default userRouter;

@@ -42,6 +42,7 @@ const updateUserRole = async (id: string, role: UserRole) => {
   });
 };
 
+// 유저 비밀번호 업데이트
 const updatePassword = async (id: string, hashedPassword: string) => {
   return await prisma.user.update({
     where: { id },

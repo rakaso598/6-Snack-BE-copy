@@ -12,5 +12,6 @@ superAdminRouter.patch(
   authorizeRoles("SUPER_ADMIN"),
   userController.updateRole,
 );
+superAdminRouter.patch("/users/:userId/company", authenticateToken, authorizeRoles("SUPER_ADMIN"));
 
 export default superAdminRouter;
