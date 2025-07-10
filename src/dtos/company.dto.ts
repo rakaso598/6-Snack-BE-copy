@@ -3,7 +3,7 @@ export type TUpdateCompanyInfoDto = {
   passwordData?: { newPassword: string; newPasswordConfirm: string };
 };
 
-export type TUpdateCompanyNameResponseDto = {
+export type TUpdateCompanyInfoResponseDto = {
   message: string;
   company: {
     id: number;

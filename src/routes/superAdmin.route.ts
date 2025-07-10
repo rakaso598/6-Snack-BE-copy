@@ -2,6 +2,7 @@ import { Router } from "express";
 import authenticateToken from "../middlewares/jwtAuth.middleware";
 import authorizeRoles from "../middlewares/authorizeRoles.middleware";
 import userController from "../controllers/user.controller";
+import companyController from "../controllers/company.controller";
 
 const superAdminRouter = Router();
 
@@ -12,6 +13,11 @@ superAdminRouter.patch(
   authorizeRoles("SUPER_ADMIN"),
   userController.updateRole,
 );
-superAdminRouter.patch("/users/:userId/company", authenticateToken, authorizeRoles("SUPER_ADMIN"));
+superAdminRouter.patch(
+  "/users/:userId/company",
+  authenticateToken,
+  authorizeRoles("SUPER_ADMIN"),
+  companyController.updateCompanyInfo,
+);
 
 export default superAdminRouter;

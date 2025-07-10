@@ -1,4 +1,4 @@
-import { TUpdateCompanyInfoDto } from "../dtos/company.dto";
+import { TUpdateCompanyInfoDto, TUpdateCompanyInfoResponseDto } from "../dtos/company.dto";
 import companyRepository from "../repositories/company.repository";
 import { BadRequestError } from "../types/error";
 import { TCurrentUser } from "../types/user.types";
@@ -9,7 +9,7 @@ const updateCompanyInfo = async (
   updateData: TUpdateCompanyInfoDto,
   currentUser: TCurrentUser,
   companyId: number,
-) => {
+): Promise<TUpdateCompanyInfoResponseDto> => {
   // updateData를 봐서 updateData.companyName 있으면 회사명 변경 실행
   const newCompanyName = updateData.companyName;
   let newPasswordData = updateData.passwordData;
@@ -38,8 +38,18 @@ const updateCompanyInfo = async (
   }
 
   // 응답 데이터 구성
+  const company = updatedCompany || (await companyRepository.findCompanyById(companyId));
+
+  if (!company) {
+    throw new BadRequestError("회사 정보가 존재하지 않습니다.");
+  }
+
   return {
-    company: updatedCompany || (await companyRepository.findCompanyById(companyId)),
+    message: "회사 정보가 업데이트 되었습니다",
+    company: {
+      id: company.id,
+      name: company.name,
+    },
   };
 };
 
