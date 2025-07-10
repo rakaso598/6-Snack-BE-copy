@@ -3,18 +3,26 @@ import orderController from "../controllers/order.controller";
 import authenticateToken from "../middlewares/jwtAuth.middleware";
 import authorizeRoles from "../middlewares/authorizeRoles.middleware";
 import validateUpdateStatusOrderBody from "../middlewares/validateUpdateStatusOrderBody.middleware";
+import validateGetOrderQuery from "../middlewares/validateGetOrderQuery.middleware";
 
 const adminOrderRouter = Router();
 
-// 승인된 전체 구매내역 조회
-adminOrderRouter.get("/", authenticateToken, authorizeRoles("ADMIN", "SUPER_ADMIN"), orderController.getApprovedOrders);
+// 구매내역 조회(대기 or 승인)
+adminOrderRouter.get(
+  "/",
+  authenticateToken,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  validateGetOrderQuery,
+  orderController.getOrders,
+);
 
-// 승인된 구매내역 상세 조회
+// 구매내역 상세 조회(대기 or 승인)
 adminOrderRouter.get(
   "/:orderId",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  orderController.getApprovedOrder,
+  validateGetOrderQuery,
+  orderController.getOrder,
 );
 
 // 구매 승인 | 구매 반려

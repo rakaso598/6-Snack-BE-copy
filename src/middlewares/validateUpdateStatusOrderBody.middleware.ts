@@ -10,6 +10,10 @@ const validateUpdateStatusOrderBody: RequestHandler<{}, {}, TUpdateStatusOrderBo
   }
 
   if (!status) {
+    throw new ValidationError("상태 값을 입력해주세요.");
+  }
+
+  if (status !== "APPROVED" && status !== "REJECTED") {
     throw new ValidationError("올바른 상태를 입력해주세요.");
   }
 
