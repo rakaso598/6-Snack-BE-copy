@@ -1,7 +1,7 @@
 import { Router } from "express";
 import authRouter from "./auth.route";
 import cartRouter from "./cart.route";
-import orderRequestRouter from "./orderRequest.route";
+import orderRouter from "./orderRequest.route";
 import adminRouter from "./admin.route";
 import superAdminRouter from "./superAdmin.route";
 import productRouter from './product.route'

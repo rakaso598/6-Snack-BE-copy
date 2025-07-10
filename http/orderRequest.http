@@ -1,5 +1,5 @@
 ### 구매 요청 생성
-POST http://localhost:3000/order-request
+POST http://localhost:3000/orders
 Content-Type: application/json
 Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
@@ -10,15 +10,15 @@ Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 }
 
 ### 내 구매 요청 리스트 조회
-GET http://localhost:3000/order-request
+GET http://localhost:3000/orders
 Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
 ### 구매 요청 상세 조회
-GET http://localhost:3000/order-request/1
+GET http://localhost:3000/orders/1
 Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
 ### 구매 요청 취소
-PATCH http://localhost:3000/order-request/1
+PATCH http://localhost:3000/orders/1
 Content-Type: application/json
 Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
@@ -27,7 +27,7 @@ Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 }
 
 ### 즉시 구매
-POST http://localhost:3000/order-request/instant
+POST http://localhost:3000/orders/instant
 Content-Type: application/json
 Cookie: accessToken=여기에_로그인_후_발급받은_토큰
 
