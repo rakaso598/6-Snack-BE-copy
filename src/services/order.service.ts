@@ -37,7 +37,7 @@ const getApprovedOrder = async (orderId: Order["id"]) => {
   const formattedOrder = {
     ...rest,
     requester: order.user.name,
-    products: order.orderedItems.flatMap((item) => item.receipt),
+    products: order.orderedItems.map((item) => item.receipt),
   };
 
   return formattedOrder;
