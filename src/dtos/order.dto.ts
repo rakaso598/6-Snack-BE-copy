@@ -9,7 +9,6 @@ export type TOrderParamsDto = {
 };
 
 export type TUpdateStatusOrderBodyDto = {
-  approver: string;
-  adminMessage: string;
+  adminMessage?: string;
   status: "APPROVED" | "REJECTED";
 };
