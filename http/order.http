@@ -1,7 +1,14 @@
 ### 승인된 전체 구매내역 조회
 GET http://localhost:8080/admin/orders?offset=0&limit=4&orderBy=priceHigh
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1ODE0OTZkLWQzNWEtNGI3Ny1iMmVkLTNhNGZiNGFlZWUwYyIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJuYW1lIjoi6rSA66as7J6QIiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzUyMDUzMzI1LCJleHAiOjE3NTIwNTQyMjV9.0oe0AqUVgqHCilxesvIBDsrxghL9A17TPosF5SrPGRQ
 
 ### 승인된 구매내역 상세 조회
 GET http://localhost:8080/admin/orders/33
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1ODE0OTZkLWQzNWEtNGI3Ny1iMmVkLTNhNGZiNGFlZWUwYyIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJuYW1lIjoi6rSA66as7J6QIiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzUyMDUzMzI1LCJleHAiOjE3NTIwNTQyMjV9.0oe0AqUVgqHCilxesvIBDsrxghL9A17TPosF5SrPGRQ
+
+### 구매 승인 | 구매 반려
+PATCH http://localhost:8080/admin/orders/2
+Content-Type: application/json
+
+{
+  "adminMessage": "구매 승인처리 되었습니다. 3영업일 내로 배송이 완료될 예정입니다.",
+  "status": "REJECTED"
+}

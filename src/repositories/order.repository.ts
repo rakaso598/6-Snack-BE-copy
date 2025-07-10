@@ -31,7 +31,27 @@ const getApprovedById = async (id: Order["id"]) => {
   });
 };
 
+const getById = async (id: Order["id"]) => {
+  return await prisma.order.findUnique({ where: { id } });
+};
+
+const updateOrder = async (
+  id: Order["id"],
+  body: Pick<Order, "approver" | "adminMessage" | "status">,
+  tx?: Prisma.TransactionClient,
+) => {
+  const { approver, adminMessage, status } = body;
+  const client = tx || prisma;
+
+  return await client.order.update({
+    where: { id },
+    data: { approver, adminMessage, status },
+  });
+};
+
 export default {
   getApprovedOrders,
   getApprovedById,
+  getById,
+  updateOrder,
 };

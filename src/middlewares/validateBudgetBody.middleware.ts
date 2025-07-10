@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { TUpdateMonthlyBudgetBody } from "../types/budget.type";
 import { ValidationError } from "../types/error";
 
-const validatedBudgetBody: RequestHandler<{}, {}, TUpdateMonthlyBudgetBody> = (req, res, next) => {
+const validateBudgetBody: RequestHandler<{}, {}, TUpdateMonthlyBudgetBody> = (req, res, next) => {
   const { currentMonthBudget, monthlyBudget } = req.body;
 
   if (typeof currentMonthBudget === "string" || typeof monthlyBudget === "string") {
@@ -16,4 +16,4 @@ const validatedBudgetBody: RequestHandler<{}, {}, TUpdateMonthlyBudgetBody> = (r
   next();
 };
 
-export default validatedBudgetBody;
+export default validateBudgetBody;

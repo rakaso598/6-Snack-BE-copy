@@ -7,3 +7,8 @@ export type TApprovedOrderQueryDto = {
 export type TOrderParamsDto = {
   orderId: string;
 };
+
+export type TUpdateStatusOrderBodyDto = {
+  adminMessage?: string;
+  status: "APPROVED" | "REJECTED";
+};
