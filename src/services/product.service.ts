@@ -1,11 +1,11 @@
+import { Prisma } from "@prisma/client";
 import productRepository from "../repositories/product.repository";
-import { AuthenticationError, ServerError, ValidationError } from "../types/error";
+import { AuthenticationError, NotFoundError, ServerError, ValidationError } from "../types/error";
 import { ProductQueryOptions, CreateProductParams } from "../types/product.types";
 
 // 상품 등록
-const createProduct = async (input: CreateProductParams) => {
+const createProduct = async (input: CreateProductParams, tx?: Prisma.TransactionClient) => {
   const { name, price, linkUrl, imageUrl, categoryId, creatorId } = input;
-
   const errors: Record<string, string> = {};
 
   if (!creatorId) {
@@ -28,37 +28,82 @@ const createProduct = async (input: CreateProductParams) => {
     throw new ValidationError("요청 데이터가 유효하지 않습니다.", errors);
   }
 
-  const product = await productRepository.create(input);
+    const product = await productRepository.create(input, tx);
   if (!product) {
     throw new ServerError("상품 생성에 실패했습니다.");
   }
 
-  return productRepository.findById(product.id);
+  return productRepository.findById(product.id, tx);
 };
 
+// 상품 ID로 단일 상품 조회
+const getProductById = async (id: number, tx?: Prisma.TransactionClient) => {
+  const product = await productRepository.findProductById(id, tx);
 
-const getProductById = async (id: number) => {
-  return productRepository.findById(id);
+  if (!product) {
+    throw new NotFoundError("상품을 찾을 수 없습니다.");
+  }
+
+  return product;
 };
 
-const getProductList = async (options: ProductQueryOptions) => {
-  return productRepository.findManyAll(options);
+// 옵션에 따라 여러 상품 목록 조회
+const getProductList = async (
+  options: ProductQueryOptions,
+  tx?: Prisma.TransactionClient
+) => {
+  return productRepository.findManyAll(options, tx);
 };
 
-const getProductsByCreator = async (options: Pick<ProductQueryOptions, "creatorId" | "skip" | "take">) => {
+// 특정 사용자가 등록한 상품 목록 조회
+const getProductsCreator = async (
+  options: Pick<ProductQueryOptions, "creatorId" | "skip" | "take">,
+  tx?: Prisma.TransactionClient
+) => {
   if (!options.creatorId) {
     throw new ValidationError("creatorId는 필수입니다.");
   }
-  return productRepository.findManyByCreator({
-    creatorId: options.creatorId,
-    skip: options.skip,
-    take: options.take,
-  });
+
+  return await productRepository.findManyCreator(
+    {
+      creatorId: options.creatorId,
+      skip: options.skip,
+      take: options.take,
+    },
+    tx
+  );
+};
+
+// 특정 사용자가 등록한 상품 개수 조회
+const countProducts = async (creatorId: string, tx?: Prisma.TransactionClient) => {
+  return productRepository.countCreator(creatorId, tx);
+};
+
+const updateProduct = async (
+  productId: number,
+  creatorId: string,
+  input: Partial<CreateProductParams>,
+  tx?: Prisma.TransactionClient,
+) => {
+  const existing = await productRepository.findProductById(productId, tx);
+
+  if (!existing || existing.creatorId !== creatorId) {
+    throw new NotFoundError("수정할 수 있는 상품이 없거나 권한이 없습니다.");
+  }
+
+  return await productRepository.update(productId, input, tx);
+};
+
+const deleteProduct = async (id: number, tx?: Prisma.TransactionClient) => {
+  return await productRepository.softDeleteById(id, tx);
 };
 
 export default {
   createProduct,
   getProductById,
   getProductList,
-  getProductsByCreator,
+  getProductsCreator,
+  countProducts,
+  updateProduct,
+  deleteProduct,
 };
