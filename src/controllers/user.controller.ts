@@ -1,11 +1,4 @@
-import {
-  TDeleteUserResponseDto,
-  TUpdatePasswordDto,
-  TUpdatePasswordResponseDto,
-  TUpdateRoleDto,
-  TUpdateRoleResponseDto,
-  TUserIdParamsDto,
-} from "../dtos/user.dto";
+import { TUpdatePasswordDto, TUpdateRoleDto, TUserIdParamsDto } from "../dtos/user.dto";
 import userService from "../services/user.service";
 import { RequestHandler } from "express";
 
@@ -15,12 +8,8 @@ const deleteUser: RequestHandler<TUserIdParamsDto> = async (req, res, next) => {
     const userId = req.params.userId;
     const currentUser = req.user!;
 
-    await userService.deleteUser(userId, currentUser);
-
-    const response: TDeleteUserResponseDto = {
-      message: "사용자가 성공적으로 삭제되었습니다.",
-    };
-    res.status(200).json(response);
+    const result = await userService.deleteUser(userId, currentUser);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -33,13 +22,8 @@ const updateRole: RequestHandler<TUserIdParamsDto, any, TUpdateRoleDto> = async 
     const { role }: TUpdateRoleDto = req.body;
     const currentUser = req.user!;
 
-    const updatedUser = await userService.updateRole(userId, role, currentUser);
-
-    const response: TUpdateRoleResponseDto = {
-      message: "사용자 권한이 성공적으로 변경되었습니다.",
-      role: updatedUser.role as "ADMIN" | "USER",
-    };
-    res.status(200).json(response);
+    const result = await userService.updateRole(userId, role, currentUser);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -51,12 +35,8 @@ const updatePassword: RequestHandler<TUserIdParamsDto, any, TUpdatePasswordDto> 
     const passwordData: TUpdatePasswordDto = req.body;
     const currentUser = req.user!;
 
-    await userService.updatePassword(userId, passwordData, currentUser);
-
-    const response: TUpdatePasswordResponseDto = {
-      message: "비밀번호가 성공적으로 변경되었습니다.",
-    };
-    res.status(200).json(response);
+    const result = await userService.updatePassword(userId, passwordData, currentUser);
+    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
