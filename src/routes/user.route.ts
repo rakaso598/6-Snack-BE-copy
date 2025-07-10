@@ -50,7 +50,7 @@ userRouter.get("/me", authenticateToken, (req: Request, res: Response, next: Nex
 
 // 유저 비밀번호 변경
 userRouter.patch(
-  "/users/:userId/password",
+  "/:userId/password",
   authenticateToken,
   authorizeRoles("SUPER_ADMIN", "ADMIN", "USER"),
   userController.updatePassword,

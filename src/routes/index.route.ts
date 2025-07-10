@@ -19,6 +19,6 @@ indexRouter.use("/cart", cartRouter);
 // indexRouter.use("/my", myRouter);
 indexRouter.use("/auth", authRouter);
 // indexRouter.use("/invite", inviteRouter);
-// indexRouter.use("/users", userRouter);
+indexRouter.use("/users", userRouter);
 
 export default indexRouter;
