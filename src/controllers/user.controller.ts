@@ -1,4 +1,4 @@
-import { TUpdatePasswordDto, TUpdateRoleDto, TUserIdParamsDto } from "../dtos/user.dto";
+import { TGetUsersQueryDto, TUpdatePasswordDto, TUpdateRoleDto, TUserIdParamsDto } from "../dtos/user.dto";
 import userService from "../services/user.service";
 import { RequestHandler } from "express";
 
@@ -41,4 +41,15 @@ const updatePassword: RequestHandler<TUserIdParamsDto, any, TUpdatePasswordDto> 
     next(error);
   }
 };
-export default { deleteUser, updateRole, updatePassword };
+
+//  유저 조회
+const getUsersByCompany: RequestHandler<{}, any, {}, TGetUsersQueryDto> = async (req, res, next) => {
+  try {
+    const currentUser = req.user!;
+    const result = await userService.getUsersByCompany(currentUser, req.query);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+export default { deleteUser, updateRole, updatePassword, getUsersByCompany };

@@ -4,6 +4,8 @@ import {
   TDeleteUserResponseDto,
   TUpdateRoleResponseDto,
   TUpdatePasswordResponseDto,
+  TGetUsersQueryDto,
+  TGetUsersResponseDto,
 } from "../dtos/user.dto";
 import userRepository from "../repositories/user.repository";
 import { BadRequestError, NotFoundError } from "../types/error";
@@ -88,4 +90,37 @@ const updatePassword = async (
   };
 };
 
-export default { deleteUser, updateRole, updatePassword };
+// 회사 유저 목록 조회
+const getUsersByCompany = async (
+  currentUser: TCurrentUser,
+  query: TGetUsersQueryDto,
+): Promise<TGetUsersResponseDto> => {
+  const limit = query.limit || 5;
+
+  const result = await userRepository.findUsersByCompanyId(currentUser.companyId, query.name, query.cursor, limit);
+
+  let hasPrev = false;
+  if (query.cursor) {
+    hasPrev = await userRepository.hasPreviousPage(currentUser.companyId, query.cursor, query.name);
+  }
+  
+  const prevCursor = result.users.length > 0 ? result.users[0].id : undefined;
+
+  return {
+    message: query.name ? `"${query.name}" 검색 결과입니다.` : "회사 유저 목록 조회가 완료되었습니다.",
+    users: result.users.map((user) => ({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role as "ADMIN" | "USER",
+    })),
+    pagination: {
+      hasNext: result.hasNext,
+      hasPrev: hasPrev,
+      nextCursor: result.nextCursor,
+      prevCursor: hasPrev ? prevCursor : undefined,
+    },
+  };
+};
+
+export default { deleteUser, updateRole, updatePassword, getUsersByCompany };
