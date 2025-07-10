@@ -1,3 +1,5 @@
+### ===== DELETE USER TESTS =====
+
 ### 1. SUPER_ADMIN 로그인 (쿠키 획득)
 POST http://localhost:8080/auth/login
 Content-Type: application/json
@@ -19,11 +21,10 @@ DELETE http://localhost:8080/super-admin/users/non-existent-user
 ### 5. SUPER_ADMIN이 자기 자신 삭제 시도 (실패 케이스)
 DELETE http://localhost:8080/super-admin/users/user-1
 
-### 6. 쿠키 없이 삭제 시도 (실패 케이스- 이거는 로컬에서 테스트 불가 - 쿠키인증 방식때문, 추후에 브라우저에서 테스트예정))
+### 6. 쿠키 없이 삭제 시도 (실패 케이스 )
 DELETE http://localhost:8080/super-admin/users/user-3
 
-### 7. ADMIN 로그인 후 삭제 시도 (실패 케이스- (이거는 로컬에서 테스트 불가 - 쿠키인증 방식때문, 추후에 브라우저에서 테스트예정))
-# @name adminLogin
+### 7. SUPER_ADMIN 대신 ADMIN 로그인 후 삭제 시도 (실패 케이스 )
 POST http://localhost:8080/auth/login
 Content-Type: application/json
 
@@ -34,3 +35,61 @@ Content-Type: application/json
 
 ### 
 DELETE http://localhost:8080/super-admin/users/user-4
+
+### ===== UPDATE ROLE TESTS =====
+
+### 8. SUPER_ADMIN이 일반 유저를 ADMIN으로 변경 (성공 케이스)
+PATCH http://localhost:8080/super-admin/users/user-3/role
+Content-Type: application/json
+
+{
+    "role": "ADMIN"
+}
+
+### 9. SUPER_ADMIN이 ADMIN을 일반 유저로 변경 (성공 케이스)
+PATCH http://localhost:8080/super-admin/users/user-2/role
+Content-Type: application/json
+
+{
+    "role": "USER"
+}
+
+### 10. 존재하지 않는 유저 권한 변경 시도 (실패 케이스)
+PATCH http://localhost:8080/super-admin/users/non-existent-user/role
+Content-Type: application/json
+
+{
+    "role": "ADMIN"
+}
+
+### 11. SUPER_ADMIN이 자기 자신 권한 변경 시도 (실패 케이스)
+PATCH http://localhost:8080/super-admin/users/user-1/role
+Content-Type: application/json
+
+{
+    "role": "USER"
+}
+
+### 12. 잘못된 role 값으로 변경 시도 (실패 케이스)
+PATCH http://localhost:8080/super-admin/users/user-3/role
+Content-Type: application/json
+
+{
+    "role": "INVALID_ROLE"
+}
+
+### 13. role 필드 없이 요청 (실패 케이스)
+PATCH http://localhost:8080/super-admin/users/user-3/role
+Content-Type: application/json
+
+{
+    "name": "test"
+}
+
+### 14. 쿠키 없이 권한 변경 시도 (실패 케이스 )
+PATCH http://localhost:8080/super-admin/users/user-3/role
+Content-Type: application/json
+
+{
+    "role": "ADMIN"
+}
