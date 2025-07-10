@@ -1,6 +1,6 @@
 import { Router } from "express";
 import budgetController from "../controllers/budget.controller";
-import validatedBudgetBody from "../middlewares/validatedBudgetBody.middleware";
+import validateBudgetBody from "../middlewares/validateBudgetBody.middleware";
 import authenticateToken from "../middlewares/jwtAuth.middleware";
 import authorizeRoles from "../middlewares/authorizeRoles.middleware";
 
@@ -10,7 +10,7 @@ superAdminBudgetRouter.patch(
   "/",
   authenticateToken,
   authorizeRoles("SUPER_ADMIN"),
-  validatedBudgetBody,
+  validateBudgetBody,
   budgetController.updateMonthlyBudget,
 );
 
