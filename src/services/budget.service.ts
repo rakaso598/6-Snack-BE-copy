@@ -1,7 +1,5 @@
 import { MonthlyBudget } from "@prisma/client";
 import budgetRepository from "../repositories/budget.repository";
-import { formatInTimeZone } from "date-fns-tz";
-import { subMonths, subYears } from "date-fns";
 import { NotFoundError } from "../types/error";
 import { TUpdateMonthlyBudgetBody } from "../types/budget.type";
 import getDateForBudget from "../utils/date";
@@ -9,7 +7,7 @@ import getDateForBudget from "../utils/date";
 // 예산 및 지출 현황 조회(관리자, 최고 관리자)
 const getMonthlyBudget = async (companyId: MonthlyBudget["companyId"]) => {
   const { year, month, previousYear, previousMonth } = getDateForBudget();
-  
+
   const currentMonthBudget = await budgetRepository.getMonthlyBudget({ companyId, year, month });
 
   if (!currentMonthBudget) {
@@ -34,6 +32,8 @@ const getMonthlyBudget = async (companyId: MonthlyBudget["companyId"]) => {
 
 // 예산 수정(최고 관리자)
 const updateMonthlyBudget = async (companyId: MonthlyBudget["companyId"], body: TUpdateMonthlyBudgetBody) => {
+  const { year, month } = getDateForBudget();
+
   const monthlyBudget = await budgetRepository.getMonthlyBudget({ companyId, year, month });
 
   if (!monthlyBudget) {
