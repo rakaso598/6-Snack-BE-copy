@@ -43,7 +43,21 @@ const getApprovedOrder = async (orderId: Order["id"]) => {
   return formattedOrder;
 };
 
+// 구매 승인 | 구매 반려
+const updateOrder = async (orderId: Order["id"], body: Pick<Order, "approver" | "adminMessage" | "status">) => {
+  const order = await orderRepository.getById(orderId);
+
+  if (!order) {
+    throw new NotFoundError("주문을 찾을 수 없습니다.");
+  }
+
+  const updatedOrder = await orderRepository.updateOrder(orderId, body);
+
+  return updatedOrder;
+};
+
 export default {
   getApprovedOrders,
   getApprovedOrder,
+  updateOrder,
 };

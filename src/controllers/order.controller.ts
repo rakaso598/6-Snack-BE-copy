@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import orderService from "../services/order.service";
-import { TApprovedOrderQueryDto, TOrderParamsDto } from "../dtos/order.dto";
+import { TApprovedOrderQueryDto, TOrderParamsDto, TUpdateStatusOrderBodyDto } from "../dtos/order.dto";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 
 // 승인된 전체 구매내역 조회
@@ -23,7 +23,18 @@ const getApprovedOrder: RequestHandler<TOrderParamsDto> = async (req, res, next)
   res.status(200).json(order);
 };
 
+// 구매 승인 | 구매 반려
+const updateOrder: RequestHandler<TOrderParamsDto, {}, TUpdateStatusOrderBodyDto> = async (req, res, next) => {
+  const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
+  const body = req.body;
+
+  const updatedOrder = await orderService.updateOrder(orderId, body);
+
+  res.status(200).json(updatedOrder);
+};
+
 export default {
   getApprovedOrders,
   getApprovedOrder,
+  updateOrder,
 };
