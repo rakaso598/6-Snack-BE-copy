@@ -2,10 +2,8 @@ import prisma from "../config/prisma";
 import { Prisma } from "@prisma/client";
 import type { ProductQueryOptions, CreatorQueryOptions, CreateProductParams } from "../types/product.types";
 
-const findManyAll = async (
-  options: ProductQueryOptions = {},
-  tx?: Prisma.TransactionClient
-) => {
+// 전체 상품을 조건에 맞게 조회
+const findManyAll = async (options: ProductQueryOptions = {}, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
   const { sort = "latest", category, take = 9, cursor } = options;
 
@@ -20,6 +18,7 @@ const findManyAll = async (
   return client.product.findMany({
     where: {
       ...(category && { categoryId: category }),
+      deletedAt: null,
     },
     orderBy,
     take,
@@ -32,11 +31,8 @@ const findManyAll = async (
   });
 };
 
-const findManyAllPopular = async ({
-  category,
-  skip = 0,
-  take = 6,
-}: ProductQueryOptions) => {
+// 인기 상품
+const findManyAllPopular = async ({ category, skip = 0, take = 6 }: ProductQueryOptions) => {
   const result = await prisma.$queryRaw`
     SELECT 
       p.*,
@@ -52,9 +48,11 @@ const findManyAllPopular = async ({
   return result;
 };
 
-const findById = (id: number) => {
-  return prisma.product.findUnique({
-    where: { id },
+// ID로 단일 상품 조회, **deletedAt이 null**인 활성 상품만 조회
+const findById = (id: number, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.product.findFirst({
+    where: { id, deletedAt: null },
     include: {
       category: true,
       creator: true,
@@ -62,13 +60,21 @@ const findById = (id: number) => {
   });
 };
 
-const create = (data: CreateProductParams) => {
-  return prisma.product.create({ data });
+// 새로운 상품 생성
+const create = (data: CreateProductParams, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.product.create({ data });
 };
 
-const findManyByCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions) => {
-  return prisma.product.findMany({
-    where: { creatorId },
+// 특정 사용자의 상품 목록 조회
+const findManyCreator = (
+  { creatorId, skip = 0, take = 10 }: CreatorQueryOptions,
+  tx?: Prisma.TransactionClient
+) => {
+  const client = tx || prisma;
+
+  return client.product.findMany({
+    where: { creatorId, deletedAt: null },
     skip,
     take,
     include: {
@@ -81,9 +87,47 @@ const findManyByCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptio
   });
 };
 
+// 특정 사용자 상품 총 개수 조회
+const countCreator = (creatorId: string, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.product.count({
+    where: { creatorId, deletedAt: null },
+  });
+};
+
+const findProductById = async (id: number, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return await client.product.findUnique({
+    where: { id, deletedAt: null },
+    include: {
+      category: true,
+      creator: true,
+    },
+  });
+};
+
+const update = async (id: number, data: Partial<CreateProductParams>, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return await client.product.update({
+    where: { id, deletedAt: null },
+    data,
+  });
+};
+
+const softDeleteById = async (id: number, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return await client.product.update({
+    where: { id },
+    data: { deletedAt: new Date() },
+  });
+};
 export default {
   create,
   findById,
   findManyAll,
-  findManyByCreator,
+  findManyCreator,
+  countCreator,
+  findProductById,
+  update,
+  softDeleteById,
 };

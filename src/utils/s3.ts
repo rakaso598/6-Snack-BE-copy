@@ -10,16 +10,16 @@ export const s3 = new S3Client({
 
 export const uploadImageToS3 = async (file: Express.Multer.File) => {
   const fileKey = `products/${Date.now()}_${file.originalname}`;
+  const bucketName = process.env.AWS_BUCKET_NAME!;
 
   const command = new PutObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET_NAME!,
+    Bucket: bucketName,
     Key: fileKey,
     Body: file.buffer,
     ContentType: file.mimetype,
-    ACL: "public-read",
   });
 
   await s3.send(command);
 
-  return `https://${process.env.AWS_S3_BUCKET_NAME}.s3.amazonaws.com/${fileKey}`;
+  return `https://${bucketName}.s3.amazonaws.com/${fileKey}`;
 };
