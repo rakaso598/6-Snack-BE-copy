@@ -12,3 +12,12 @@ export type TUpdateRoleResponseDto = {
   message: string;
   role: UserRole;
 };
+
+export type TUpdatePasswordDto = {
+  newPassword: string;
+  newPasswordConfirm: string;
+}
+
+export type TUpdatePasswordResponseDto = {
+  message: string;
+}

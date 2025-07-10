@@ -42,4 +42,20 @@ const updateUserRole = async (id: string, role: UserRole) => {
   });
 };
 
-export default { findActiveUserById, deleteUser, updateUserRole };
+const updatePassword = async (id: string, hashedPassword: string) => {
+  return await prisma.user.update({
+    where: { id },
+    data: { password: hashedPassword },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      companyId: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  });
+};
+
+export default { findActiveUserById, deleteUser, updateUserRole, updatePassword };

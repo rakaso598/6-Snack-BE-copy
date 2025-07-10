@@ -1,7 +1,8 @@
-import { UserRole } from "../dtos/user.dto";
+import { TUpdatePasswordDto, UserRole } from "../dtos/user.dto";
 import userRepository from "../repositories/user.repository";
 import { BadRequestError, NotFoundError } from "../types/error";
 import { TCurrentUser } from "../types/user.types";
+import bcrypt from "bcrypt";
 
 // 유저 탈퇴
 const deleteUser = async (userId: string, currentUser: TCurrentUser) => {
@@ -37,4 +38,27 @@ const updateRole = async (userId: string, role: UserRole, currentUser: TCurrentU
   return await userRepository.updateUserRole(userId, role);
 };
 
-export default { deleteUser, updateRole };
+// 유저 비밀번호 변경
+const updatePassword = async (userId: string, passwordData: TUpdatePasswordDto, currentUser: TCurrentUser) => {
+  // 자기 자신만 변경 가능한지 확인
+  if (userId !== currentUser.id) {
+    throw new BadRequestError("자기 자신의 비밀번호만 변경할 수 있습니다.");
+  }
+
+  // 비밀번호와 확인 비밀번호 일치 체크
+  if (passwordData.newPassword !== passwordData.newPasswordConfirm) {
+    throw new BadRequestError("비밀번호가 일치하지 않습니다.");
+  }
+
+  // 비밀번호 유효성 검증 (최소 8자)
+  if (passwordData.newPassword.length < 8) {
+    throw new BadRequestError("비밀번호는 최소 8자 이상이어야 합니다.");
+  }
+
+  // 비밀번호 해싱
+  const hashedPassword = await bcrypt.hash(passwordData.newPassword, 10);
+
+  return await userRepository.updatePassword(userId, hashedPassword);
+};
+
+export default { deleteUser, updateRole, updatePassword };

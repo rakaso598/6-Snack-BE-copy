@@ -1,4 +1,10 @@
-import { TDeleteUserResponseDto, TUpdateRoleDto, TUpdateRoleResponseDto } from "../dtos/user.dto";
+import {
+  TDeleteUserResponseDto,
+  TUpdatePasswordDto,
+  TUpdatePasswordResponseDto,
+  TUpdateRoleDto,
+  TUpdateRoleResponseDto,
+} from "../dtos/user.dto";
 import userService from "../services/user.service";
 import { RequestHandler } from "express";
 
@@ -37,4 +43,21 @@ const updateRole: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-export default { deleteUser, updateRole };
+
+const updatePassword: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const passwordData: TUpdatePasswordDto = req.body;
+    const currentUser = req.user!;
+
+    const updatedUser = await userService.updatePassword(userId, passwordData, currentUser);
+
+    const response: TUpdatePasswordResponseDto = {
+      message: "비밀번호가 성공적으로 변경되었습니다.",
+    };
+    res.status(200).json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+export default { deleteUser, updateRole, updatePassword };
