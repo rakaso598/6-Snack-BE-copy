@@ -9,6 +9,10 @@ const validatedBudgetBody: RequestHandler<{}, {}, TUpdateMonthlyBudgetBody> = (r
     throw new ValidationError("이번 달 예산 또는 매달 예산에는 숫자만 입력해주세요.");
   }
 
+  if (currentMonthBudget < 0 || monthlyBudget < 0) {
+    throw new ValidationError("예산은 0원 이상으로 설정해주세요.");
+  }
+
   next();
 };
 
