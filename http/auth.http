@@ -39,7 +39,25 @@ Content-Type: application/json
   "confirmPassword": "password123"
 }
 
-### 로그인
+### 로그인(일반 유저)
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@codeit.com",
+  "password": "11111111"
+}
+
+### 로그인(관리자)
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@codeit.com",
+  "password": "11111111"
+}
+
+### 로그인(최고 관리자)
 POST {{url}}/auth/login
 Content-Type: application/json
 
