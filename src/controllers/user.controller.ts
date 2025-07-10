@@ -4,12 +4,13 @@ import {
   TUpdatePasswordResponseDto,
   TUpdateRoleDto,
   TUpdateRoleResponseDto,
+  TUserIdParamsDto,
 } from "../dtos/user.dto";
 import userService from "../services/user.service";
 import { RequestHandler } from "express";
 
 // 유저 탈퇴
-const deleteUser: RequestHandler<{ userId: string }> = async (req, res, next) => {
+const deleteUser: RequestHandler<TUserIdParamsDto> = async (req, res, next) => {
   try {
     const userId = req.params.userId;
     const currentUser = req.user!;
@@ -26,7 +27,7 @@ const deleteUser: RequestHandler<{ userId: string }> = async (req, res, next) =>
 };
 
 // 유저 권한 변경
-const updateRole: RequestHandler<{ userId: string }, any, TUpdateRoleDto> = async (req, res, next) => {
+const updateRole: RequestHandler<TUserIdParamsDto, any, TUpdateRoleDto> = async (req, res, next) => {
   try {
     const userId = req.params.userId;
     const { role }: TUpdateRoleDto = req.body;
@@ -44,7 +45,7 @@ const updateRole: RequestHandler<{ userId: string }, any, TUpdateRoleDto> = asyn
   }
 };
 
-const updatePassword: RequestHandler<{ userId: string }, any, TUpdatePasswordDto> = async (req, res, next) => {
+const updatePassword: RequestHandler<TUserIdParamsDto, any, TUpdatePasswordDto> = async (req, res, next) => {
   try {
     const userId = req.params.userId;
     const passwordData: TUpdatePasswordDto = req.body;

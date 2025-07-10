@@ -16,8 +16,13 @@ export type TUpdateRoleResponseDto = {
 export type TUpdatePasswordDto = {
   newPassword: string;
   newPasswordConfirm: string;
-}
+};
 
 export type TUpdatePasswordResponseDto = {
   message: string;
-}
+};
+
+// Path Parameters DTOs
+export type TUserIdParamsDto = {
+  userId: string;
+};
