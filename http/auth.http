@@ -62,8 +62,8 @@ POST {{url}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "super_admin@codeit.com",
-  "password": "11111111"
+  "email": "admin@example.com",
+  "password": "adminpass123"
 }
 
 ### 내 정보 조회

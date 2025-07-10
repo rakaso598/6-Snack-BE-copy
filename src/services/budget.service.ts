@@ -4,17 +4,12 @@ import { formatInTimeZone } from "date-fns-tz";
 import { subMonths, subYears } from "date-fns";
 import { NotFoundError } from "../types/error";
 import { TUpdateMonthlyBudgetBody } from "../types/budget.type";
-
-const DATE = new Date();
-const TIME_ZONE = "Asia/Seoul";
-
-const year = formatInTimeZone(DATE, TIME_ZONE, "yyyy");
-const month = formatInTimeZone(DATE, TIME_ZONE, "MM");
-const previousYear = formatInTimeZone(subYears(DATE, 1), TIME_ZONE, "yyyy");
-const previousMonth = formatInTimeZone(subMonths(DATE, 1), TIME_ZONE, "MM");
+import getDateForBudget from "../utils/date";
 
 // 예산 및 지출 현황 조회(관리자, 최고 관리자)
 const getMonthlyBudget = async (companyId: MonthlyBudget["companyId"]) => {
+  const { year, month, previousYear, previousMonth } = getDateForBudget();
+  
   const currentMonthBudget = await budgetRepository.getMonthlyBudget({ companyId, year, month });
 
   if (!currentMonthBudget) {

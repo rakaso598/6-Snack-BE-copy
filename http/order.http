@@ -1,5 +1,7 @@
 ### 승인된 전체 구매내역 조회
-GET http://localhost:8080/admin/orders
+GET http://localhost:8080/admin/orders?offset=0&limit=4&orderBy=priceHigh
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1ODE0OTZkLWQzNWEtNGI3Ny1iMmVkLTNhNGZiNGFlZWUwYyIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJuYW1lIjoi6rSA66as7J6QIiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzUyMDUzMzI1LCJleHAiOjE3NTIwNTQyMjV9.0oe0AqUVgqHCilxesvIBDsrxghL9A17TPosF5SrPGRQ
 
-### 승인된 구매내역 상세 조회s
-GET http://localhost:8080/admin/orders/4
+### 승인된 구매내역 상세 조회
+GET http://localhost:8080/admin/orders/33
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1ODE0OTZkLWQzNWEtNGI3Ny1iMmVkLTNhNGZiNGFlZWUwYyIsImVtYWlsIjoiYWRtaW5AZXhhbXBsZS5jb20iLCJuYW1lIjoi6rSA66as7J6QIiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzUyMDUzMzI1LCJleHAiOjE3NTIwNTQyMjV9.0oe0AqUVgqHCilxesvIBDsrxghL9A17TPosF5SrPGRQ
