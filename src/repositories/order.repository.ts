@@ -1,4 +1,4 @@
-import { Order, OrderStatus, Prisma } from "@prisma/client";
+import { Order, Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { TGetOrdersQuery, TGetOrderStatus } from "../types/order.types";
 

@@ -3,7 +3,7 @@ import orderRepository from "../repositories/order.repository";
 import { NotFoundError } from "../types/error";
 import { TGetOrdersQuery, TOrderWithBudget } from "../types/order.types";
 import budgetRepository from "../repositories/budget.repository";
-import getDateForBudget from "../utils/date";
+import getDateForBudget from "../utils/getDateForBudget";
 
 // 구매내역 조회(대기 or 승인)
 const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) => {

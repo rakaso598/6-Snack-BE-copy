@@ -2,7 +2,7 @@ import { MonthlyBudget } from "@prisma/client";
 import budgetRepository from "../repositories/budget.repository";
 import { NotFoundError } from "../types/error";
 import { TUpdateMonthlyBudgetBody } from "../types/budget.type";
-import getDateForBudget from "../utils/date";
+import getDateForBudget from "../utils/getDateForBudget";
 
 // 예산 및 지출 현황 조회(관리자, 최고 관리자)
 const getMonthlyBudget = async (companyId: MonthlyBudget["companyId"]) => {

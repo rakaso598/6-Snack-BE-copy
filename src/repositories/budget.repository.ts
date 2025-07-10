@@ -1,4 +1,4 @@
-import { MonthlyBudget, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { TMonthlyBudget, TTotalExpense, TUpdateMonthlyBudgetBody } from "../types/budget.type";
 
