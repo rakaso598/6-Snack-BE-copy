@@ -9,20 +9,61 @@ POST {{url}}/auth/signup
 Content-Type: application/json
 
 {
-    "email": "testuser1@example.com",
-    "name": "Test User1",
-    "password": "password123",
-    "role": "USER",
-    "companyId": 1
+  "email": "admin@example.com",
+  "name": "관리자",
+  "password": "adminpass123",
+  "confirmPassword": "adminpass123",
+  "companyName": "MyCompany Inc.",
+  "bizNumber": "1234567800"
 }
 
-### 로그인
+### 초대 링크 생성
+POST {{url}}/invite
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "name": "새로운 사용자",
+  "role": "USER",
+  "companyId": 1,
+  "invitedById": "user-1",
+  "expiresInDays": 7
+}
+
+### 회원가입 (일반유저, 관리자) - 초대 링크 사용
+POST {{url}}/auth/signup/{{inviteId}}
+Content-Type: application/json
+
+{
+  "password": "password123",
+  "confirmPassword": "password123"
+}
+
+### 로그인(일반 유저)
 POST {{url}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "testuser1@example.com",
-    "password": "password123"
+  "email": "user@codeit.com",
+  "password": "11111111"
+}
+
+### 로그인(관리자)
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@codeit.com",
+  "password": "11111111"
+}
+
+### 로그인(최고 관리자)
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "super_admin@codeit.com",
+  "password": "11111111"
 }
 
 ### 내 정보 조회

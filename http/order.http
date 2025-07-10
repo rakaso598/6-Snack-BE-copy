@@ -1,5 +1,14 @@
 ### 승인된 전체 구매내역 조회
-GET http://localhost:8080/admin/orders
+GET http://localhost:8080/admin/orders?offset=0&limit=4&orderBy=priceHigh
 
-### 승인된 구매내역 상세 조회s
-GET http://localhost:8080/admin/orders/4
+### 승인된 구매내역 상세 조회
+GET http://localhost:8080/admin/orders/33
+
+### 구매 승인 | 구매 반려
+PATCH http://localhost:8080/admin/orders/2
+Content-Type: application/json
+
+{
+  "adminMessage": "구매 승인처리 되었습니다. 3영업일 내로 배송이 완료될 예정입니다.",
+  "status": "REJECTED"
+}
