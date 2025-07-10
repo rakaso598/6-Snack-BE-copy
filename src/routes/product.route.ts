@@ -2,6 +2,7 @@ import { Router } from "express";
 import productController from "../controllers/product.controller";
 import authenticateToken from "../middlewares/jwtAuth.middleware";
 import upload from "../middlewares/upload.middleware";
+import authorizeRoles from "../middlewares/authorizeRoles.middleware";
 
 const router = Router();
 

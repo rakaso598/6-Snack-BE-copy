@@ -49,8 +49,9 @@ const findManyAllPopular = async ({ category, skip = 0, take = 6 }: ProductQuery
 };
 
 // ID로 단일 상품 조회, **deletedAt이 null**인 활성 상품만 조회
-const findById = (id: number) => {
-  return prisma.product.findUnique({
+const findById = (id: number, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.product.findFirst({
     where: { id, deletedAt: null },
     include: {
       category: true,
@@ -60,12 +61,19 @@ const findById = (id: number) => {
 };
 
 // 새로운 상품 생성
-const create = (data: CreateProductParams) => {
-  return prisma.product.create({ data });
+const create = (data: CreateProductParams, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.product.create({ data });
 };
-// 특정 사용자의 상품 목록 조회, **deletedAt이 null**인 활성 상품만
-const findManyCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions) => {
-  return prisma.product.findMany({
+
+// 특정 사용자의 상품 목록 조회
+const findManyCreator = (
+  { creatorId, skip = 0, take = 10 }: CreatorQueryOptions,
+  tx?: Prisma.TransactionClient
+) => {
+  const client = tx || prisma;
+
+  return client.product.findMany({
     where: { creatorId, deletedAt: null },
     skip,
     take,
@@ -80,14 +88,16 @@ const findManyCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions
 };
 
 // 특정 사용자 상품 총 개수 조회
-const countCreator = (creatorId: string) => {
-  return prisma.product.count({
+const countCreator = (creatorId: string, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.product.count({
     where: { creatorId, deletedAt: null },
   });
 };
 
-export const findProductById = async (id: number) => {
-  return await prisma.product.findUnique({
+const findProductById = async (id: number, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return await client.product.findUnique({
     where: { id, deletedAt: null },
     include: {
       category: true,
@@ -96,15 +106,17 @@ export const findProductById = async (id: number) => {
   });
 };
 
-const update = async (id: number, data: Partial<CreateProductParams>) => {
-  return await prisma.product.update({
+const update = async (id: number, data: Partial<CreateProductParams>, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return await client.product.update({
     where: { id, deletedAt: null },
     data,
   });
 };
 
-const softDeleteById = async (id: number) => {
-  return await prisma.product.update({
+const softDeleteById = async (id: number, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return await client.product.update({
     where: { id },
     data: { deletedAt: new Date() },
   });

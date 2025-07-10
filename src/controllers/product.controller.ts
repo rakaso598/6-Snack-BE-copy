@@ -94,53 +94,41 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
 };
 
 //유저가 등록한상품 목록
-const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async (req, res) => {
+const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async (req, res, next) => {
   try {
     const creatorId = req.user?.id;
-
     if (!creatorId) {
-      res.status(401).json({ message: "로그인이 필요합니다." });
-      return;
+      throw new AuthenticationError("로그인이 필요합니다.");
     }
 
     const page = req.query.page ? parseNumberOrThrow(req.query.page, "page") : 1;
     const limit = req.query.limit ? parseNumberOrThrow(req.query.limit, "limit") : 10;
     const skip = (page - 1) * limit;
 
-    const params: TGetMyProductsDto = {
-      creatorId,
-      page,
-      limit,
-      skip,
-    };
-
     const [items, totalCount] = await Promise.all([
-      productService.getProductsCreator({ creatorId: params.creatorId, skip: params.skip, take: params.limit }),
-      productService.countProducts(params.creatorId),
+      productService.getProductsCreator({ creatorId, skip, take: limit }),
+      productService.countProducts(creatorId),
     ]);
 
     res.json({
       items,
       meta: {
         totalCount,
-        currentPage: params.page,
-        itemsPerPage: params.limit,
-        totalPages: Math.ceil(totalCount / params.limit),
+        currentPage: page,
+        itemsPerPage: limit,
+        totalPages: Math.ceil(totalCount / limit),
       },
     });
   } catch (error) {
-    console.error("getMyProducts error:", error);
-    res.status(500).json({ message: "서버 에러 발생" });
+    next(error); 
   }
 };
+
 
 //상품 상세 페이지
 export const getProductDetail: RequestHandler<TProductIdParamsDto> = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) {
-      throw new BadRequestError("상품 ID는 숫자여야 합니다.");
-    }
+    const id = parseNumberOrThrow(req.params.id, "상품 ID");
 
     const product = await productService.getProductById(id);
     res.json(product);
@@ -149,15 +137,11 @@ export const getProductDetail: RequestHandler<TProductIdParamsDto> = async (req,
   }
 };
 
+
 //상품 수정
 export const updateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdateProductDto> = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) {
-      res.status(400).json({ message: "상품 ID는 숫자여야 합니다." });
-      return;
-    }
-
+    const id = parseNumberOrThrow(req.params.id, "상품 ID");
     const { name, price, linkUrl, categoryId } = req.body;
     const creatorId = req.user?.id;
 
@@ -200,20 +184,16 @@ export const updateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdateProdu
 //상품 삭제
 export const deleteProduct: RequestHandler<{ id: string }> = async (req, res, next) => {
   try {
-    const productId = Number(req.params.id);
+    const productId = parseNumberOrThrow(req.params.id, "상품 ID");
     const userId = req.user?.id;
     const userRole = req.user?.role;
-
-    if (isNaN(productId)) {
-      throw new BadRequestError("상품 ID는 숫자여야 합니다.");
-    }
 
     const product = await productService.getProductById(productId);
     if (!product) {
       throw new NotFoundError("상품을 찾을 수 없습니다.");
     }
 
-    const isAdmin = userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN
+    const isAdmin = userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN;
     const isOwner = product.creatorId === userId;
     if (!isOwner && !isAdmin) {
       throw new ForbiddenError("본인이 등록한 상품만 삭제할 수 있습니다.");
@@ -225,6 +205,7 @@ export const deleteProduct: RequestHandler<{ id: string }> = async (req, res, ne
     next(error);
   }
 };
+
 
 export default {
   createProduct,

@@ -36,3 +36,4 @@ export type TUpdateProductDto = {
   linkUrl: string;
   categoryId: string;
 };
+

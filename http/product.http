@@ -1,7 +1,6 @@
+# 포스트맨으로 실행시켜주세요
 POST http://localhost:8080/products
-Content-Type: multipart/form-data
-Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUwNWEyOTdhLTNhMjQtNGNiMS04MWIyLWVmYmUzMmEzZTRkZiIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNTI3NTMsImV4cCI6MTc1MjA1MzY1M30.8RkX8B2fRsa77cnZ42qUBMnF9r9JVlT6SNvVlewKXhY;
-
+# Body
 FormData:
 - name: 포도
 - categoryId: 28
@@ -15,11 +14,12 @@ GET http://localhost:8080/my/products
 Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5OWQ0NjYwLWU5M2MtNDA1My04MjUwLWIyMzE4MThlODgzZiIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNzU5OTUsImV4cCI6MTc1MjA3Njg5NX0.YuROnKaa9kg9X1BNCGxCb7TbJeZ_28NWoWKYpW8xAyY;
 
 ### 상품 상세 페이지
-GET http://localhost:8080/products/15
+GET http://localhost:8080/products/17
 Content-Type: application/json
 Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5OWQ0NjYwLWU5M2MtNDA1My04MjUwLWIyMzE4MThlODgzZiIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNzY5ODAsImV4cCI6MTc1MjA3Nzg4MH0.60Ywhc3zquw0GajtYXbXAD3k1LpT59Jx42dWPQXzd4k;
+
 ### 상품 수정
-PATCH http://localhost:8080/products/15
+PATCH http://localhost:8080/products/17
 Content-Type: application/json
 Cookie:accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5OWQ0NjYwLWU5M2MtNDA1My04MjUwLWIyMzE4MThlODgzZiIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNzM0MDUsImV4cCI6MTc1MjA3NDMwNX0.kSrVrR-c_0P4_bRB_yBq50SE0SYmZd1aN5S54e8GT74;
 
