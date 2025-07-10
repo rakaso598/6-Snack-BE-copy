@@ -1,0 +1,2 @@
+### 예산 및 지출 현황 조회
+GET http://localhost:8080/admin/2/budgets
