@@ -12,13 +12,13 @@ import userRouter from "./user.route";
 const indexRouter = Router();
 
 indexRouter.use("/super-admin", superAdminRouter);
-// indexRouter.use("/admin", adminRouter);
-// indexRouter.use("/products", productRouter);
+indexRouter.use("/admin", adminRouter);
+indexRouter.use("/products", productRouter);
 indexRouter.use("/cart", cartRouter);
 indexRouter.use("/orders", orderRequestRouter);
 indexRouter.use("/my", myRouter);
 indexRouter.use("/auth", authRouter);
-// indexRouter.use("/invite", inviteRouter);
+indexRouter.use("/invite", inviteRouter);
 indexRouter.use("/users", userRouter);
 
 export default indexRouter;
