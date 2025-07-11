@@ -1,10 +1,10 @@
-import { BadRequestError } from "../types/error";
+import { ValidationError } from "../types/error";
 
 export const parseNumberOrThrow = (value: string, fieldName: string): number => {
   const num = Number(value);
 
   if (isNaN(num)) {
-    throw new BadRequestError(`${fieldName}이 숫자여야 합니다.`);
+    throw new ValidationError(`${fieldName}에는 숫자만 입력해주세요.`);
   }
 
   return num;
