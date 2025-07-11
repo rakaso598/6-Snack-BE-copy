@@ -1,4 +1,4 @@
-import { Prisma, Role } from '@prisma/client';
+import { Prisma, Role } from "@prisma/client";
 import prisma from "../config/prisma";
 
 /**
@@ -52,7 +52,11 @@ const findInviteById = async (inviteId: string) => {
  * @param prismaTransaction - 트랜잭션 내에서 사용할 Prisma 트랜잭션 클라이언트
  * @returns 생성된 회사 정보
  */
-const createCompany = async (data: { name: string; bizNumber: string }, prismaTransaction: Prisma.TransactionClient) => {
+
+const createCompany = async (
+  data: { name: string; bizNumber: string },
+  prismaTransaction: Prisma.TransactionClient,
+) => {
   return prismaTransaction.company.create({
     data: {
       name: data.name,
@@ -67,7 +71,16 @@ const createCompany = async (data: { name: string; bizNumber: string }, prismaTr
  * @param prismaTransaction - 트랜잭션 내에서 사용할 Prisma 트랜잭션 클라이언트
  * @returns 생성된 사용자 정보 (선택된 필드만)
  */
-const createUser = async (data: { email: string; name: string; password: string; role: Role; companyId: number }, prismaTransaction: Prisma.TransactionClient) => {
+const createUser = async (
+  data: {
+    email: string;
+    name: string;
+    password: string;
+    role: Role;
+    companyId: number;
+  },
+  prismaTransaction: Prisma.TransactionClient,
+) => {
   return prismaTransaction.user.create({
     data: {
       email: data.email,
@@ -116,7 +129,9 @@ const updateInviteToUsed = async (inviteId: string, prismaTransaction: Prisma.Tr
  * @param callback - 트랜잭션 내에서 실행될 비동기 콜백 함수
  * @returns 콜백 함수의 결과
  */
-const runInTransaction = async <T>(callback: (prismaTransaction: Prisma.TransactionClient) => Promise<T>): Promise<T> => {
+const runInTransaction = async <T>(
+  callback: (prismaTransaction: Prisma.TransactionClient) => Promise<T>,
+): Promise<T> => {
   return prisma.$transaction(callback);
 };
 
