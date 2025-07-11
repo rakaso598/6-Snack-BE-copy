@@ -10,7 +10,6 @@ export type TGetOrderParamsDto = {
 };
 
 export type TUpdateStatusOrderBodyDto = {
-  approver: string;
-  adminMessage: string;
+  adminMessage?: string;
   status: "APPROVED" | "REJECTED";
 };

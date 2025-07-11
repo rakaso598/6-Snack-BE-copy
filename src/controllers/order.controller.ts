@@ -26,10 +26,11 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
 
 // 구매 승인 | 구매 반려
 const updateOrder: RequestHandler<TGetOrderParamsDto, {}, TUpdateStatusOrderBodyDto> = async (req, res, next) => {
+  const approver = req.user!.name;
   const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
-  const body = req.body;
+  const { adminMessage = "", status } = req.body;
 
-  const updatedOrder = await orderService.updateOrder(orderId, body);
+  const updatedOrder = await orderService.updateOrder(orderId, { approver, adminMessage, status });
 
   res.status(200).json(updatedOrder);
 };

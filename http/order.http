@@ -9,7 +9,6 @@ PATCH http://localhost:8080/admin/orders/2
 Content-Type: application/json
 
 {
-  "approver": "최고 관리자",
   "adminMessage": "구매 승인처리 되었습니다. 3영업일 내로 배송이 완료될 예정입니다.",
-  "status": "PENDING"
+  "status": "REJECTED"
 }

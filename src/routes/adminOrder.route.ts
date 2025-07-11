@@ -34,4 +34,13 @@ adminOrderRouter.patch(
   orderController.updateOrder,
 );
 
+// 구매 승인 | 구매 반려
+adminOrderRouter.patch(
+  "/:orderId",
+  authenticateToken,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  validateUpdateStatusOrderBody,
+  orderController.updateOrder,
+);
+
 export default adminOrderRouter;
