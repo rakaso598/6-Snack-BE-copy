@@ -1,0 +1,104 @@
+### SUPER_ADMIN 로그인 (쿠키 설정)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "super_admin@codeit.com",
+  "password": "11111111"
+}
+
+### 회사 정보 업데이트 (SUPER_ADMIN만 가능)
+PATCH http://localhost:8080/super-admin/users/user-1/company
+Content-Type: application/json
+
+{
+  "companyName": "코드다운",
+  "passwordData": {
+    "newPassword": "newpassword123",
+    "newPasswordConfirm": "newpassword123"
+  }
+}
+
+### 회사 정보 업데이트 다시 목데이터 값으로 초기화
+PATCH http://localhost:8080/super-admin/users/user-1/company
+Content-Type: application/json
+
+{
+  "companyName": "코드잇",
+  "passwordData": {
+    "newPassword": "11111111",
+    "newPasswordConfirm": "11111111"
+  }
+}
+
+### 회사명만 업데이트
+PATCH http://localhost:8080/super-admin/users/user-1/company
+Content-Type: application/json
+
+{
+  "companyName": "업데이트된 회사명"
+}
+
+### 비밀번호만 업데이트
+PATCH http://localhost:8080/super-admin/users/user-1/company
+Content-Type: application/json
+
+{
+  "passwordData": {
+    "newPassword": "newpassword456",
+    "newPasswordConfirm": "newpassword456"
+  }
+}
+
+### 에러 케이스: 회사명과 비밀번호 모두 없음
+PATCH http://localhost:8080/super-admin/users/user-1/company
+Content-Type: application/json
+
+{
+}
+
+### 에러 케이스: 비밀번호 불일치
+PATCH http://localhost:8080/super-admin/users/user-1/company
+Content-Type: application/json
+
+{
+  "passwordData": {
+    "newPassword": "password123",
+    "newPasswordConfirm": "password456"
+  }
+}
+
+### 에러 케이스: 비밀번호 8자 미만
+PATCH http://localhost:8080/super-admin/users/user-1/company
+Content-Type: application/json
+
+{
+  "passwordData": {
+    "newPassword": "123",
+    "newPasswordConfirm": "123"
+  }
+} 
+=== 회사 유저 목록조회 ====
+### SUPER_ADMIN 로그인 (쿠키 설정)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "super_admin@codeit.com",
+  "password": "11111111"
+}
+
+### 전체 회사 유저 목록 조회 (첫 페이지)
+GET http://localhost:8080/super-admin/users
+
+### 다음 페이지 조회
+GET http://localhost:8080/super-admin/users?cursor=user-3
+
+### 이름으로 검색
+GET http://localhost:8080/super-admin/users?name=관리자
+
+### 이름 검색 + 페이지네이션
+GET http://localhost:8080/super-admin/users?name=유저&cursor=user-4
+
+### 개수 지정 (3개씩)
+GET http://localhost:8080/super-admin/users?limit=3
