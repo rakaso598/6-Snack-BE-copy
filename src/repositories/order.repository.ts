@@ -1,16 +1,21 @@
-import { Order, Prisma } from "@prisma/client";
+import { Order, OrderStatus, Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
-import { TApprovedOrderQuery } from "../types/order.types";
+import { TGetOrdersQuery, TGetOrderStatus } from "../types/order.types";
 
-const getApprovedOrders = async ({ offset, limit, orderBy }: TApprovedOrderQuery) => {
+const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) => {
   const sortOptions: Record<"latest" | "priceLow" | "priceHigh", Prisma.OrderOrderByWithRelationInput> = {
     latest: { createdAt: "desc" },
     priceLow: { totalPrice: "asc" },
     priceHigh: { totalPrice: "desc" },
   };
 
+  const statusOptions: TGetOrderStatus = {
+    pending: "PENDING",
+    approved: "APPROVED",
+  };
+
   return await prisma.order.findMany({
-    where: { status: "APPROVED" },
+    where: { status: statusOptions[status] },
     skip: offset,
     take: limit,
     orderBy: sortOptions[orderBy] || sortOptions["latest"],
@@ -21,9 +26,14 @@ const getApprovedOrders = async ({ offset, limit, orderBy }: TApprovedOrderQuery
   });
 };
 
-const getApprovedById = async (id: Order["id"]) => {
+const getOrderByIdAndStatus = async (id: Order["id"], status: "pending" | "approved") => {
+  const statusOptions: TGetOrderStatus = {
+    pending: "PENDING",
+    approved: "APPROVED",
+  };
+
   return await prisma.order.findFirst({
-    where: { id, status: "APPROVED" },
+    where: { id, status: statusOptions[status] },
     include: {
       user: true,
       orderedItems: { include: { receipt: true } },
@@ -31,8 +41,14 @@ const getApprovedById = async (id: Order["id"]) => {
   });
 };
 
-const getById = async (id: Order["id"]) => {
-  return await prisma.order.findUnique({ where: { id } });
+const getOrderById = async (id: Order["id"]) => {
+  return await prisma.order.findUnique({
+    where: { id },
+    include: {
+      user: true,
+      orderedItems: { include: { receipt: true } },
+    },
+  });
 };
 
 const updateOrder = async (
@@ -50,8 +66,8 @@ const updateOrder = async (
 };
 
 export default {
-  getApprovedOrders,
-  getApprovedById,
-  getById,
+  getOrders,
+  getOrderByIdAndStatus,
+  getOrderById,
   updateOrder,
 };
