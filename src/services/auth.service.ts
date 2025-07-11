@@ -1,7 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { Role } from '@prisma/client';
-import { AuthRepository } from '../repositories/auth.repository';
+import { Role, Prisma } from '@prisma/client';
+import AuthRepository from '../repositories/auth.repository';
 import { AppError } from '../types/error';
 
 const JWT_SECRET: string = process.env.JWT_SECRET || 'your_very_strong_and_secret_jwt_key_please_change_this_in_production';
@@ -45,7 +45,19 @@ export class AuthService {
         role: Role.SUPER_ADMIN,
         companyId: createdCompany.id,
       }, prismaTransaction);
-      return { company: createdCompany, user: createdUser };
+      
+      // 현재 년도와 월을 가져와서 월별 예산 생성
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear().toString();
+      const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+      
+      const createdMonthlyBudget = await AuthRepository.createMonthlyBudget({
+        companyId: createdCompany.id,
+        year: currentYear,
+        month: currentMonth,
+      }, prismaTransaction);
+      
+      return { company: createdCompany, user: createdUser, monthlyBudget: createdMonthlyBudget };
     });
 
     return transactionResult;

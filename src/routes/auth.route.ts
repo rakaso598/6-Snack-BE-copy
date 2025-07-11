@@ -16,7 +16,7 @@ const authRouter = Router();
  * @body {string} confirmPassword - 비밀번호 확인 (password와 일치해야 함)
  * @body {string} companyName - 회사 이름 (필수)
  * @body {string} bizNumber - 사업자 등록 번호 (필수, 고유해야 함)
- * @returns {object} - 성공 메시지 및 생성된 사용자/회사 정보 (비밀번호 제외)
+ * @returns {object} - 성공 메시지 및 생성된 사용자/회사/월별예산 정보 (비밀번호 제외)
  * @throws {AppError} - 입력 유효성 검사 실패, 이메일/사업자 등록 번호 중복 시
  */
 authRouter.post('/signup', async (req: Request, res: Response, next: NextFunction) => {
@@ -37,8 +37,9 @@ authRouter.post('/signup', async (req: Request, res: Response, next: NextFunctio
 
     const newUser = transactionResult.user;
     const registeredCompany = transactionResult.company;
+    const monthlyBudget = transactionResult.monthlyBudget;
 
-    console.log(`[회원가입 성공] 새 SUPER_ADMIN 사용자: ${newUser.email}, 회사: ${registeredCompany.name}`);
+    console.log(`[회원가입 성공] 새 SUPER_ADMIN 사용자: ${newUser.email}, 회사: ${registeredCompany.name}, 예산 생성: ${monthlyBudget.year}년 ${monthlyBudget.month}월`);
 
     res.status(201).json({
       message: '최고 관리자 회원가입이 성공적으로 등록되었습니다.',
@@ -50,6 +51,14 @@ authRouter.post('/signup', async (req: Request, res: Response, next: NextFunctio
       company: {
         id: registeredCompany.id,
         name: registeredCompany.name,
+      },
+      monthlyBudget: {
+        id: monthlyBudget.id,
+        year: monthlyBudget.year,
+        month: monthlyBudget.month,
+        currentMonthExpense: monthlyBudget.currentMonthExpense,
+        currentMonthBudget: monthlyBudget.currentMonthBudget,
+        monthlyBudget: monthlyBudget.monthlyBudget,
       },
     });
 

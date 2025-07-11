@@ -125,6 +125,32 @@ const updateInviteToUsed = async (inviteId: string, prismaTransaction: Prisma.Tr
 };
 
 /**
+ * 새로운 월별 예산을 생성합니다.
+ * @param data - 생성할 월별 예산 데이터 (회사 ID, 년도, 월)
+ * @param prismaTransaction - 트랜잭션 내에서 사용할 Prisma 트랜잭션 클라이언트
+ * @returns 생성된 월별 예산 정보
+ */
+const createMonthlyBudget = async (
+  data: {
+    companyId: number;
+    year: string;
+    month: string;
+  },
+  prismaTransaction: Prisma.TransactionClient,
+) => {
+  return prismaTransaction.monthlyBudget.create({
+    data: {
+      companyId: data.companyId,
+      year: data.year,
+      month: data.month,
+      currentMonthExpense: 0,
+      currentMonthBudget: 0,
+      monthlyBudget: 0,
+    },
+  });
+};
+
+/**
  * Prisma 트랜잭션을 실행합니다.
  * @param callback - 트랜잭션 내에서 실행될 비동기 콜백 함수
  * @returns 콜백 함수의 결과
@@ -142,6 +168,7 @@ export default {
   findInviteById,
   createCompany,
   createUser,
+  createMonthlyBudget,
   updateUserRefreshToken,
   updateInviteToUsed,
   runInTransaction,
