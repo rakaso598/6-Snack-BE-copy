@@ -1,8 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { PrismaClient } from '@prisma/client';
 import { AppError } from '../types/error';
+import prisma from "../config/prisma";
 
-const prisma = new PrismaClient();
 const inviteRouter = Router();
 
 inviteRouter.post('/', async (req: Request, res: Response, next: NextFunction) => {
