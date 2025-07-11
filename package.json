@@ -8,7 +8,8 @@
     "dev": "ts-node-dev --respawn src/app.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "ssh": "dotenv -- bash -c 'ssh -i \"$SSH_KEY_PATH\" -L 5432:$DB_HOST:5432 $EC2_USER@$EC2_HOST'"
+    "ssh": "dotenv -- bash -c 'ssh -i \"$SSH_KEY_PATH\" -L 5432:$DB_HOST:5432 $EC2_USER@$EC2_HOST'",
+    "cron": "node dist/cron/autoCreateMonthlyBudget.js"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +26,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.1",
     "multer-s3": "^3.0.1",
+    "node-cron": "^4.2.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },

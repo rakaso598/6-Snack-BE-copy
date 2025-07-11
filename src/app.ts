@@ -7,6 +7,7 @@ import swaggerSpec from "./config/swagger";
 import indexRouter from "./routes/index.route";
 import errorHandler from "./middlewares/errorHandler.middleware";
 import cookieParser from "cookie-parser";
+import autoCreateMonthlyBudget from "./cron/autoCreateMonthlyBudget";
 
 const app: Application = express();
 const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -16,8 +17,11 @@ app.use(cookieParser());
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", indexRouter);
-app.use(errorHandler);
 
+// node-cron 실행
+autoCreateMonthlyBudget.start();
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
