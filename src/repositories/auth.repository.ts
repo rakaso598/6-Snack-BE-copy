@@ -4,10 +4,12 @@ import prisma from "../config/prisma";
 /**
  * 주어진 이메일로 사용자를 조회하고, 회사 정보를 포함합니다.
  * @param email - 조회할 사용자의 이메일
+ * @param tx - 트랜잭션 클라이언트 (선택적)
  * @returns 사용자 및 회사 정보 또는 null
  */
-const findUserByEmailWithCompany = async (email: string) => {
-  return prisma.user.findUnique({
+const findUserByEmailWithCompany = async (email: string, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.user.findUnique({
     where: { email },
     include: { company: true },
   });
@@ -16,10 +18,12 @@ const findUserByEmailWithCompany = async (email: string) => {
 /**
  * 주어진 ID로 사용자를 조회합니다.
  * @param id - 조회할 사용자의 ID
+ * @param tx - 트랜잭션 클라이언트 (선택적)
  * @returns 사용자 정보 또는 null
  */
-const findUserById = async (id: string) => {
-  return prisma.user.findUnique({
+const findUserById = async (id: string, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.user.findUnique({
     where: { id },
   });
 };
@@ -27,10 +31,12 @@ const findUserById = async (id: string) => {
 /**
  * 주어진 사업자 등록 번호로 회사를 조회합니다.
  * @param bizNumber - 조회할 회사의 사업자 등록 번호
+ * @param tx - 트랜잭션 클라이언트 (선택적)
  * @returns 회사 정보 또는 null
  */
-const findCompanyByBizNumber = async (bizNumber: string) => {
-  return prisma.company.findUnique({
+const findCompanyByBizNumber = async (bizNumber: string, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.company.findUnique({
     where: { bizNumber },
   });
 };
@@ -38,10 +44,12 @@ const findCompanyByBizNumber = async (bizNumber: string) => {
 /**
  * 주어진 ID로 초대 정보를 조회합니다.
  * @param inviteId - 조회할 초대 ID
+ * @param tx - 트랜잭션 클라이언트 (선택적)
  * @returns 초대 정보 또는 null
  */
-const findInviteById = async (inviteId: string) => {
-  return prisma.invite.findUnique({
+const findInviteById = async (inviteId: string, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.invite.findUnique({
     where: { id: inviteId },
   });
 };
@@ -49,15 +57,14 @@ const findInviteById = async (inviteId: string) => {
 /**
  * 새로운 회사를 생성합니다.
  * @param data - 생성할 회사 데이터 (이름, 사업자 등록 번호)
- * @param prismaTransaction - 트랜잭션 내에서 사용할 Prisma 트랜잭션 클라이언트
+ * @param tx - 트랜잭션 클라이언트 (필수)
  * @returns 생성된 회사 정보
  */
-
 const createCompany = async (
   data: { name: string; bizNumber: string },
-  prismaTransaction: Prisma.TransactionClient,
+  tx: Prisma.TransactionClient,
 ) => {
-  return prismaTransaction.company.create({
+  return tx.company.create({
     data: {
       name: data.name,
       bizNumber: data.bizNumber,
@@ -68,7 +75,7 @@ const createCompany = async (
 /**
  * 새로운 사용자를 생성합니다.
  * @param data - 생성할 사용자 데이터 (이메일, 이름, 비밀번호, 역할, 회사 ID)
- * @param prismaTransaction - 트랜잭션 내에서 사용할 Prisma 트랜잭션 클라이언트
+ * @param tx - 트랜잭션 클라이언트 (필수)
  * @returns 생성된 사용자 정보 (선택된 필드만)
  */
 const createUser = async (
@@ -79,9 +86,9 @@ const createUser = async (
     role: Role;
     companyId: number;
   },
-  prismaTransaction: Prisma.TransactionClient,
+  tx: Prisma.TransactionClient,
 ) => {
-  return prismaTransaction.user.create({
+  return tx.user.create({
     data: {
       email: data.email,
       name: data.name,
@@ -103,10 +110,12 @@ const createUser = async (
  * 사용자의 리프레시 토큰 해시를 업데이트합니다.
  * @param userId - 사용자 ID
  * @param hashedRefreshToken - 새로운 리프레시 토큰 해시 (null 가능)
+ * @param tx - 트랜잭션 클라이언트 (선택적)
  * @returns 업데이트된 사용자 정보
  */
-const updateUserRefreshToken = async (userId: string, hashedRefreshToken: string | null) => {
-  return prisma.user.update({
+const updateUserRefreshToken = async (userId: string, hashedRefreshToken: string | null, tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+  return client.user.update({
     where: { id: userId },
     data: { hashedRefreshToken },
   });
@@ -115,10 +124,10 @@ const updateUserRefreshToken = async (userId: string, hashedRefreshToken: string
 /**
  * 초대 상태를 사용 완료로 업데이트합니다.
  * @param inviteId - 초대 ID
- * @param prismaTransaction - 트랜잭션 내에서 사용할 Prisma 트랜잭션 클라이언트
+ * @param tx - 트랜잭션 클라이언트 (필수)
  */
-const updateInviteToUsed = async (inviteId: string, prismaTransaction: Prisma.TransactionClient) => {
-  return prismaTransaction.invite.update({
+const updateInviteToUsed = async (inviteId: string, tx: Prisma.TransactionClient) => {
+  return tx.invite.update({
     where: { id: inviteId },
     data: { isUsed: true },
   });
@@ -127,7 +136,7 @@ const updateInviteToUsed = async (inviteId: string, prismaTransaction: Prisma.Tr
 /**
  * 새로운 월별 예산을 생성합니다.
  * @param data - 생성할 월별 예산 데이터 (회사 ID, 년도, 월)
- * @param prismaTransaction - 트랜잭션 내에서 사용할 Prisma 트랜잭션 클라이언트
+ * @param tx - 트랜잭션 클라이언트 (필수)
  * @returns 생성된 월별 예산 정보
  */
 const createMonthlyBudget = async (
@@ -136,9 +145,9 @@ const createMonthlyBudget = async (
     year: string;
     month: string;
   },
-  prismaTransaction: Prisma.TransactionClient,
+  tx: Prisma.TransactionClient,
 ) => {
-  return prismaTransaction.monthlyBudget.create({
+  return tx.monthlyBudget.create({
     data: {
       companyId: data.companyId,
       year: data.year,
