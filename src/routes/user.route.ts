@@ -48,6 +48,8 @@ userRouter.get("/me", authenticateToken, (req: Request, res: Response, next: Nex
   });
 });
 
+// 유저 정보 확인
+userRouter.get("/:userId/", authenticateToken, userController.getUserInfo)
 // 유저 비밀번호 변경
 userRouter.patch(
   "/:userId/password",
@@ -55,3 +57,4 @@ userRouter.patch(
   userController.updatePassword,
 );
 export default userRouter;
+
