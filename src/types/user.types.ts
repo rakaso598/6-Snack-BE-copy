@@ -6,4 +6,7 @@ export type TCurrentUser = {
   companyId: number;
   createdAt: Date;
   updatedAt: Date;
+  company?: {
+    name: string;
+  };
 };

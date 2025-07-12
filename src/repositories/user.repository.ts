@@ -19,29 +19,6 @@ const findActiveUserById = async (id: string) => {
   });
 };
 
-// 유저 프로필 조회
-// const getUserInfo = async (userId: string, tx?: Prisma.TransactionClient) => {
-//   const client = tx || prisma;
-
-//   return await client.user.findFirst({
-//     where: {
-//       id: userId,
-//       deletedAt: null,
-//     },
-//     select: {
-//       id: true,
-//       email: true,
-//       name: true,
-//       role: true,
-//       company: {
-//         select: {
-//           name: true,
-//         },
-//       },
-//     },
-//   });
-// };
-
 // 유저 삭제 (soft delete)
 const deleteUser = async (id: string) => {
   return await prisma.user.update({
@@ -158,5 +135,4 @@ export default {
   updatePassword,
   findUsersByCompanyId,
   hasPreviousPage,
-  getUserInfo,
 };
