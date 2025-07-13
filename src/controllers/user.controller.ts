@@ -2,6 +2,19 @@ import { TGetUsersQueryDto, TUpdatePasswordDto, TUpdateRoleDto, TUserIdParamsDto
 import userService from "../services/user.service";
 import { RequestHandler } from "express";
 
+// 유저 프로필 조회
+const getUserInfo: RequestHandler<TUserIdParamsDto> = async (req, res, next) => {
+  try {
+    const userId = req.params.userId;
+    const currentUser = req.user!;
+
+    const result = await userService.getUserInfo(userId, currentUser);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // 유저 탈퇴
 const deleteUser: RequestHandler<TUserIdParamsDto> = async (req, res, next) => {
   try {
@@ -52,4 +65,4 @@ const getUsersByCompany: RequestHandler<{}, any, {}, TGetUsersQueryDto> = async 
     next(error);
   }
 };
-export default { deleteUser, updateRole, updatePassword, getUsersByCompany };
+export default { deleteUser, updateRole, updatePassword, getUsersByCompany, getUserInfo };
