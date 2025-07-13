@@ -1,3 +1,5 @@
+import { Product } from "@prisma/client";
+
 export type SortOption = "latest" | "popular" | "low" | "high";
 
 export type ProductQueryOptions = {
@@ -8,6 +10,10 @@ export type ProductQueryOptions = {
   creatorId?: string;
   cursor?: { id: number } | undefined;
   orderBy?: any;
+  
+};
+export type ProductSaleCount = Product & {
+  saleCount: number;
 };
 
 export type CreatorQueryOptions = {

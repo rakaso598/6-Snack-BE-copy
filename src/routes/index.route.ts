@@ -1,7 +1,7 @@
 import { Router } from "express";
 import authRouter from "./auth.route";
 import cartRouter from "./cart.route";
-import orderRequestRouter from "./orderRequest.route";
+// import orderRequestRouter from "./orderRequest.route";
 import adminRouter from "./admin.route";
 import superAdminRouter from "./superAdmin.route";
 import productRouter from "./product.route";
@@ -15,7 +15,7 @@ indexRouter.use("/super-admin", superAdminRouter);
 indexRouter.use("/admin", adminRouter);
 indexRouter.use("/products", productRouter);
 indexRouter.use("/cart", cartRouter);
-indexRouter.use("/orders", orderRequestRouter);
+// indexRouter.use("/orders", orderRequestRouter);
 indexRouter.use("/my", myRouter);
 indexRouter.use("/auth", authRouter);
 indexRouter.use("/invite", inviteRouter);
