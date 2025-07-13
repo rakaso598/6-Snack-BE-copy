@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import orderRequestRepository from '../repositories/orderRequest.repository';
-import type { TCreateOrderRequest, TCreateOrderResponse } from '../types/orderRequest.types';
+import orderService from './order.service';
+import type { TCreateOrderRequest, TCreateInstantOrderRequest, TCreateOrderResponse } from '../types/orderRequest.types';
 import { BadRequestError, NotFoundError, ValidationError, ForbiddenError } from '../types/error';
 
 const prisma = new PrismaClient();
@@ -60,7 +61,8 @@ const cancelOrder = async (orderId: number, userId: string) => {
   return await orderRequestRepository.updateOrderStatus(orderId, 'CANCELED');
 };
 
-const createInstantOrder = async (orderData: TCreateOrderRequest): Promise<TCreateOrderResponse> => {
+//즉시 구매 
+const createInstantOrder = async (orderData: TCreateInstantOrderRequest): Promise<TCreateOrderResponse> => {
   // 입력값 검증
   if (!orderData.userId) {
     throw new ValidationError('사용자 ID는 필수입니다.');
@@ -70,14 +72,17 @@ const createInstantOrder = async (orderData: TCreateOrderRequest): Promise<TCrea
     throw new ValidationError('카트 아이템이 필요합니다.');
   }
 
-  // 트랜잭션으로 즉시 구매 주문 생성 (APPROVED 상태로)
+  // 트랜잭션으로 즉시 구매 주문 생성
   const result = await prisma.$transaction(async (tx) => {
     const instantOrderData = {
       ...orderData,
-      status: 'APPROVED' as const
+      adminMessage: undefined,
+      requestMessage: undefined
     };
     
+    // 주문 생성
     const order = await orderRequestRepository.createOrder(instantOrderData, tx);
+    
     return order;
   });
 

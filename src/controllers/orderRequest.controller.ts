@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import orderRequestService from '../services/orderRequest.service';
-import type { TCreateOrderRequest } from '../types/orderRequest.types';
+import orderService from '../services/order.service';
+import type { TCreateOrderRequest, TCreateInstantOrderRequest } from '../types/orderRequest.types';
 import { AuthenticationError } from '../types/error';
 
 const createOrder = async (req: Request, res: Response, next: NextFunction) => {
@@ -99,17 +100,24 @@ const createInstantOrder = async (req: Request, res: Response, next: NextFunctio
       throw new AuthenticationError('로그인이 필요합니다.');
     }
     
-    // 인증된 사용자의 ID를 사용
-    const authenticatedOrderData: TCreateOrderRequest = {
-      ...orderData,
+    // 인증된 사용자의 ID를 사용 (메시지 필드 제거)
+    const authenticatedOrderData: TCreateInstantOrderRequest = {
+      cartItemIds: orderData.cartItemIds,
       userId: req.user.id
     };
     
+    // 1. 주문 생성
     const result = await orderRequestService.createInstantOrder(authenticatedOrderData);
+    
+    // 2. orderService를 사용하여 승인 처리
+    const approvedOrder = await orderService.updateOrder(result.id, {
+      adminMessage: '즉시 구매로 자동 승인',
+      status: 'APPROVED'
+    });
     
     res.status(201).json({
       message: '즉시 구매가 성공적으로 완료되었습니다.',
-      data: result
+      data: approvedOrder
     });
   } catch (error) {
     next(error);

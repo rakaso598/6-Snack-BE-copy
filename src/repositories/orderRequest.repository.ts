@@ -43,7 +43,7 @@ const createOrder = async (orderData: TCreateOrderRequest, tx?: Prisma.Transacti
   // 4. 주문 생성
   const order = await client.order.create({
     data: {
-      userId: orderData.userId,
+      userId: orderData.userId!,
       adminMessage: orderData.adminMessage,
       requestMessage: orderData.requestMessage,
       totalPrice: totalPrice,

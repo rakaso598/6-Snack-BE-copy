@@ -7,6 +7,11 @@ export type TCreateOrderRequest = {
   cartItemIds: number[];
 };
 
+export type TCreateInstantOrderRequest = {
+  userId?: string; // 인증된 사용자의 ID는 컨트롤러에서 설정
+  cartItemIds: number[];
+};
+
 // Prisma Payload 유틸을 사용한 타입 정의
 export type TCreateOrderResponse = Prisma.OrderGetPayload<{
   include: {
