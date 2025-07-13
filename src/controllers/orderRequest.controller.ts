@@ -1,19 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
+import { RequestHandler } from 'express';
 import orderRequestService from '../services/orderRequest.service';
 import orderService from '../services/order.service';
-import type { TCreateOrderRequest, TCreateInstantOrderRequest } from '../types/orderRequest.types';
+import type { TCreateOrderRequestDto, TCreateInstantOrderRequestDto, TUpdateOrderStatusDto } from '../dtos/orderRequest.dto';
 import { AuthenticationError } from '../types/error';
+import { parseNumberOrThrow } from '../utils/parseNumberOrThrow';
 
-const createOrder = async (req: Request, res: Response, next: NextFunction) => {
+const createOrder: RequestHandler<{}, {}, TCreateOrderRequestDto> = async (req, res, next) => {
   try {
-    const orderData: TCreateOrderRequest = req.body;
+    const orderData: TCreateOrderRequestDto = req.body;
     
     if (!req.user?.id) {
       throw new AuthenticationError('로그인이 필요합니다.');
     }
     
     // 인증된 사용자의 ID를 사용
-    const authenticatedOrderData: TCreateOrderRequest = {
+    const authenticatedOrderData = {
       ...orderData,
       userId: req.user.id
     };
@@ -29,9 +30,9 @@ const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getOrderById = async (req: Request, res: Response, next: NextFunction) => {
+const getOrderById: RequestHandler<{ orderId: string }> = async (req, res, next) => {
   try {
-    const orderId = parseInt(req.params.orderId);
+    const orderId = parseNumberOrThrow(req.params.orderId, 'orderId');
     
     if (!req.user?.id) {
       throw new AuthenticationError('로그인이 필요합니다.');
@@ -48,7 +49,7 @@ const getOrderById = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
-const getOrdersByUserId = async (req: Request, res: Response, next: NextFunction) => {
+const getOrdersByUserId: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user?.id) {
       throw new AuthenticationError('로그인이 필요합니다.');
@@ -65,9 +66,9 @@ const getOrdersByUserId = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-const cancelOrder = async (req: Request, res: Response, next: NextFunction) => {
+const cancelOrder: RequestHandler<{ orderId: string }, {}, TUpdateOrderStatusDto> = async (req, res, next) => {
   try {
-    const orderId = parseInt(req.params.orderId);
+    const orderId = parseNumberOrThrow(req.params.orderId, 'orderId');
     const { status } = req.body;
     
     if (!req.user?.id) {
@@ -92,16 +93,16 @@ const cancelOrder = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const createInstantOrder = async (req: Request, res: Response, next: NextFunction) => {
+const createInstantOrder: RequestHandler<{}, {}, TCreateInstantOrderRequestDto> = async (req, res, next) => {
   try {
-    const orderData = req.body;
+    const orderData: TCreateInstantOrderRequestDto = req.body;
     
     if (!req.user?.id) {
       throw new AuthenticationError('로그인이 필요합니다.');
     }
     
     // 인증된 사용자의 ID를 사용 (메시지 필드 제거)
-    const authenticatedOrderData: TCreateInstantOrderRequest = {
+    const authenticatedOrderData = {
       cartItemIds: orderData.cartItemIds,
       userId: req.user.id
     };
@@ -111,6 +112,7 @@ const createInstantOrder = async (req: Request, res: Response, next: NextFunctio
     
     // 2. orderService를 사용하여 승인 처리
     const approvedOrder = await orderService.updateOrder(result.id, {
+      approver: req.user.name || '시스템',
       adminMessage: '즉시 구매로 자동 승인',
       status: 'APPROVED'
     });
