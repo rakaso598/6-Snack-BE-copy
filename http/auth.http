@@ -14,7 +14,7 @@ Content-Type: application/json
   "password": "adminpass123",
   "confirmPassword": "adminpass123",
   "companyName": "MyCompany Inc.",
-  "bizNumber": "1234567800"
+  "bizNumber": "1234567899"
 }
 
 ### 초대 링크 생성
@@ -39,31 +39,13 @@ Content-Type: application/json
   "confirmPassword": "password123"
 }
 
-### 로그인(일반 유저)
+### 로그인
 POST {{url}}/auth/login
 Content-Type: application/json
 
 {
-  "email": "user@codeit.com",
-  "password": "11111111"
-}
-
-### 로그인(관리자)
-POST {{url}}/auth/login
-Content-Type: application/json
-
-{
-  "email": "admin@codeit.com",
-  "password": "11111111"
-}
-
-### 로그인(최고 관리자)
-POST {{url}}/auth/login
-Content-Type: application/json
-
-{
-  "email": "super_admin@codeit.com",
-  "password": "11111111"
+    "email": "admin@example.com",
+    "password": "adminpass123"
 }
 
 ### 내 정보 조회
