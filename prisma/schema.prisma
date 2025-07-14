@@ -68,10 +68,11 @@ model Product {
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
 
-  cart     CartItem[]
-  likes    Like[]
-  creator  User       @relation("ProductCreator", fields: [creatorId], references: [id])
-  category Category   @relation(fields: [categoryId], references: [id])
+  cart         CartItem[]
+  likes        Like[]
+  creator      User          @relation("ProductCreator", fields: [creatorId], references: [id])
+  category     Category      @relation(fields: [categoryId], references: [id])
+  orderedItems OrderedItem[]
 }
 
 model Category {
@@ -105,7 +106,7 @@ model Receipt {
   imageUrl    String
   quantity    Int
 
-  OrderedItem OrderedItem[]
+  orderedItem OrderedItem[]
 }
 
 model Order {
@@ -127,9 +128,11 @@ model OrderedItem {
   id        Int @id @default(autoincrement())
   orderId   Int
   receiptId Int
+  productId Int
 
   order   Order   @relation(fields: [orderId], references: [id])
   receipt Receipt @relation(fields: [receiptId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 }
 
 model Invite {
