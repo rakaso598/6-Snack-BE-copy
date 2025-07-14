@@ -6,11 +6,39 @@ import {
   TUpdatePasswordResponseDto,
   TGetUsersQueryDto,
   TGetUsersResponseDto,
+  TGetUserInfoResponseDto,
 } from "../dtos/user.dto";
 import userRepository from "../repositories/user.repository";
 import { BadRequestError, NotFoundError } from "../types/error";
 import { TCurrentUser } from "../types/user.types";
 import bcrypt from "bcrypt";
+
+const getUserInfo = async (userId: string, currentUser: TCurrentUser): Promise<TGetUserInfoResponseDto> => {
+  if (userId !== currentUser.id) {
+    throw new BadRequestError("자기 자신의 정보만 조회할 수 있습니다.");
+  }
+
+  if (currentUser.role === "USER") {
+    return {
+      message: "일반 유저 정보 조회 완료",
+      user: {
+        company: { name: currentUser.company!.name },
+        name: currentUser.name,
+        email: currentUser.email,
+      },
+    };
+  } else {
+    return {
+      message: "관리자/최고 관리자 정보 조회 완료",
+      user: {
+        company: { name: currentUser.company!.name },
+        role: currentUser.role as "ADMIN" | "SUPER_ADMIN",
+        name: currentUser.name,
+        email: currentUser.email,
+      },
+    };
+  }
+};
 
 // 유저 탈퇴
 const deleteUser = async (userId: string, currentUser: TCurrentUser): Promise<TDeleteUserResponseDto> => {
@@ -103,7 +131,7 @@ const getUsersByCompany = async (
   if (query.cursor) {
     hasPrev = await userRepository.hasPreviousPage(currentUser.companyId, query.cursor, query.name);
   }
-  
+
   const prevCursor = result.users.length > 0 ? result.users[0].id : undefined;
 
   return {
@@ -123,4 +151,4 @@ const getUsersByCompany = async (
   };
 };
 
-export default { deleteUser, updateRole, updatePassword, getUsersByCompany };
+export default { deleteUser, updateRole, updatePassword, getUsersByCompany, getUserInfo };

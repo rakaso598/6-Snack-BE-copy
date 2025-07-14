@@ -1,8 +1,10 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { UserRole } from "../dtos/user.dto";
 
+// 현재 존재하는 회원인지 확인
 const findActiveUserById = async (id: string) => {
-  return await prisma.user.findUnique({
+  return await prisma.user.findFirst({
     where: { id, deletedAt: null },
     // 비밀번호, refreshToken 정보 제외
     select: {
