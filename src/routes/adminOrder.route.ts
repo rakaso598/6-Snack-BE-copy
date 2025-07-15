@@ -34,13 +34,12 @@ adminOrderRouter.patch(
   orderController.updateOrder,
 );
 
-// 구매 승인 | 구매 반려
-adminOrderRouter.patch(
-  "/:orderId",
+// 즉시 구매 (어드민 전용)
+adminOrderRouter.post(
+  "/instant",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  validateUpdateStatusOrderBody,
-  orderController.updateOrder,
+  orderController.createInstantOrder,
 );
 
 export default adminOrderRouter;

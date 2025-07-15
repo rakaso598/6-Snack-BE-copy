@@ -16,7 +16,4 @@ router.get('/:orderId', authenticateToken, orderController.getOrderById);
 // 구매 요청 취소
 router.patch('/:orderId', authenticateToken, orderController.cancelOrder);
 
-// 즉시 구매 (어드민 전용)
-router.post('/instant', authenticateToken, orderController.createInstantOrder);
-
 export default router; 
