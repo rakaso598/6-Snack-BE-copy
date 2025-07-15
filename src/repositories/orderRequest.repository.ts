@@ -1,130 +1,187 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-import type { TCreateOrderRequest, TCreateOrderResponse } from '../types/orderRequest.types';
+// import { PrismaClient, Prisma } from '@prisma/client';
+// import type { TCreateOrderRequest, TCreateOrderResponse } from '../types/orderRequest.types';
+// import { NotFoundError } from '../types/error';
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
-const createOrder = async (orderData: TCreateOrderRequest, tx?: Prisma.TransactionClient): Promise<TCreateOrderResponse> => {
-  const client = tx || prisma;
+// const createOrder = async (orderData: TCreateOrderRequest, tx?: Prisma.TransactionClient): Promise<TCreateOrderResponse> => {
+//   const client = tx || prisma;
 
-  const { cartItemIds, ...orderInfo } = orderData;
+//   // 1. 카트 아이템들을 가져와서 receipt 생성
+//   const cartItems = await client.cartItem.findMany({
+//     where: {
+//       id: { in: orderData.cartItemIds }
+//     },
+//     include: {
+//       product: true
+//     }
+//   });
 
-  // 주문 생성
-  const order = await client.order.create({
-    data: {
-      ...orderInfo,
-      status: orderInfo.status || 'PENDING',
-      orderedItems: {
-        create: cartItemIds.map(cartItemId => ({
-          cartId: cartItemId
-        }))
-      }
-    },
-    include: {
-      orderedItems: {
-        include: {
-          cartItem: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  price: true,
-                  imageUrl: true
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  });
+//   if (cartItems.length !== orderData.cartItemIds.length) {
+//     throw new NotFoundError('일부 카트 아이템을 찾을 수 없습니다.');
+//   }
 
-  return order as TCreateOrderResponse;
-};
+//   // 2. 각 카트 아이템으로부터 receipt 생성
+//   const receipts = await Promise.all(
+//     cartItems.map(async (cartItem) => {
+//       return await client.receipt.create({
+//         data: {
+//           productName: cartItem.product.name,
+//           price: cartItem.product.price,
+//           imageUrl: cartItem.product.imageUrl,
+//           quantity: cartItem.quantity
+//         }
+//       });
+//     })
+//   );
 
-const getOrderById = async (orderId: number, tx?: Prisma.TransactionClient) => {
-  const client = tx || prisma;
+//   // 3. 총 가격 계산
+//   const totalPrice = receipts.reduce((sum, receipt) => {
+//     return sum + (receipt.price * receipt.quantity);
+//   }, 0);
 
-  return await client.order.findUnique({
-    where: { id: orderId },
-    include: {
-      orderedItems: {
-        include: {
-          cartItem: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  price: true,
-                  imageUrl: true
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  });
-};
+//   // 4. 주문 생성
+//   const order = await client.order.create({
+//     data: {
+//       userId: orderData.userId!,
+//       adminMessage: orderData.adminMessage,
+//       requestMessage: orderData.requestMessage,
+//       totalPrice: totalPrice,
+//       status: 'PENDING'
+//     }
+//   });
 
-const getOrdersByUserId = async (userId: string, tx?: Prisma.TransactionClient) => {
-  const client = tx || prisma;
+//   // 5. OrderedItem 생성 (주문과 receipt 연결)
+//   await Promise.all(
+//     receipts.map(async (receipt) => {
+//       return await client.orderedItem.create({
+//         data: {
+//           orderId: order.id,
+//           receiptId: receipt.id
+//         }
+//       });
+//     })
+//   );
 
-  return await client.order.findMany({
-    where: { userId },
-    include: {
-      orderedItems: {
-        include: {
-          cartItem: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  price: true,
-                  imageUrl: true
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    orderBy: { createdAt: 'desc' }
-  });
-};
+//   // 6. 생성된 주문 정보 반환
+//   const result = await client.order.findUnique({
+//     where: { id: order.id },
+//     include: {
+//       orderedItems: {
+//         include: {
+//           receipt: {
+//             select: {
+//               id: true,
+//               productName: true,
+//               price: true,
+//               imageUrl: true,
+//               quantity: true
+//             }
+//           }
+//         }
+//       }
+//     }
+//   });
 
-const updateOrderStatus = async (orderId: number, status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELED', tx?: Prisma.TransactionClient) => {
-  const client = tx || prisma;
+//   if (!result) {
+//     throw new NotFoundError('생성된 주문을 찾을 수 없습니다.');
+//   }
 
-  return await client.order.update({
-    where: { id: orderId },
-    data: { status },
-    include: {
-      orderedItems: {
-        include: {
-          cartItem: {
-            include: {
-              product: {
-                select: {
-                  id: true,
-                  name: true,
-                  price: true,
-                  imageUrl: true
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  });
-};
+//   return result;
+// };
 
-export default {
-  createOrder,
-  getOrderById,
-  getOrdersByUserId,
-  updateOrderStatus
-}; 
+// const getOrderById = async (orderId: number, tx?: Prisma.TransactionClient) => {
+//   const client = tx || prisma;
+
+//   const order = await client.order.findUnique({
+//     where: { id: orderId },
+//     include: {
+//       orderedItems: {
+//         include: {
+//           receipt: {
+//             select: {
+//               id: true,
+//               productName: true,
+//               price: true,
+//               imageUrl: true,
+//               quantity: true
+//             }
+//           }
+//         }
+//       }
+//     }
+//   });
+
+//   if (!order) {
+//     throw new NotFoundError(`ID ${orderId}인 주문을 찾을 수 없습니다.`);
+//   }
+
+//   return order;
+// };
+
+// const getOrdersByUserId = async (userId: string, tx?: Prisma.TransactionClient) => {
+//   const client = tx || prisma;
+
+//   return await client.order.findMany({
+//     where: { userId },
+//     include: {
+//       orderedItems: {
+//         include: {
+//           receipt: {
+//             select: {
+//               id: true,
+//               productName: true,
+//               price: true,
+//               imageUrl: true,
+//               quantity: true
+//             }
+//           }
+//         }
+//       }
+//     },
+//     orderBy: { createdAt: 'desc' }
+//   });
+// };
+
+// const updateOrderStatus = async (orderId: number, status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELED', tx?: Prisma.TransactionClient) => {
+//   const client = tx || prisma;
+
+//   try {
+//     const updatedOrder = await client.order.update({
+//       where: { id: orderId },
+//       data: { status },
+//       include: {
+//         orderedItems: {
+//           include: {
+//             receipt: {
+//               select: {
+//                 id: true,
+//                 productName: true,
+//                 price: true,
+//                 imageUrl: true,
+//                 quantity: true
+//               }
+//             }
+//           }
+//         }
+//       }
+//     });
+
+//     return updatedOrder;
+//   } catch (error) {
+//     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+//       throw new NotFoundError(`ID ${orderId}인 주문을 찾을 수 없습니다.`);
+//     }
+//     throw error;
+//   }
+// };
+
+// export default {
+//   createOrder,
+//   getOrderById,
+//   getOrdersByUserId,
+//   updateOrderStatus
+// };
+
+// OrderRequest 관련 코드가 Order 모델로 통합되어 주석 처리됨
+export default {}; 

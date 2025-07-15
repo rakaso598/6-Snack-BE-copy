@@ -1,14 +1,65 @@
-### 구매내역 조회(대기 or 승인)
-GET http://localhost:8080/admin/orders?offset=0&limit=4&orderBy=latest&status=pending
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZjAzMzJhYS0xNWRlLTRmZTAtYTNhYy1jYTZjMDdmY2NmNmEiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzUyNTY0NTgzLCJleHAiOjE3NTI1NjU0ODN9.qCyJdrxTlfryd3CGpeJ-HrFIvN8vfDLC3xr827tqZkw; Path=/; Expires=Tue, 15 Jul 2025 07:44:43 GMT; HttpOnly; SameSite=Lax,refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZjAzMzJhYS0xNWRlLTRmZTAtYTNhYy1jYTZjMDdmY2NmNmEiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUyNTY0NTgzLCJleHAiOjE3NTMxNjkzODN9.EkZy8Rwuq67aehl6FhiPOhhV0Iu1Z1niIhgqJSGmHE4
 
-### 구매내역 상세 조회(대기 or 승인)
-GET http://localhost:8080/admin/orders/2?status=pending
 
-### 구매 승인 | 구매 반려
-PATCH http://localhost:8080/admin/orders/2
+### 구매 요청 생성
+POST http://localhost:8080/orders
 Content-Type: application/json
+Cookie: accessToken={{accessToken}}
 
 {
-  "adminMessage": "구매 승인처리 되었습니다. 3영업일 내로 배송이 완료될 예정입니다.",
-  "status": "REJECTED"
+  "cartItemIds": [1, 2],
+  "adminMessage": "관리자에게 남길 메시지",
+  "requestMessage": "요청 메시지"
 }
+
+### 내 구매 요청 리스트 조회
+GET http://localhost:8080/orders
+Cookie: accessToken={{accessToken}}
+
+### 구매 요청 상세 조회
+GET http://localhost:8080/orders/3
+Cookie: accessToken={{accessToken}}
+
+### 구매 요청 취소
+PATCH http://localhost:8080/orders/3
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
+
+{
+  "status": "CANCELED"
+}
+
+### 즉시 구매 (어드민 전용)
+POST http://localhost:8080/admin/orders/instant
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
+
+{
+  "cartItemIds": [1, 2]
+}
+
+### 관리자 - 구매내역 조회 (대기)
+GET http://localhost:8080/admin/orders?status=pending&offset=0&limit=4&orderBy=latest
+Cookie: accessToken={{accessToken}}
+
+### 관리자 - 구매내역 조회 (승인)
+GET http://localhost:8080/admin/orders?status=approved&offset=0&limit=4&orderBy=latest
+Cookie: accessToken={{accessToken}}
+
+### 관리자 - 구매내역 상세 조회 (대기)
+GET http://localhost:8080/admin/orders/11?status=pending
+Cookie: accessToken={{accessToken}}
+
+### 관리자 - 구매내역 상세 조회 (승인)
+GET http://localhost:8080/admin/orders/11?status=approved
+Cookie: accessToken={{accessToken}}
+
+### 관리자 - 구매 승인/반려
+PATCH http://localhost:8080/admin/orders/11
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
+
+{
+  "status": "APPROVED",
+  "adminMessage": "승인되었습니다."
+} 

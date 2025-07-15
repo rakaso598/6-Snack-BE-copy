@@ -1,32 +1,34 @@
-export type TCreateOrderRequest = {
-  userId: string;
-  adminMessage?: string;
-  requestMessage?: string;
-  totalPrice: number;
-  cartItemIds: number[];
-  status?: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELED';
-};
+// import { Prisma } from '@prisma/client';
 
-export type TCreateOrderResponse = {
-  id: number;
-  userId: string;
-  adminMessage?: string;
-  requestMessage?: string;
-  totalPrice: number;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELED';
-  createdAt: Date;
-  updatedAt: Date;
-  orderedItems: Array<{
-    id: number;
-    cartItem: {
-      id: number;
-      quantity: number;
-      product: {
-        id: number;
-        name: string;
-        price: number;
-        imageUrl: string;
-      };
-    };
-  }>;
-}; 
+// export type TCreateOrderRequest = {
+//   userId?: string; // 인증된 사용자의 ID는 컨트롤러에서 설정
+//   adminMessage?: string;
+//   requestMessage?: string;
+//   cartItemIds: number[];
+// };
+
+// export type TCreateInstantOrderRequest = {
+//   userId?: string;
+//   cartItemIds: number[];
+// };
+
+// export type TCreateOrderResponse = Prisma.OrderGetPayload<{
+//   include: {
+//     orderedItems: {
+//       include: {
+//         receipt: {
+//           select: {
+//             id: true;
+//             productName: true;
+//             price: true;
+//             imageUrl: true;
+//             quantity: true;
+//           };
+//         };
+//       };
+//     };
+//   };
+// }>;
+
+// OrderRequest 관련 타입이 Order 모델로 통합되어 주석 처리됨
+export {}; 
