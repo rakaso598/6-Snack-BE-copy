@@ -1,9 +1,10 @@
 import { Order } from "@prisma/client";
 import orderRepository from "../repositories/order.repository";
-import { NotFoundError } from "../types/error";
+import { NotFoundError, ValidationError, ForbiddenError, BadRequestError } from "../types/error";
 import { TGetOrdersQuery, TOrderWithBudget } from "../types/order.types";
 import budgetRepository from "../repositories/budget.repository";
 import getDateForBudget from "../utils/getDateForBudget";
+import prisma from "../config/prisma";
 
 // 구매내역 조회(대기 or 승인)
 const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) => {
@@ -77,8 +78,106 @@ const updateOrder = async (orderId: Order["id"], body: Pick<Order, "approver" | 
   return updatedOrder;
 };
 
+// OrderRequest 관련 기능들 추가
+const createOrder = async (orderData: {
+  userId: string;
+  adminMessage?: string;
+  requestMessage?: string;
+  cartItemIds: number[];
+}) => {
+  // 입력값 검증
+  if (!orderData.userId) {
+    throw new ValidationError('사용자 ID는 필수입니다.');
+  }
+
+  if (!orderData.cartItemIds || orderData.cartItemIds.length === 0) {
+    throw new ValidationError('카트 아이템이 필요합니다.');
+  }
+
+  // 트랜잭션으로 주문 생성
+  const result = await prisma.$transaction(async (tx) => {
+    const order = await orderRepository.createOrder(orderData, tx);
+    return order;
+  });
+
+  return result;
+};
+
+const getOrderById = async (orderId: number, userId: string) => {
+  const order = await orderRepository.getOrderById(orderId);
+
+  if (!order) {
+    throw new NotFoundError('주문을 찾을 수 없습니다.');
+  }
+
+  if (order.userId !== userId) {
+    throw new ForbiddenError('해당 주문에 접근할 권한이 없습니다.');
+  }
+
+  return order;
+};
+
+const getOrdersByUserId = async (userId: string) => {
+  return await orderRepository.getOrdersByUserId(userId);
+};
+
+const cancelOrder = async (orderId: number, userId: string) => {
+  const order = await orderRepository.getOrderById(orderId);
+
+  if (!order) {
+    throw new NotFoundError('주문을 찾을 수 없습니다.');
+  }
+
+  if (order.userId !== userId) {
+    throw new ForbiddenError('해당 주문에 접근할 권한이 없습니다.');
+  }
+
+  if (order.status !== 'PENDING') {
+    throw new BadRequestError('대기 중인 주문만 취소할 수 있습니다.');
+  }
+
+  return await orderRepository.updateOrderStatus(orderId, 'CANCELED');
+};
+
+// 즉시 구매
+const createInstantOrder = async (orderData: {
+  userId: string;
+  cartItemIds: number[];
+}) => {
+  // 입력값 검증
+  if (!orderData.userId) {
+    throw new ValidationError('사용자 ID는 필수입니다.');
+  }
+
+  if (!orderData.cartItemIds || orderData.cartItemIds.length === 0) {
+    throw new ValidationError('카트 아이템이 필요합니다.');
+  }
+
+  // 트랜잭션으로 즉시 구매 주문 생성
+  const result = await prisma.$transaction(async (tx) => {
+    const instantOrderData = {
+      ...orderData,
+      adminMessage: undefined,
+      requestMessage: undefined
+    };
+    
+    // 주문 생성
+    const order = await orderRepository.createOrder(instantOrderData, tx);
+    
+    return order;
+  });
+
+  return result;
+};
+
 export default {
   getOrders,
   getOrder,
   updateOrder,
+  // OrderRequest 관련 기능들
+  createOrder,
+  getOrderById,
+  getOrdersByUserId,
+  cancelOrder,
+  createInstantOrder,
 };

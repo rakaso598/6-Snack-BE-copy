@@ -1,14 +1,62 @@
-### 구매내역 조회(대기 or 승인)
-GET http://localhost:8080/admin/orders?offset=0&limit=4&orderBy=latest&status=pending
-
-### 구매내역 상세 조회(대기 or 승인)
-GET http://localhost:8080/admin/orders/2?status=pending
-
-### 구매 승인 | 구매 반려
-PATCH http://localhost:8080/admin/orders/2
+### 구매 요청 생성
+POST http://localhost:8080/orders
 Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
 
 {
-  "adminMessage": "구매 승인처리 되었습니다. 3영업일 내로 배송이 완료될 예정입니다.",
-  "status": "REJECTED"
+  "cartItemIds": [1, 2, 3],
+  "adminMessage": "관리자에게 남길 메시지",
+  "requestMessage": "요청 메시지"
 }
+
+### 내 구매 요청 리스트 조회
+GET http://localhost:8080/orders
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMyIsImVtYWlsIjoidXNlckBjb2RlaXQuY29tIiwibmFtZSI6IuycoOyggCIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzUyMTkyNDE4LCJleHAiOjE3NTIxOTMzMTh9.Co6nDH_5mv1fddc-eNOei3MfuQ8MmVOLzdcQWnIApog
+
+### 구매 요청 상세 조회
+GET http://localhost:8080/orders/11
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMyIsImVtYWlsIjoidXNlckBjb2RlaXQuY29tIiwibmFtZSI6IuycoOyggCIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzUyMTkyNDE4LCJleHAiOjE3NTIxOTMzMTh9.Co6nDH_5mv1fddc-eNOei3MfuQ8MmVOLzdcQWnIApog
+
+### 구매 요청 취소
+PATCH http://localhost:8080/orders/11
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMyIsImVtYWlsIjoidXNlckBjb2RlaXQuY29tIiwibmFtZSI6IuycoOyggCIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzUyMTkyNDE4LCJleHAiOjE3NTIxOTMzMTh9.Co6nDH_5mv1fddc-eNOei3MfuQ8MmVOLzdcQWnIApog
+
+{
+  "status": "CANCELED"
+}
+
+### 즉시 구매 (어드민 전용)
+POST http://localhost:8080/orders/instant
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+
+{
+  "cartItemIds": [1, 2]
+}
+
+### 관리자 - 구매내역 조회 (대기)
+GET http://localhost:8080/admin/orders?status=pending&offset=0&limit=4&orderBy=latest
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+
+### 관리자 - 구매내역 조회 (승인)
+GET http://localhost:8080/admin/orders?status=approved&offset=0&limit=4&orderBy=latest
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+
+### 관리자 - 구매내역 상세 조회 (대기)
+GET http://localhost:8080/admin/orders/11?status=pending
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+
+### 관리자 - 구매내역 상세 조회 (승인)
+GET http://localhost:8080/admin/orders/11?status=approved
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+
+### 관리자 - 구매 승인/반려
+PATCH http://localhost:8080/admin/orders/11
+Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+
+{
+  "status": "APPROVED",
+  "adminMessage": "승인되었습니다."
+} 
