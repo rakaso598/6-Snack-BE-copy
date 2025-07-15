@@ -3,7 +3,6 @@ import productService from "../services/product.service";
 import {
   AppError,
   AuthenticationError,
-  BadRequestError,
   ForbiddenError,
   NotFoundError,
   ServerError,
@@ -181,22 +180,95 @@ export const updateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdateProdu
   }
 };
 
+
+// 상품 수정 어드민
+export const forceUpdateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdateProductDto> = async (req, res, next) => {
+  try {
+    const id = parseNumberOrThrow(req.params.id, "상품 ID");
+    const { name, price, linkUrl, categoryId } = req.body;
+    const user = req.user;
+
+    if (!user?.id) {
+      throw new AuthenticationError("로그인이 필요합니다.");
+    }
+
+    const admin = user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN;
+    if (!admin) {
+      throw new ForbiddenError("관리자만 접근할 수 있습니다.");
+    }
+
+    const product = await productService.getProductById(id);
+    if (!product) {
+      throw new NotFoundError("상품을 찾을 수 없습니다.");
+    }
+
+    const priceNum = parseNumberOrThrow(price, "price");
+    const categoryIdNum = parseNumberOrThrow(categoryId, "categoryId");
+
+    let imageUrl: string | undefined;
+    if (req.file) {
+      imageUrl = await uploadImageToS3(req.file);
+    }
+
+    const input = {
+      name,
+      price: priceNum,
+      linkUrl,
+      categoryId: categoryIdNum,
+      ...(imageUrl && { imageUrl }),
+    };
+
+    const updated = await productService.updateProduct(id, product.creatorId, input); 
+    if (updated) {
+      res.status(200).json(updated);
+    } else {
+      throw new ServerError("상품 수정에 실패했습니다.");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+
+
 //상품 삭제
 export const deleteProduct: RequestHandler<{ id: string }> = async (req, res, next) => {
   try {
     const productId = parseNumberOrThrow(req.params.id, "상품 ID");
     const userId = req.user?.id;
-    const userRole = req.user?.role;
 
     const product = await productService.getProductById(productId);
     if (!product) {
       throw new NotFoundError("상품을 찾을 수 없습니다.");
     }
 
-    const isAdmin = userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN;
-    const isOwner = product.creatorId === userId;
-    if (!isOwner && !isAdmin) {
+    const owner = product.creatorId === userId;
+    if (!owner) {
       throw new ForbiddenError("본인이 등록한 상품만 삭제할 수 있습니다.");
+    }
+
+    await productService.deleteProduct(productId);
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};
+
+//상품 삭제 어드민
+export const forceDeleteProduct: RequestHandler<{ id: string }> = async (req, res, next) => {
+  try {
+    const productId = parseNumberOrThrow(req.params.id, "상품 ID");
+    const userRole = req.user?.role;
+
+    const admin = userRole === Role.ADMIN || userRole === Role.SUPER_ADMIN;
+    if (!admin) {
+      throw new ForbiddenError("관리자만 접근할 수 있습니다.");
+    }
+
+    const product = await productService.getProductById(productId);
+    if (!product) {
+      throw new NotFoundError("상품을 찾을 수 없습니다.");
     }
 
     await productService.deleteProduct(productId);
@@ -214,4 +286,6 @@ export default {
   getProductDetail,
   updateProduct,
   deleteProduct,
+  forceUpdateProduct,
+  forceDeleteProduct
 };

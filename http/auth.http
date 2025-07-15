@@ -9,7 +9,7 @@ POST {{url}}/auth/signup
 Content-Type: application/json
 
 {
-  "email": "admin@example.com",
+  "email": "admin1@example.com",
   "name": "관리자",
   "password": "adminpass123",
   "confirmPassword": "adminpass123",

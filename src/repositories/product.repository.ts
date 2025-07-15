@@ -7,18 +7,24 @@ const findManyAll = async (options: ProductQueryOptions = {}, tx?: Prisma.Transa
   const client = tx || prisma;
   const { sort = "latest", category, take = 9, cursor } = options;
 
+  const categoryIds = await getCategory(category, client);
+
   if (sort === "popular") {
-    return findManyAllPopular({ category, take });
+    return findManyAllPopular({
+      categoryIds,
+      take,
+      skip: cursor ? 1 : 0,
+    });
   }
 
   let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: "desc" };
+  if (sort === "high") orderBy = { price: "desc" };
   if (sort === "low") orderBy = { price: "asc" };
-  else if (sort === "high") orderBy = { price: "desc" };
 
   return client.product.findMany({
     where: {
-      ...(category && { categoryId: category }),
       deletedAt: null,
+      ...(categoryIds ? { categoryId: { in: categoryIds } } : {}),
     },
     orderBy,
     take,
@@ -31,24 +37,50 @@ const findManyAll = async (options: ProductQueryOptions = {}, tx?: Prisma.Transa
   });
 };
 
-// 인기 상품
-const findManyAllPopular = async ({ category, skip = 0, take = 6 }: ProductQueryOptions) => {
-  const result = await prisma.$queryRaw`
-    SELECT 
-      p.*,
-      COUNT(oi."id")::int AS "saleCount"
-    FROM "Product" p
-    LEFT JOIN "CartItem" ci ON p."id" = ci."productId"
-    LEFT JOIN "OrderedItem" oi ON ci."id" = oi."cartId"
-    ${category ? Prisma.sql`WHERE p."categoryId" = ${category}` : Prisma.empty}
-    GROUP BY p."id"
-    ORDER BY COUNT(oi."id") DESC
-    LIMIT ${take} OFFSET ${skip}
-  `;
-  return result;
+// 인기 상품 전용 정렬
+const findManyAllPopular = async ({
+  categoryIds,
+  skip = 0,
+  take = 6,
+}: {
+  categoryIds?: number[];
+  skip?: number;
+  take?: number;
+}) => {
+  return prisma.product.findMany({
+    where: {
+      deletedAt: null,
+      ...(categoryIds ? { categoryId: { in: categoryIds } } : {}),
+    },
+    include: {
+      category: true,
+      creator: true,
+      _count: { select: { orderedItems: true } },
+    },
+    orderBy: {
+      orderedItems: { _count: "desc" },
+    },
+    skip,
+    take,
+  });
 };
 
-// ID로 단일 상품 조회, **deletedAt이 null**인 활성 상품만 조회
+// 카테고리 + 하위 카테고리 ID 조회
+const getCategory = async (
+  category: number | undefined,
+  client: Prisma.TransactionClient | typeof prisma,
+): Promise<number[] | undefined> => {
+  if (!category) return undefined;
+
+  const subCategories = await client.category.findMany({
+    where: { parentId: category },
+    select: { id: true },
+  });
+
+  return [category, ...subCategories.map((c) => c.id)];
+};
+
+// ID로 단일 상품 조회
 const findById = (id: number, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
   return client.product.findFirst({
@@ -67,10 +99,7 @@ const create = (data: CreateProductParams, tx?: Prisma.TransactionClient) => {
 };
 
 // 특정 사용자의 상품 목록 조회
-const findManyCreator = (
-  { creatorId, skip = 0, take = 10 }: CreatorQueryOptions,
-  tx?: Prisma.TransactionClient
-) => {
+const findManyCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
 
   return client.product.findMany({
@@ -97,7 +126,7 @@ const countCreator = (creatorId: string, tx?: Prisma.TransactionClient) => {
 
 const findProductById = async (id: number, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
-  return await client.product.findUnique({
+  return await client.product.findFirst({
     where: { id, deletedAt: null },
     include: {
       category: true,
@@ -108,8 +137,14 @@ const findProductById = async (id: number, tx?: Prisma.TransactionClient) => {
 
 const update = async (id: number, data: Partial<CreateProductParams>, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
-  return await client.product.update({
+  const product = await client.product.findFirst({
     where: { id, deletedAt: null },
+  });
+
+  if (!product) throw new Error("상품이 존재하지 않거나 이미 삭제되었습니다.");
+
+  return await client.product.update({
+    where: { id },
     data,
   });
 };
