@@ -54,7 +54,7 @@ Cookie:accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5OWQ0NjYwLWU5
 
 
 ### 상품 전체 요청 
-GET http://localhost:8080/products?sort=popular
+GET http://localhost:8080/products
 Content-Type: application/json
 
 # 쿼리스트링 옵션:

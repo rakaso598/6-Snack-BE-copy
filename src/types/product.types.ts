@@ -12,6 +12,11 @@ export type ProductQueryOptions = {
   orderBy?: any;
   
 };
+
+export type ExtendedProductQueryOptions = ProductQueryOptions & {
+  categoryIds?: number[];
+};
+
 export type ProductSaleCount = Product & {
   saleCount: number;
 };

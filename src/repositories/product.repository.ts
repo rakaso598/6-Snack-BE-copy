@@ -1,27 +1,30 @@
 import prisma from "../config/prisma";
 import { Prisma } from "@prisma/client";
-import type { ProductQueryOptions, CreatorQueryOptions, CreateProductParams, ProductSaleCount } from "../types/product.types";
+import type { ProductQueryOptions, CreatorQueryOptions, CreateProductParams } from "../types/product.types";
 
 // 전체 상품을 조건에 맞게 조회
 const findManyAll = async (options: ProductQueryOptions = {}, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
   const { sort = "latest", category, take = 9, cursor } = options;
 
+  const categoryIds = await getCategory(category, client);
+
   if (sort === "popular") {
-    return findManyAllPopular({ category, take });
+    return findManyAllPopular({
+      categoryIds,
+      take,
+      skip: cursor ? 1 : 0,
+    });
   }
 
   let orderBy: Prisma.ProductOrderByWithRelationInput = { createdAt: "desc" };
-if (["popular", "latest-with-sales", "low-with-sales", "high-with-sales"].includes(sort)) {
-  return findManyAllPopular({ category, take, skip: cursor ? 1 : 0, sort });
-}
-
-  else if (sort === "high") orderBy = { price: "desc" };
+  if (sort === "high") orderBy = { price: "desc" };
+  if (sort === "low") orderBy = { price: "asc" };
 
   return client.product.findMany({
     where: {
-      ...(category && { categoryId: category }),
       deletedAt: null,
+      ...(categoryIds ? { categoryId: { in: categoryIds } } : {}),
     },
     orderBy,
     take,
@@ -34,41 +37,48 @@ if (["popular", "latest-with-sales", "low-with-sales", "high-with-sales"].includ
   });
 };
 
-// 인기 상품
+// 인기 상품 전용 정렬
 const findManyAllPopular = async ({
-  category,
+  categoryIds,
   skip = 0,
   take = 6,
-  sort = "popular",
-}: ProductQueryOptions & { sort?: "popular" | "latest" | "low" | "high" }) => {
-  const orderByClause = (() => {
-    if (sort === "popular") {
-      return Prisma.sql`ORDER BY COUNT(oi."id") DESC`;
-    } else if (sort === "low") {
-      return Prisma.sql`ORDER BY p."price" ASC`;
-    } else if (sort === "high") {
-      return Prisma.sql`ORDER BY p."price" DESC`;
-    } else {
-      return Prisma.sql`ORDER BY p."createdAt" DESC`; // default: latest
-    }
-  })();
-
-  const result = await prisma.$queryRaw<ProductSaleCount[]>`
-    SELECT 
-      p.*,
-      COUNT(oi."id")::int AS "saleCount"
-    FROM "Product" p
-    LEFT JOIN "CartItem" ci ON p."id" = ci."productId"
-    LEFT JOIN "OrderedItem" oi ON ci."id" = oi."cartId"
-    WHERE p."deletedAt" IS NULL
-    ${category ? Prisma.sql`AND p."categoryId" = ${category}` : Prisma.empty}
-    GROUP BY p."id"
-    ${orderByClause}
-    LIMIT ${take} OFFSET ${skip}
-  `;
-  return result;
+}: {
+  categoryIds?: number[];
+  skip?: number;
+  take?: number;
+}) => {
+  return prisma.product.findMany({
+    where: {
+      deletedAt: null,
+      ...(categoryIds ? { categoryId: { in: categoryIds } } : {}),
+    },
+    include: {
+      category: true,
+      creator: true,
+      _count: { select: { orderedItems: true } },
+    },
+    orderBy: {
+      orderedItems: { _count: "desc" },
+    },
+    skip,
+    take,
+  });
 };
 
+// 카테고리 + 하위 카테고리 ID 조회
+const getCategory = async (
+  category: number | undefined,
+  client: Prisma.TransactionClient | typeof prisma,
+): Promise<number[] | undefined> => {
+  if (!category) return undefined;
+
+  const subCategories = await client.category.findMany({
+    where: { parentId: category },
+    select: { id: true },
+  });
+
+  return [category, ...subCategories.map((c) => c.id)];
+};
 
 // ID로 단일 상품 조회
 const findById = (id: number, tx?: Prisma.TransactionClient) => {
