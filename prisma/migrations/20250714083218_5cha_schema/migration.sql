@@ -14,6 +14,7 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "deletedAt" TIMESTAMP(3),
+    "hashedRefreshToken" TEXT,
     "role" "Role" NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -34,7 +35,7 @@ CREATE TABLE "Company" (
 CREATE TABLE "MonthlyBudget" (
     "id" SERIAL NOT NULL,
     "companyId" INTEGER NOT NULL,
-    "totalExpense" INTEGER NOT NULL DEFAULT 0,
+    "currentMonthExpense" INTEGER NOT NULL DEFAULT 0,
     "currentMonthBudget" INTEGER NOT NULL DEFAULT 0,
     "monthlyBudget" INTEGER NOT NULL DEFAULT 0,
     "year" TEXT NOT NULL,
@@ -77,15 +78,28 @@ CREATE TABLE "CartItem" (
     "userId" TEXT NOT NULL,
     "productId" INTEGER NOT NULL,
     "quantity" INTEGER NOT NULL,
+    "isChecked" BOOLEAN NOT NULL DEFAULT true,
     "deletedAt" TIMESTAMP(3),
 
     CONSTRAINT "CartItem_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
+CREATE TABLE "Receipt" (
+    "id" SERIAL NOT NULL,
+    "productName" TEXT NOT NULL,
+    "price" INTEGER NOT NULL,
+    "imageUrl" TEXT NOT NULL,
+    "quantity" INTEGER NOT NULL,
+
+    CONSTRAINT "Receipt_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Order" (
     "id" SERIAL NOT NULL,
     "userId" TEXT NOT NULL,
+    "approver" TEXT,
     "adminMessage" TEXT,
     "requestMessage" TEXT,
     "totalPrice" INTEGER NOT NULL,
@@ -99,10 +113,9 @@ CREATE TABLE "Order" (
 -- CreateTable
 CREATE TABLE "OrderedItem" (
     "id" SERIAL NOT NULL,
-    "productId" INTEGER NOT NULL,
     "orderId" INTEGER NOT NULL,
-    "price" INTEGER NOT NULL,
-    "quantity" INTEGER NOT NULL,
+    "receiptId" INTEGER NOT NULL,
+    "productId" INTEGER NOT NULL,
 
     CONSTRAINT "OrderedItem_pkey" PRIMARY KEY ("id")
 );
@@ -140,6 +153,9 @@ CREATE UNIQUE INDEX "Company_bizNumber_key" ON "Company"("bizNumber");
 CREATE UNIQUE INDEX "MonthlyBudget_companyId_year_month_key" ON "MonthlyBudget"("companyId", "year", "month");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "CartItem_userId_productId_key" ON "CartItem"("userId", "productId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Invite_email_key" ON "Invite"("email");
 
 -- AddForeignKey
@@ -167,10 +183,13 @@ ALTER TABLE "CartItem" ADD CONSTRAINT "CartItem_productId_fkey" FOREIGN KEY ("pr
 ALTER TABLE "Order" ADD CONSTRAINT "Order_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderedItem" ADD CONSTRAINT "OrderedItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderedItem" ADD CONSTRAINT "OrderedItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OrderedItem" ADD CONSTRAINT "OrderedItem_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "OrderedItem" ADD CONSTRAINT "OrderedItem_receiptId_fkey" FOREIGN KEY ("receiptId") REFERENCES "Receipt"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "OrderedItem" ADD CONSTRAINT "OrderedItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Invite" ADD CONSTRAINT "Invite_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
