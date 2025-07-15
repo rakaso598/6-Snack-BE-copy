@@ -1,26 +1,29 @@
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZjAzMzJhYS0xNWRlLTRmZTAtYTNhYy1jYTZjMDdmY2NmNmEiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzUyNTY0NTgzLCJleHAiOjE3NTI1NjU0ODN9.qCyJdrxTlfryd3CGpeJ-HrFIvN8vfDLC3xr827tqZkw; Path=/; Expires=Tue, 15 Jul 2025 07:44:43 GMT; HttpOnly; SameSite=Lax,refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZjAzMzJhYS0xNWRlLTRmZTAtYTNhYy1jYTZjMDdmY2NmNmEiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUyNTY0NTgzLCJleHAiOjE3NTMxNjkzODN9.EkZy8Rwuq67aehl6FhiPOhhV0Iu1Z1niIhgqJSGmHE4
+
+
 ### 구매 요청 생성
 POST http://localhost:8080/orders
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+Cookie: accessToken={{accessToken}}
 
 {
-  "cartItemIds": [1, 2, 3],
+  "cartItemIds": [1, 2],
   "adminMessage": "관리자에게 남길 메시지",
   "requestMessage": "요청 메시지"
 }
 
 ### 내 구매 요청 리스트 조회
 GET http://localhost:8080/orders
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMyIsImVtYWlsIjoidXNlckBjb2RlaXQuY29tIiwibmFtZSI6IuycoOyggCIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzUyMTkyNDE4LCJleHAiOjE3NTIxOTMzMTh9.Co6nDH_5mv1fddc-eNOei3MfuQ8MmVOLzdcQWnIApog
+Cookie: accessToken={{accessToken}}
 
 ### 구매 요청 상세 조회
-GET http://localhost:8080/orders/11
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMyIsImVtYWlsIjoidXNlckBjb2RlaXQuY29tIiwibmFtZSI6IuycoOyggCIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzUyMTkyNDE4LCJleHAiOjE3NTIxOTMzMTh9.Co6nDH_5mv1fddc-eNOei3MfuQ8MmVOLzdcQWnIApog
+GET http://localhost:8080/orders/3
+Cookie: accessToken={{accessToken}}
 
 ### 구매 요청 취소
-PATCH http://localhost:8080/orders/11
+PATCH http://localhost:8080/orders/3
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMyIsImVtYWlsIjoidXNlckBjb2RlaXQuY29tIiwibmFtZSI6IuycoOyggCIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzUyMTkyNDE4LCJleHAiOjE3NTIxOTMzMTh9.Co6nDH_5mv1fddc-eNOei3MfuQ8MmVOLzdcQWnIApog
+Cookie: accessToken={{accessToken}}
 
 {
   "status": "CANCELED"
@@ -29,7 +32,7 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMyIsImV
 ### 즉시 구매 (어드민 전용)
 POST http://localhost:8080/orders/instant
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+Cookie: accessToken={{accessToken}}
 
 {
   "cartItemIds": [1, 2]
@@ -37,24 +40,24 @@ Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImV
 
 ### 관리자 - 구매내역 조회 (대기)
 GET http://localhost:8080/admin/orders?status=pending&offset=0&limit=4&orderBy=latest
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 조회 (승인)
 GET http://localhost:8080/admin/orders?status=approved&offset=0&limit=4&orderBy=latest
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 상세 조회 (대기)
 GET http://localhost:8080/admin/orders/11?status=pending
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 상세 조회 (승인)
 GET http://localhost:8080/admin/orders/11?status=approved
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매 승인/반려
 PATCH http://localhost:8080/admin/orders/11
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXItMSIsImVtYWlsIjoic3VwZXJfYWRtaW5AY29kZWl0LmNvbSIsIm5hbWUiOiLstZzqs6DqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIxOTM3NzEsImV4cCI6MTc1MjE5NDY3MX0.VbmsPDSKhvje758djPAngBPBGkLywUpjy7dhdAW_4No
+Cookie: accessToken={{accessToken}}
 
 {
   "status": "APPROVED",

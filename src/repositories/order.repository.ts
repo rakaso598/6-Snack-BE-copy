@@ -120,11 +120,12 @@ const createOrder = async (orderData: {
 
   // 5. OrderedItem 생성 (주문과 receipt 연결)
   await Promise.all(
-    receipts.map(async (receipt) => {
+    receipts.map(async (receipt, index) => {
       return await client.orderedItem.create({
         data: {
           orderId: order.id,
-          receiptId: receipt.id
+          receiptId: receipt.id,
+          productId: cartItems[index].productId
         }
       });
     })
