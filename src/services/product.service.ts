@@ -1,10 +1,10 @@
 import { Prisma } from "@prisma/client";
 import productRepository from "../repositories/product.repository";
 import { AuthenticationError, NotFoundError, ServerError, ValidationError } from "../types/error";
-import { ProductQueryOptions, CreateProductParams } from "../types/product.types";
+import { TProductQueryOptions, TCreateProductParams, TCategoryMap, TParentCategory, TChildCategory } from "../types/product.types";
 
 // 상품 등록
-const createProduct = async (input: CreateProductParams, tx?: Prisma.TransactionClient) => {
+const createProduct = async (input: TCreateProductParams, tx?: Prisma.TransactionClient) => {
   const { name, price, linkUrl, imageUrl, categoryId, creatorId } = input;
   const errors: Record<string, string> = {};
 
@@ -49,7 +49,7 @@ const getProductById = async (id: number, tx?: Prisma.TransactionClient) => {
 
 // 옵션에 따라 여러 상품 목록 조회
 const getProductList = async (
-  options: ProductQueryOptions,
+  options: TProductQueryOptions,
   tx?: Prisma.TransactionClient
 ) => {
   return productRepository.findManyAll(options, tx);
@@ -57,7 +57,7 @@ const getProductList = async (
 
 // 특정 사용자가 등록한 상품 목록 조회
 const getProductsCreator = async (
-  options: Pick<ProductQueryOptions, "creatorId" | "skip" | "take">,
+  options: Pick<TProductQueryOptions, "creatorId" | "skip" | "take">,
   tx?: Prisma.TransactionClient
 ) => {
   if (!options.creatorId) {
@@ -82,7 +82,7 @@ const countProducts = async (creatorId: string, tx?: Prisma.TransactionClient) =
 const updateProduct = async (
   productId: number,
   creatorId: string,
-  input: Partial<CreateProductParams>,
+  input: Partial<TCreateProductParams>,
   tx?: Prisma.TransactionClient,
 ) => {
   const existing = await productRepository.findProductById(productId, tx);
@@ -98,6 +98,31 @@ const deleteProduct = async (id: number, tx?: Prisma.TransactionClient) => {
   return await productRepository.softDeleteById(id, tx);
 };
 
+
+// 카테고리
+const getCategory = async (): Promise<TCategoryMap> => {
+  const categories = await productRepository.findAllCategories();
+
+  const parentCategory: TParentCategory[] = [];
+  const childrenCategory: Record<string, TChildCategory[]> = {};
+
+  for (const category of categories) {
+    if (category.parentId == null) {
+      parentCategory.push({ id: category.id, name: category.name });
+    }
+  }
+
+  for (const parent of parentCategory) {
+    const children: TChildCategory[] = categories
+      .filter((c) => c.parentId === parent.id)
+      .map((c) => ({ id: c.id, name: c.name }));
+
+    childrenCategory[parent.name] = children;
+  }
+
+  return { parentCategory, childrenCategory };
+};
+
 export default {
   createProduct,
   getProductById,
@@ -106,4 +131,5 @@ export default {
   countProducts,
   updateProduct,
   deleteProduct,
+  getCategory
 };

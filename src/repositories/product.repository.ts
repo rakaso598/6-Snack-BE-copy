@@ -1,9 +1,9 @@
 import prisma from "../config/prisma";
 import { Prisma } from "@prisma/client";
-import type { ProductQueryOptions, CreatorQueryOptions, CreateProductParams } from "../types/product.types";
+import type { TProductQueryOptions, TCreatorQueryOptions, TCreateProductParams } from "../types/product.types";
 
 // 전체 상품을 조건에 맞게 조회
-const findManyAll = async (options: ProductQueryOptions = {}, tx?: Prisma.TransactionClient) => {
+const findManyAll = async (options: TProductQueryOptions = {}, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
   const { sort = "latest", category, take = 9, cursor } = options;
 
@@ -93,13 +93,13 @@ const findById = (id: number, tx?: Prisma.TransactionClient) => {
 };
 
 // 새로운 상품 생성
-const create = (data: CreateProductParams, tx?: Prisma.TransactionClient) => {
+const create = (data: TCreateProductParams, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
   return client.product.create({ data });
 };
 
 // 특정 사용자의 상품 목록 조회
-const findManyCreator = ({ creatorId, skip = 0, take = 10 }: CreatorQueryOptions, tx?: Prisma.TransactionClient) => {
+const findManyCreator = ({ creatorId, skip = 0, take = 10 }: TCreatorQueryOptions, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
 
   return client.product.findMany({
@@ -135,7 +135,7 @@ const findProductById = async (id: number, tx?: Prisma.TransactionClient) => {
   });
 };
 
-const update = async (id: number, data: Partial<CreateProductParams>, tx?: Prisma.TransactionClient) => {
+const update = async (id: number, data: Partial<TCreateProductParams>, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
   const product = await client.product.findFirst({
     where: { id, deletedAt: null },
@@ -156,6 +156,19 @@ const softDeleteById = async (id: number, tx?: Prisma.TransactionClient) => {
     data: { deletedAt: new Date() },
   });
 };
+
+
+const findAllCategories = async () => {
+  return prisma.category.findMany({
+    select: {
+      id: true,
+      name: true,
+      parentId: true,
+    },
+  });
+};
+
+
 export default {
   create,
   findById,
@@ -165,4 +178,5 @@ export default {
   findProductById,
   update,
   softDeleteById,
+  findAllCategories
 };

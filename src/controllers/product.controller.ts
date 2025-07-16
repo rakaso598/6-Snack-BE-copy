@@ -11,7 +11,6 @@ import { uploadImageToS3 } from "../utils/s3";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 import {
   TCreateProductDto,
-  TGetMyProductsDto,
   TGetMyProductsQueryDto,
   TGetProductsQueryDto,
   TProductIdParamsDto,
@@ -278,6 +277,14 @@ export const forceDeleteProduct: RequestHandler<{ id: string }> = async (req, re
   }
 };
 
+const getCategoryTree: RequestHandler = async (req, res, next) => {
+  try {
+    const categories = await productService.getCategory();
+    res.json(categories);
+  } catch (error) {
+    next(error instanceof Error ? error : new ServerError("카테고리 조회 중 에러", error));
+  }
+};
 
 export default {
   createProduct,
@@ -287,5 +294,6 @@ export default {
   updateProduct,
   deleteProduct,
   forceUpdateProduct,
-  forceDeleteProduct
+  forceDeleteProduct,
+  getCategoryTree
 };
