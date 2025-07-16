@@ -6,6 +6,7 @@ import authorizeRoles from "../middlewares/authorizeRoles.middleware";
 
 const router = Router();
 
+router.get("/category", productController.getCategoryTree);
 router.post(
   "/",
   authenticateToken,

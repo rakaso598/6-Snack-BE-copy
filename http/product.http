@@ -52,9 +52,12 @@ DELETE http://localhost:8080/admin/products/8
 Content-Type: application/json
 Cookie:accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5OWQ0NjYwLWU5M2MtNDA1My04MjUwLWIyMzE4MThlODgzZiIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNzU5MDgsImV4cCI6MTc1MjA3NjgwOH0.q5u5sUCu8QpQdzxvEKPO_4iQ8_nX-hUnYpc-Ld_xC0E;
 
+### 카테고리
+GET http://localhost:8080/products/category
+Content-Type: application/json
 
 ### 상품 전체 요청 
-GET http://localhost:8080/products
+GET http://localhost:8080/products?category=1
 Content-Type: application/json
 
 # 쿼리스트링 옵션:
@@ -67,7 +70,7 @@ Content-Type: application/json
 #     - high     : 가격 높은순
 #
 # - category: 카테고리 ID (number)
-#   예) category=3
+#   예) category=3(parentId, id)
 #
 # - cursor: 커서 ID (number)
 #   페이징용으로 사용, 이전 요청 마지막 아이템 ID
