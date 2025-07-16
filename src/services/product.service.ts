@@ -98,27 +98,29 @@ const deleteProduct = async (id: number, tx?: Prisma.TransactionClient) => {
   return await productRepository.softDeleteById(id, tx);
 };
 
+
+// 카테고리
 const getCategory = async (): Promise<TCategoryMap> => {
   const categories = await productRepository.findAllCategories();
 
-  const parentCategories: TParentCategory[] = [];
-  const childrenCategoryMap: Record<string, TChildCategory[]> = {};
+  const parentCategory: TParentCategory[] = [];
+  const childrenCategory: Record<string, TChildCategory[]> = {};
 
   for (const category of categories) {
     if (category.parentId == null) {
-      parentCategories.push({ id: category.id, name: category.name });
+      parentCategory.push({ id: category.id, name: category.name });
     }
   }
 
-  for (const parent of parentCategories) {
+  for (const parent of parentCategory) {
     const children: TChildCategory[] = categories
       .filter((c) => c.parentId === parent.id)
       .map((c) => ({ id: c.id, name: c.name }));
 
-    childrenCategoryMap[parent.name] = children;
+    childrenCategory[parent.name] = children;
   }
 
-  return { parentCategories, childrenCategoryMap };
+  return { parentCategory, childrenCategory };
 };
 
 export default {

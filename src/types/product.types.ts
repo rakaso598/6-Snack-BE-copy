@@ -66,6 +66,6 @@ export type TCategoryTreeNode = TParentCategory & {
 
 // 프론트 UI용: 대분류 배열 + 이름 기반 소분류 맵
 export type TCategoryMap = {
-  parentCategories: TParentCategory[];
-  childrenCategoryMap: Record<string, TChildCategory[]>;
+  parentCategory: TParentCategory[];
+  childrenCategory: Record<string, TChildCategory[]>;
 };
