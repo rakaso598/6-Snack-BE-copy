@@ -1,0 +1,19 @@
+@url=http://localhost:8080
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NTgzOTksImV4cCI6MTc1MTk2MTk5OX0.T1iIV0VSadnAbb_Nm-okXCQ8mVd8CLrjufjx2EKFPYw
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NjMzMzIsImV4cCI6MTc1MTk2NDIzMn0.qtpZKSF6RsxaGqCogwPBvvFKVwVhAPanxPIqVNcV48k
+@refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1ODE0OTZkLWQzNWEtNGI3Ny1iMmVkLTNhNGZiNGFlZWUwYyIsImlhdCI6MTc1MjAzOTcyNiwiZXhwIjoxNzUyNjQ0NTI2fQ.KVM4FvB5-pj60hKByYkYnhmXk0LO8T_RgT7C8I_FlBk
+@inviteId=ce1e2d8e-7e62-4bc3-a44c-2984075a27ca
+
+### 헬스 체크
+GET {{url}}/health
+
+### 로그인
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@example.com",
+    "password": "adminpass123"
+}
+
+### http://team3-snack-alb-607127335.ap-northeast-2.elb.amazonaws.com

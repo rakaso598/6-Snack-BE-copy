@@ -9,12 +9,12 @@ POST {{url}}/auth/signup
 Content-Type: application/json
 
 {
-  "email": "admin1@example.com",
+  "email": "admin2@example.com",
   "name": "관리자",
   "password": "adminpass123",
   "confirmPassword": "adminpass123",
   "companyName": "MyCompany Inc.",
-  "bizNumber": "1234567899"
+  "bizNumber": "1223567899"
 }
 
 ### 초대 링크 생성
