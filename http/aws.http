@@ -7,3 +7,13 @@
 ### 헬스 체크
 GET {{url}}/health
 
+### 로그인
+POST {{url}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@example.com",
+    "password": "adminpass123"
+}
+
+### http://team3-snack-alb-607127335.ap-northeast-2.elb.amazonaws.com
