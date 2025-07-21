@@ -29,32 +29,10 @@ const userRouter = Router();
  * @returns {object} - 현재 로그인된 사용자 정보 (ID, 이메일, 이름, 역할, 회사 정보 포함)
  * @throws {AppError} - 사용자 정보를 찾을 수 없거나 인증되지 않은 경우
  */
-userRouter.get("/me", authenticateToken, (req: Request, res: Response, next: NextFunction) => {
-  if (!req.user) {
-    return next(new AppError("사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.", 401));
-  }
-
-  res.status(200).json({
-    user: {
-      id: req.user.id,
-      email: req.user.email,
-      name: req.user.name,
-      role: req.user.role,
-      company: {
-        id: req.user.company.id,
-        name: req.user.company.name,
-      },
-    },
-  });
-});
+userRouter.get("/me", authenticateToken, userController.getMe);
 
 // 유저 정보 확인
-userRouter.get("/:userId/", authenticateToken, userController.getUserInfo)
+userRouter.get("/:userId/", authenticateToken, userController.getUserInfo);
 // 유저 비밀번호 변경
-userRouter.patch(
-  "/:userId/password",
-  authenticateToken,
-  userController.updatePassword,
-);
+userRouter.patch("/:userId/password", authenticateToken, userController.updatePassword);
 export default userRouter;
-

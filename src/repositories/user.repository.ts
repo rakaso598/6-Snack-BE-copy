@@ -128,6 +128,24 @@ const hasPreviousPage = async (companyId: number, cursor: string, name?: string)
   return count > 0;
 };
 
+// userId로 회사 포함 유저 조회
+const findUserWithCompanyById = async (id: string) => {
+  return await prisma.user.findUnique({
+    where: { id },
+    include: { company: true },
+  });
+};
+
+// userId로 삭제되지 않은 cartItem 개수 조회
+const getCartItemCountByUserId = async (userId: string) => {
+  return await prisma.cartItem.count({
+    where: {
+      userId,
+      deletedAt: null,
+    },
+  });
+};
+
 export default {
   findActiveUserById,
   deleteUser,
@@ -135,4 +153,6 @@ export default {
   updatePassword,
   findUsersByCompanyId,
   hasPreviousPage,
+  findUserWithCompanyById, // 추가
+  getCartItemCountByUserId, // 추가
 };
