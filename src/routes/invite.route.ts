@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { BadRequestError, ValidationError, NotFoundError } from '../types/error';
 import prisma from "../config/prisma";
+import inviteController from '../controllers/invite.controller';
 
 const inviteRouter = Router();
 
@@ -78,5 +79,5 @@ inviteRouter.post('/', async (req: Request, res: Response, next: NextFunction) =
   }
 });
 
-inviteRouter.get('/:inviteId', InviteController.getInvite)
+inviteRouter.get('/:inviteId', inviteController.getInviteInfo)
 export default inviteRouter;
