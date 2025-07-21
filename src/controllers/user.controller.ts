@@ -65,4 +65,17 @@ const getUsersByCompany: RequestHandler<{}, any, {}, TGetUsersQueryDto> = async 
     next(error);
   }
 };
-export default { deleteUser, updateRole, updatePassword, getUsersByCompany, getUserInfo };
+
+// 내 정보 조회
+const getMe: RequestHandler = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      throw new Error("사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.");
+    }
+    const user = await userService.getMe(req.user.id);
+    res.status(200).json({ user });
+  } catch (error) {
+    next(error);
+  }
+};
+export default { deleteUser, updateRole, updatePassword, getUsersByCompany, getUserInfo, getMe };
