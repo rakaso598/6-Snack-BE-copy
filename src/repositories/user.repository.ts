@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { UserRole } from "../dtos/user.dto";
 
