@@ -5,7 +5,8 @@ import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 
 const getMyCart: RequestHandler = async (req, res, next) => {
   try {
-    const cart = await cartService.getMyCart(req.user!.id);
+    const onlySelected = req.query.selected === "true";
+    const cart = await cartService.getMyCart(req.user!.id, onlySelected);
     res.json(cart);
   } catch (err) {
     next(err);

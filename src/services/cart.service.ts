@@ -1,11 +1,20 @@
 import cartRepository from "../repositories/cart.repository";
 import { TAddToCartDto, TDeleteCartItemsDto, TToggleCheckDto } from "../dtos/cart.dto";
 import { BadRequestError, NotFoundError } from "../types/error";
+import prisma from "../lib/prisma";
 
-const getMyCart = async (userId: string) => {
-  return await cartRepository.getCartItemsByUserId(userId);
+const getMyCart = async (userId: string, onlySelected: boolean) => {
+  return await prisma.cartItem.findMany({
+    where: {
+      userId,
+      deletedAt: null,
+      ...(onlySelected && { isChecked: true }),
+    },
+    include: {
+      product: true,
+    },
+  });
 };
-
 const addToCart = async (userId: string, dto: TAddToCartDto) => {
   if (dto.quantity <= 0) {
     throw new BadRequestError("수량은 1 이상이어야 합니다.");
