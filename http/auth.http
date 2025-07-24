@@ -66,12 +66,12 @@ POST {{url}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "admin@example.com",
-    "password": "adminpass123"
+    "email": "han.backend@codeit.com",
+    "password": "1q2w3e4r!"
 }
 
 ### 내 정보 조회
-GET {{url}}/users/me
+GET http://localhost:8080/users/me
 Content-Type: application/json
 Cookie: accessToken={{accessToken}}
 

@@ -99,7 +99,15 @@ const create = (data: TCreateProductParams, tx?: Prisma.TransactionClient) => {
 };
 
 // 특정 사용자의 상품 목록 조회
-const findManyCreator = ({ creatorId, skip = 0, take = 10 }: TCreatorQueryOptions, tx?: Prisma.TransactionClient) => {
+const findManyCreator = (
+  {
+    creatorId,
+    skip = 0,
+    take = 10,
+    orderBy = { createdAt: "desc" }, 
+  }: TCreatorQueryOptions,
+  tx?: Prisma.TransactionClient
+) => {
   const client = tx || prisma;
 
   return client.product.findMany({
@@ -110,11 +118,10 @@ const findManyCreator = ({ creatorId, skip = 0, take = 10 }: TCreatorQueryOption
       category: true,
       creator: true,
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy,
   });
 };
+
 
 // 특정 사용자 상품 총 개수 조회
 const countCreator = (creatorId: string, tx?: Prisma.TransactionClient) => {
@@ -157,7 +164,6 @@ const softDeleteById = async (id: number, tx?: Prisma.TransactionClient) => {
   });
 };
 
-
 const findAllCategories = async () => {
   return prisma.category.findMany({
     select: {
@@ -168,7 +174,6 @@ const findAllCategories = async () => {
   });
 };
 
-
 export default {
   create,
   findById,
@@ -178,5 +183,5 @@ export default {
   findProductById,
   update,
   softDeleteById,
-  findAllCategories
+  findAllCategories,
 };
