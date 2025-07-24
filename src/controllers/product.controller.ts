@@ -81,7 +81,7 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
 
     const nextCursor = items.length > 0 ? items[items.length - 1].id : null;
 
-    res.json({ items, nextCursor: nextCursor ? nextCursor.toString() : null });
+    res.json({ items, nextCursor: nextCursor || null });
   } catch (error) {
     next(error instanceof Error ? error : new ServerError("예기치 못한 에러", error));
   }
