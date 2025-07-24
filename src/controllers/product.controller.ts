@@ -88,7 +88,7 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
   }
 };
 
-//유저가 등록한상품 목록
+// 유저가 등록한 상품 목록
 const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async (req, res, next) => {
   try {
     const creatorId = req.user?.id;
@@ -100,10 +100,29 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
     const limit = req.query.limit ? parseNumberOrThrow(req.query.limit, "limit") : 10;
     const skip = (page - 1) * limit;
 
-    const [items, totalCount] = await Promise.all([
-      productService.getProductsCreator({ creatorId, skip, take: limit }),
-      productService.countProducts(creatorId),
-    ]);
+    const orderByParam = req.query.orderBy || "latest";
+
+    let orderBy: { createdAt?: "asc" | "desc"; price?: "asc" | "desc" };
+
+    switch (orderByParam) {
+      case "priceLow":
+        orderBy = { price: "asc" };
+        break;
+      case "priceHigh":
+        orderBy = { price: "desc" };
+        break;
+      case "latest":
+      default:
+        orderBy = { createdAt: "desc" };
+        break;
+    }
+
+    const { items, totalCount } = await productService.getProductsCreator({
+      creatorId,
+      skip,
+      take: limit,
+      orderBy,
+    });
 
     res.json({
       items,

@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "email": "super_admin@codeit.com",
-  "password": "11111111"
+  "password": "1q2w3e4r!"
 }
 
 ### 회사 정보 업데이트 (SUPER_ADMIN만 가능)
@@ -45,8 +45,8 @@ Content-Type: application/json
 
 {
   "passwordData": {
-    "newPassword": "newpassword456",
-    "newPasswordConfirm": "newpassword456"
+    "newPassword": "newpassword456@",
+    "newPasswordConfirm": "newpassword456@"
   }
 }
 
@@ -89,10 +89,10 @@ Content-Type: application/json
 }
 
 ### 전체 회사 유저 목록 조회 (첫 페이지)
-GET http://localhost:8080/super-admin/users
+GET http://localhost:8080/super-admin/users?limit=15
 
 ### 다음 페이지 조회
-GET http://localhost:8080/super-admin/users?cursor=user-3
+GET http://localhost:8080/super-admin/users?cursor=user-1
 
 ### 이름으로 검색
 GET http://localhost:8080/super-admin/users?name=관리자
