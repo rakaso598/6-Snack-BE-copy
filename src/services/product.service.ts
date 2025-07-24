@@ -57,22 +57,31 @@ const getProductList = async (
 
 // 특정 사용자가 등록한 상품 목록 조회
 const getProductsCreator = async (
-  options: Pick<TProductQueryOptions, "creatorId" | "skip" | "take">,
+  options: Pick<TProductQueryOptions, "creatorId" | "skip" | "take"> & {
+    orderBy?: { createdAt?: "asc" | "desc"; price?: "asc" | "desc" };
+  },
   tx?: Prisma.TransactionClient
 ) => {
   if (!options.creatorId) {
     throw new ValidationError("creatorId는 필수입니다.");
   }
 
-  return await productRepository.findManyCreator(
-    {
-      creatorId: options.creatorId,
-      skip: options.skip,
-      take: options.take,
-    },
-    tx
-  );
+  const [items, totalCount] = await Promise.all([
+    productRepository.findManyCreator(
+      {
+        creatorId: options.creatorId,
+        skip: options.skip,
+        take: options.take,
+        orderBy: options.orderBy,
+      },
+      tx
+    ),
+    productRepository.countCreator(options.creatorId, tx),
+  ]);
+
+  return { items, totalCount };
 };
+
 
 // 특정 사용자가 등록한 상품 개수 조회
 const countProducts = async (creatorId: string, tx?: Prisma.TransactionClient) => {

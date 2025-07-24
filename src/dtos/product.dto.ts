@@ -24,6 +24,7 @@ export type TGetMyProductsDto = {
 export type TGetMyProductsQueryDto = {
   page: string;
   limit: string;
+  orderBy?: "latest" | "priceLow" | "priceHigh";
 };
 
 export type TProductIdParamsDto = {

@@ -7,9 +7,9 @@ Content-Type: application/json
 Cookie: accessToken={{accessToken}}
 
 {
-  "cartItemIds": [1, 2],
+  "cartItemIds": [1],
   "adminMessage": "관리자에게 남길 메시지",
-  "requestMessage": "요청 메시지"
+  "requestMessage": "요청 이요"
 }
 
 ### 내 구매 요청 리스트 조회
@@ -17,7 +17,7 @@ GET {{BASE_URL}}/orders
 Cookie: accessToken={{accessToken}}
 
 ### 구매 요청 상세 조회
-GET {{BASE_URL}}/orders/3
+GET {{BASE_URL}}/orders/2
 Cookie: accessToken={{accessToken}}
 
 ### 구매 요청 취소
@@ -47,7 +47,7 @@ GET {{BASE_URL}}/admin/orders?status=approved&offset=0&limit=4&orderBy=latest
 Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 상세 조회 (대기)
-GET {{BASE_URL}}/admin/orders/11?status=pending
+GET {{BASE_URL}}/admin/orders/2?status=pending
 Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 상세 조회 (승인)

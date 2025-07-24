@@ -11,7 +11,7 @@ Content-Type: application/json
 }
 
 ### 9. SUPER_ADMIN이 ADMIN을 일반 유저로 변경 (성공 케이스)
-PATCH http://localhost:8080/super-admin/users/user-2/role
+PATCH http://localhost:8080/super-admin/users/user-3/role
 Content-Type: application/json
 
 {
