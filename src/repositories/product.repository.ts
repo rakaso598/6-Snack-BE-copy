@@ -129,12 +129,15 @@ const findProductById = async (id: number, tx?: Prisma.TransactionClient) => {
   return await client.product.findFirst({
     where: { id, deletedAt: null },
     include: {
-      category: true,
+      category: {
+        include: {
+          parent: true, // ✅ 대분류 카테고리 정보 포함
+        },
+      },
       creator: true,
     },
   });
 };
-
 const update = async (id: number, data: Partial<TCreateProductParams>, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;
   const product = await client.product.findFirst({
@@ -157,7 +160,6 @@ const softDeleteById = async (id: number, tx?: Prisma.TransactionClient) => {
   });
 };
 
-
 const findAllCategories = async () => {
   return prisma.category.findMany({
     select: {
@@ -168,7 +170,6 @@ const findAllCategories = async () => {
   });
 };
 
-
 export default {
   create,
   findById,
@@ -178,5 +179,5 @@ export default {
   findProductById,
   update,
   softDeleteById,
-  findAllCategories
+  findAllCategories,
 };
