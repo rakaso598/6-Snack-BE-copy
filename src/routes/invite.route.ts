@@ -2,6 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { BadRequestError, ValidationError, NotFoundError } from '../types/error';
 import prisma from "../config/prisma";
 import inviteController from '../controllers/invite.controller';
+import inviteService from '../services/invite.service';
 
 const inviteRouter = Router();
 
@@ -41,12 +42,12 @@ inviteRouter.post('/', async (req: Request, res: Response, next: NextFunction) =
       },
     });
 
+    // 기존 활성 초대가 있으면 삭제
     if (existingActiveInvite) {
-      res.status(200).json({
-        message: '해당 이메일로 이미 활성화된 초대 링크가 존재합니다.',
-        inviteId: existingActiveInvite.id,
-        inviteLink: `${req.protocol}://${process.env.SIGNUP_HOST || 'localhost:3000'}/signup/${existingActiveInvite.id}`,
+      await prisma.invite.delete({
+        where: { id: existingActiveInvite.id }
       });
+      console.log(`[기존 초대 삭제] 이메일: ${email}, 초대 ID: ${existingActiveInvite.id}`);
     }
 
     const newInvite = await prisma.$transaction(async (prismaTransaction) => {
@@ -65,13 +66,29 @@ inviteRouter.post('/', async (req: Request, res: Response, next: NextFunction) =
 
     const inviteLink = `${req.protocol}://${process.env.SIGNUP_HOST || 'localhost:3000'}/signup/${newInvite.id}`;
 
-    console.log(`[초대 생성 성공] 이메일: ${email}, 초대 ID: ${newInvite.id}`);
-    res.status(201).json({
-      message: '초대 링크가 성공적으로 생성되었습니다.',
-      inviteId: newInvite.id,
-      inviteLink: inviteLink,
-      expiresAt: newInvite.expiresAt,
-    });
+    // 이메일 발송
+    try {
+      await inviteService.sendInviteEmail(email, name, inviteLink, role, newInvite.expiresAt);
+      console.log(`[초대 생성 및 이메일 발송 성공] 이메일: ${email}, 초대 ID: ${newInvite.id}`);
+      res.status(201).json({
+        message: '초대 링크가 성공적으로 생성되었고 이메일이 발송되었습니다.',
+        inviteId: newInvite.id,
+        inviteLink: inviteLink,
+        expiresAt: newInvite.expiresAt,
+        emailSent: true,
+      });
+    } catch (emailError) {
+      console.error('[이메일 발송 실패]', emailError);
+      // 이메일 발송이 실패해도 초대는 생성되었으므로 성공 응답
+      res.status(201).json({
+        message: '초대 링크가 생성되었지만 이메일 발송에 실패했습니다.',
+        inviteId: newInvite.id,
+        inviteLink: inviteLink,
+        expiresAt: newInvite.expiresAt,
+        emailSent: false,
+        emailError: '이메일 발송에 실패했습니다.',
+      });
+    }
 
   } catch (error) {
     console.error('[초대 생성 오류]', error);
