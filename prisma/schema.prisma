@@ -92,6 +92,9 @@ model CartItem {
   quantity  Int
   isChecked Boolean   @default(true)
   deletedAt DateTime?
+  createdAt  DateTime @default(now()) 
+  updatedAt  DateTime @updatedAt       
+
 
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
@@ -105,6 +108,7 @@ model Receipt {
   price       Int
   imageUrl    String
   quantity    Int
+  createdAt  DateTime @default(now()) 
 
   orderedItem OrderedItem[]
 }

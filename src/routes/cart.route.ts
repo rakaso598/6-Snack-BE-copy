@@ -11,5 +11,7 @@ cartRouter.post("/", cartController.addToCart);
 cartRouter.delete("/", cartController.deleteSelectedItems);
 cartRouter.delete("/:item", cartController.deleteCartItem);
 cartRouter.patch("/:item/check", cartController.toggleCheckItem);
+cartRouter.patch("/check", cartController.toggleAllItems);
+cartRouter.patch("/:item/quantity", cartController.updateQuantity);
 
 export default cartRouter;
