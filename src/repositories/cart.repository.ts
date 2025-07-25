@@ -9,10 +9,10 @@ const getCartItemsByUserId = async (userId: string) => {
   });
 };
 
-const findCartItemById = async (userId: string, itemId: number) => {
+const findCartItemById = async (userId: string, cartItemId: number) => {
   return await prisma.cartItem.findFirst({
     where: {
-      id: itemId,
+      id: cartItemId,
       userId,
       deletedAt: null,
     },
