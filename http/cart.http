@@ -1,25 +1,26 @@
 @token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTExIiwiZW1haWwiOiJoYW4uYmFja2VuZEBjb2RlaXQuY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTMzNDMyNjQsImV4cCI6MTc1MzM0NDE2NH0.mUPlsJrc7jXdy4hT9lsDNM4616jQ44nX_NPlAB_svjM; Path=/; Expires=Thu, 24 Jul 2025 08:02:44 GMT; HttpOnly; SameSite=Lax,refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTExIiwiZW1haWwiOiJoYW4uYmFja2VuZEBjb2RlaXQuY29tIiwiaWF0IjoxNzUzMzQzMjY0LCJleHAiOjE3NTM5NDgwNjR9.PeO5_9esTeGot1NR_xkqKHu4wuAc1lJySUJ51lJn_9o; Path=/; Expires=Thu, 31 Jul 2025 07:47:44 GMT; HttpOnly; SameSite=Lax
+@BASE_URL=http://localhost:8080
 
 ### 1. 내 장바구니 조회
-GET http://localhost:8080/cart
+GET {{BASE_URL}}/cart?selected=true
 Authorization: Bearer {{token}}
 
 ###
 
 ### 2. 장바구니에 상품 추가
-POST http://localhost:8080/cart
+POST {{BASE_URL}}/cart
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "productId": 1,
+  "productId": 5,
   "quantity": 2
 }
 
 ###
 
 ### 3. 장바구니 항목 일괄 삭제
-DELETE http://localhost:8080/cart
+DELETE {{BASE_URL}}/cart
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -30,16 +31,32 @@ Authorization: Bearer {{token}}
 ###
 
 ### 4. 장바구니 개별 항목 삭제
-DELETE http://localhost:8080/cart/1
+DELETE {{BASE_URL}}/cart/1
 Authorization: Bearer {{token}}
 
 ###
 
 ### 5. 장바구니 항목 체크 상태 변경
-PATCH http://localhost:8080/cart/1/check
+PATCH {{BASE_URL}}/cart/2/check
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "isChecked": false
+  "isChecked": true
+}
+
+### 6. 장바구니 전체 선택 / 해제
+PATCH {{BASE_URL}}/cart/check
+Content-Type: application/json
+
+{
+  "isChecked": true
+}
+
+### 7. 장바구니 수량 선택
+PATCH {{BASE_URL}}/cart/45/quantity
+Content-Type: application/json
+
+{
+   "quantity": 4 
 }

@@ -12,15 +12,18 @@ import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 
 const getMyCart: RequestHandler = async (req, res, next) => {
   try {
-    const { itemId, selected } = req.query;
+    const { cartItemId, isChecked } = req.query;
 
-    if (itemId) {
-      const item = await cartService.getCartItemById(req.user!.id, parseNumberOrThrow(itemId as string, "itemId"));
+    if (cartItemId) {
+      const item = await cartService.getCartItemById(
+        req.user!.id,
+        parseNumberOrThrow(cartItemId as string, "cartitemId"),
+      );
       res.json(item);
       return;
     }
 
-    const onlySelected = selected === "true";
+    const onlySelected = isChecked === "true";
     const cart = await cartService.getMyCart(req.user!.id, onlySelected);
     res.json(cart);
   } catch (err) {
