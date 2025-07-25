@@ -13,8 +13,20 @@ const getMyCart = async (userId: string, onlySelected: boolean) => {
     include: {
       product: true,
     },
+    orderBy: {
+      createdAt: "desc", // 최신순 정렬
+    },
   });
 };
+
+const getCartItemById = async (userId: string, itemId: number) => {
+  const item = await cartRepository.findCartItemById(userId, itemId);
+  if (!item) {
+    throw new NotFoundError("장바구니 항목을 찾을 수 없습니다.");
+  }
+  return item;
+};
+
 const addToCart = async (userId: string, dto: TAddToCartDto) => {
   if (dto.quantity <= 0) {
     throw new BadRequestError("수량은 1 이상이어야 합니다.");
@@ -43,10 +55,29 @@ const toggleCheckCartItem = async (userId: string, itemId: number, dto: TToggleC
   }
 };
 
+const toggleAllCheck = async (userId: string, isChecked: boolean) => {
+  await cartRepository.updateAllCartItemsChecked(userId, isChecked);
+};
+
+const updateQuantity = async (userId: string, itemId: number, quantity: number) => {
+  if (quantity <= 0) {
+    throw new BadRequestError("수량은 1 이상이어야 합니다.");
+  }
+
+  const updated = await cartRepository.updateCartItemQuantity(userId, itemId, quantity);
+
+  if (updated.count === 0) {
+    throw new NotFoundError("장바구니 항목을 찾을 수 없습니다.");
+  }
+};
+
 export default {
   getMyCart,
+  getCartItemById,
   addToCart,
   deleteSelectedItems,
   deleteCartItem,
   toggleCheckCartItem,
+  toggleAllCheck,
+  updateQuantity,
 };
