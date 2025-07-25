@@ -1,6 +1,7 @@
 import { TGetInviteInfoResponseDto } from "../dtos/invite.dto";
 import inviteRepository from "../repositories/invite.repository";
 import { NotFoundError } from "../types/error";
+import emailService from "./email.service";
 
 const getInviteInfo = async (inviteId: string): Promise<TGetInviteInfoResponseDto> => {
   const invite = await inviteRepository.findInviteById(inviteId);
@@ -20,4 +21,21 @@ const getInviteInfo = async (inviteId: string): Promise<TGetInviteInfoResponseDt
   };
 };
 
-export default { getInviteInfo };
+const sendInviteEmail = async (
+  email: string,
+  name: string,
+  inviteLink: string,
+  role: string,
+  expiresAt: Date
+): Promise<void> => {
+  const subject = `[Snack] 회사 초대 - ${name}님을 ${role === 'ADMIN' ? '관리자' : '일반 사용자'}로 초대합니다`;
+  const html = emailService.generateInviteEmailTemplate(name, inviteLink, role, expiresAt);
+  
+  await emailService.sendEmail({
+    to: email,
+    subject,
+    html,
+  });
+};
+
+export default { getInviteInfo, sendInviteEmail };
