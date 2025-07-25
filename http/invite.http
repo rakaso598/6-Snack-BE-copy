@@ -1,0 +1,37 @@
+### 초대 링크 생성 및 이메일 발송 테스트
+POST http://localhost:8080/invite
+Content-Type: application/json
+
+{
+  "email": "xdnjs77777@gmail.com",
+  "name": "테스트 사용자",
+  "role": "USER",
+  "companyId": 21,
+  "invitedById": "c3a4284b-5b95-4cef-84fe-c218aed3de77",
+  "expiresInDays": 7
+}
+
+### 관리자 초대 테스트
+POST http://localhost:8080/invite
+Content-Type: application/json
+
+{
+  "email": "xdnjs77777@gmail.com",
+  "name": "테스트 관리자",
+  "role": "ADMIN",
+  "companyId": 21,
+  "invitedById": "c3a4284b-5b95-4cef-84fe-c218aed3de77",
+  "expiresInDays": 7
+}
+
+### 초대 정보 조회 테스트 (실제 초대 ID로 변경 필요)
+GET http://localhost:8080/invite/3d794f55-7e92-433d-bff9-9efe72dafb28
+
+### 초대를 통한 회원가입 테스트 (실제 초대 ID로 변경 필요)
+POST http://localhost:8080/auth/signup/3d794f55-7e92-433d-bff9-9efe72dafb28
+Content-Type: application/json
+
+{
+  "password": "newuserpass123",
+  "confirmPassword": "newuserpass123"
+} 
