@@ -79,7 +79,7 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
       cursor: cursorObj,
     });
 
-    const nextCursor = items.length > 0 ? items[items.length - 1].id : null;
+    const nextCursor = items.length === take ? items[items.length - 1].id : null;
 
     res.json({ items, nextCursor: nextCursor || null });
   } catch (error) {
