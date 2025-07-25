@@ -6,6 +6,7 @@ export const receiptMockData = [
     price: 1500,
     imageUrl: "https://example.com/pocachip.jpg",
     quantity: 2,
+    createdAt: new Date("2025-07-15T10:30:00Z"),
   },
   {
     id: 2,
@@ -13,6 +14,7 @@ export const receiptMockData = [
     price: 1500,
     imageUrl: "https://example.com/coke.jpg",
     quantity: 1,
+    createdAt: new Date("2025-07-15T10:30:00Z"),
   },
 
   // Order 2의 Receipt들 (user-2의 주문: 킷캣 3개 = 2400원)
@@ -22,6 +24,7 @@ export const receiptMockData = [
     price: 800,
     imageUrl: "https://example.com/kitkat.jpg",
     quantity: 3,
+    createdAt: new Date("2025-07-16T14:15:00Z"),
   },
 
   // Order 3의 Receipt들 (user-3의 주문: 신라면 1개 + 아몬드 1개 = 3300원)
@@ -31,6 +34,7 @@ export const receiptMockData = [
     price: 800,
     imageUrl: "https://example.com/shinramyun.jpg",
     quantity: 1,
+    createdAt: new Date("2025-07-17T09:45:00Z"),
   },
   {
     id: 5,
@@ -38,5 +42,6 @@ export const receiptMockData = [
     price: 2500,
     imageUrl: "https://example.com/almond.jpg",
     quantity: 1,
+    createdAt: new Date("2025-07-17T09:45:00Z"),
   },
 ];
