@@ -6,6 +6,8 @@ export const cartItemMockData = [
     quantity: 2,
     isChecked: true,
     deletedAt: new Date("2025-06-15"),
+    createdAt: new Date("2025-06-10T10:00:00Z"),
+    updatedAt: new Date("2025-06-15T14:30:00Z"),
   },
   {
     id: 2,
@@ -14,6 +16,8 @@ export const cartItemMockData = [
     quantity: 1,
     isChecked: true,
     deletedAt: new Date("2025-06-15"),
+    createdAt: new Date("2025-06-12T09:15:00Z"),
+    updatedAt: new Date("2025-06-15T14:30:00Z"),
   },
   {
     id: 3,
@@ -22,6 +26,8 @@ export const cartItemMockData = [
     quantity: 3,
     isChecked: true,
     deletedAt: new Date("2025-07-01"),
+    createdAt: new Date("2025-06-20T16:45:00Z"),
+    updatedAt: new Date("2025-07-01T11:20:00Z"),
   },
   {
     id: 4,
@@ -30,6 +36,8 @@ export const cartItemMockData = [
     quantity: 1,
     isChecked: true,
     deletedAt: new Date("2025-07-07"),
+    createdAt: new Date("2025-06-25T13:30:00Z"),
+    updatedAt: new Date("2025-07-07T10:15:00Z"),
   },
   {
     id: 5,
@@ -38,6 +46,8 @@ export const cartItemMockData = [
     quantity: 1,
     isChecked: true,
     deletedAt: new Date("2025-07-07"),
+    createdAt: new Date("2025-06-25T13:35:00Z"),
+    updatedAt: new Date("2025-07-07T10:15:00Z"),
   },
   {
     id: 6,
@@ -46,6 +56,8 @@ export const cartItemMockData = [
     quantity: 2,
     isChecked: true,
     deletedAt: null,
+    createdAt: new Date("2025-07-10T08:00:00Z"),
+    updatedAt: new Date("2025-07-10T08:00:00Z"),
   },
   {
     id: 7,
@@ -54,6 +66,8 @@ export const cartItemMockData = [
     quantity: 1,
     isChecked: true,
     deletedAt: null,
+    createdAt: new Date("2025-07-12T15:20:00Z"),
+    updatedAt: new Date("2025-07-12T15:20:00Z"),
   },
   {
     id: 8,
@@ -62,5 +76,7 @@ export const cartItemMockData = [
     quantity: 1,
     isChecked: true,
     deletedAt: null,
+    createdAt: new Date("2025-07-14T12:45:00Z"),
+    updatedAt: new Date("2025-07-14T12:45:00Z"),
   },
 ];
