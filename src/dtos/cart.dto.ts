@@ -14,3 +14,11 @@ export type TToggleCheckDto = {
 export type TToggleParamsDto = {
   item: string;
 };
+
+export type TToggleAllCheckDto = {
+  isChecked: boolean;
+};
+
+export type TUpdateQuantityDto = {
+  quantity: number;
+};

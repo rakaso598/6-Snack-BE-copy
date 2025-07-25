@@ -123,7 +123,7 @@ const getUsersByCompany = async (
   currentUser: TCurrentUser,
   query: TGetUsersQueryDto,
 ): Promise<TGetUsersResponseDto> => {
-  const limit = query.limit || 5;
+  const limit = Number(query.limit) || 5;
 
   const result = await userRepository.findUsersByCompanyId(currentUser.companyId, query.name, query.cursor, limit);
 

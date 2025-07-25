@@ -14,17 +14,26 @@ const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) =>
     throw new NotFoundError("주문 내역을 찾을 수 없습니다.");
   }
 
+  const totalCount = await orderRepository.getOrdersTotalCount({ status });
+
   const formattedOrders = orders.map(({ user, orderedItems, ...rest }) => {
     // 주문 상품이 1개 이상일 때
     if (orderedItems.length >= 2) {
-      return { ...rest, requester: user.name, productName: `${orderedItems[0].receipt.productName} 외 1건` };
+      return {
+        ...rest,
+        requester: user.name,
+        productName: `${orderedItems[0].receipt.productName} 외 1건`,
+      };
     }
 
     // 주문 상품이 1개일 때
     return { ...rest, requester: user.name, productName: orderedItems[0].receipt.productName };
   });
 
-  return formattedOrders;
+  return {
+    orders: formattedOrders,
+    meta: { totalCount, currentPage: offset, totalPages: Math.ceil(totalCount / limit) },
+  };
 };
 
 // 구매내역 상세 조회(대기 or 승인)
@@ -87,11 +96,11 @@ const createOrder = async (orderData: {
 }) => {
   // 입력값 검증
   if (!orderData.userId) {
-    throw new ValidationError('사용자 ID는 필수입니다.');
+    throw new ValidationError("사용자 ID는 필수입니다.");
   }
 
   if (!orderData.cartItemIds || orderData.cartItemIds.length === 0) {
-    throw new ValidationError('카트 아이템이 필요합니다.');
+    throw new ValidationError("카트 아이템이 필요합니다.");
   }
 
   // 트랜잭션으로 주문 생성
@@ -107,11 +116,11 @@ const getOrderById = async (orderId: number, userId: string) => {
   const order = await orderRepository.getOrderById(orderId);
 
   if (!order) {
-    throw new NotFoundError('주문을 찾을 수 없습니다.');
+    throw new NotFoundError("주문을 찾을 수 없습니다.");
   }
 
   if (order.userId !== userId) {
-    throw new ForbiddenError('해당 주문에 접근할 권한이 없습니다.');
+    throw new ForbiddenError("해당 주문에 접근할 권한이 없습니다.");
   }
 
   return order;
@@ -125,32 +134,29 @@ const cancelOrder = async (orderId: number, userId: string) => {
   const order = await orderRepository.getOrderById(orderId);
 
   if (!order) {
-    throw new NotFoundError('주문을 찾을 수 없습니다.');
+    throw new NotFoundError("주문을 찾을 수 없습니다.");
   }
 
   if (order.userId !== userId) {
-    throw new ForbiddenError('해당 주문에 접근할 권한이 없습니다.');
+    throw new ForbiddenError("해당 주문에 접근할 권한이 없습니다.");
   }
 
-  if (order.status !== 'PENDING') {
-    throw new BadRequestError('대기 중인 주문만 취소할 수 있습니다.');
+  if (order.status !== "PENDING") {
+    throw new BadRequestError("대기 중인 주문만 취소할 수 있습니다.");
   }
 
-  return await orderRepository.updateOrderStatus(orderId, 'CANCELED');
+  return await orderRepository.updateOrderStatus(orderId, "CANCELED");
 };
 
 // 즉시 구매
-const createInstantOrder = async (orderData: {
-  userId: string;
-  cartItemIds: number[];
-}) => {
+const createInstantOrder = async (orderData: { userId: string; cartItemIds: number[] }) => {
   // 입력값 검증
   if (!orderData.userId) {
-    throw new ValidationError('사용자 ID는 필수입니다.');
+    throw new ValidationError("사용자 ID는 필수입니다.");
   }
 
   if (!orderData.cartItemIds || orderData.cartItemIds.length === 0) {
-    throw new ValidationError('카트 아이템이 필요합니다.');
+    throw new ValidationError("카트 아이템이 필요합니다.");
   }
 
   // 트랜잭션으로 즉시 구매 주문 생성
@@ -158,12 +164,12 @@ const createInstantOrder = async (orderData: {
     const instantOrderData = {
       ...orderData,
       adminMessage: undefined,
-      requestMessage: undefined
+      requestMessage: undefined,
     };
-    
+
     // 주문 생성
     const order = await orderRepository.createOrder(instantOrderData, tx);
-    
+
     return order;
   });
 

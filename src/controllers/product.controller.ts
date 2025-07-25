@@ -1,12 +1,6 @@
 import { RequestHandler } from "express";
 import productService from "../services/product.service";
-import {
-  AppError,
-  AuthenticationError,
-  ForbiddenError,
-  NotFoundError,
-  ServerError,
-} from "../types/error";
+import { AppError, AuthenticationError, ForbiddenError, NotFoundError, ServerError } from "../types/error";
 import { uploadImageToS3 } from "../utils/s3";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 import {
@@ -85,13 +79,15 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
       cursor: cursorObj,
     });
 
-    res.json({ items });
+    const nextCursor = items.length === take ? items[items.length - 1].id : null;
+
+    res.json({ items, nextCursor: nextCursor || null });
   } catch (error) {
     next(error instanceof Error ? error : new ServerError("예기치 못한 에러", error));
   }
 };
 
-//유저가 등록한상품 목록
+// 유저가 등록한 상품 목록
 const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async (req, res, next) => {
   try {
     const creatorId = req.user?.id;
@@ -103,10 +99,29 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
     const limit = req.query.limit ? parseNumberOrThrow(req.query.limit, "limit") : 10;
     const skip = (page - 1) * limit;
 
-    const [items, totalCount] = await Promise.all([
-      productService.getProductsCreator({ creatorId, skip, take: limit }),
-      productService.countProducts(creatorId),
-    ]);
+    const orderByParam = req.query.orderBy || "latest";
+
+    let orderBy: { createdAt?: "asc" | "desc"; price?: "asc" | "desc" };
+
+    switch (orderByParam) {
+      case "priceLow":
+        orderBy = { price: "asc" };
+        break;
+      case "priceHigh":
+        orderBy = { price: "desc" };
+        break;
+      case "latest":
+      default:
+        orderBy = { createdAt: "desc" };
+        break;
+    }
+
+    const { items, totalCount } = await productService.getProductsCreator({
+      creatorId,
+      skip,
+      take: limit,
+      orderBy,
+    });
 
     res.json({
       items,
@@ -118,10 +133,9 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
       },
     });
   } catch (error) {
-    next(error); 
+    next(error);
   }
 };
-
 
 //상품 상세 페이지
 export const getProductDetail: RequestHandler<TProductIdParamsDto> = async (req, res, next) => {
@@ -134,7 +148,6 @@ export const getProductDetail: RequestHandler<TProductIdParamsDto> = async (req,
     next(error);
   }
 };
-
 
 //상품 수정
 export const updateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdateProductDto> = async (req, res, next) => {
@@ -179,9 +192,12 @@ export const updateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdateProdu
   }
 };
 
-
 // 상품 수정 어드민
-export const forceUpdateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdateProductDto> = async (req, res, next) => {
+export const forceUpdateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdateProductDto> = async (
+  req,
+  res,
+  next,
+) => {
   try {
     const id = parseNumberOrThrow(req.params.id, "상품 ID");
     const { name, price, linkUrl, categoryId } = req.body;
@@ -217,7 +233,7 @@ export const forceUpdateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdate
       ...(imageUrl && { imageUrl }),
     };
 
-    const updated = await productService.updateProduct(id, product.creatorId, input); 
+    const updated = await productService.updateProduct(id, product.creatorId, input);
     if (updated) {
       res.status(200).json(updated);
     } else {
@@ -227,9 +243,6 @@ export const forceUpdateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdate
     next(error);
   }
 };
-
-
-
 
 //상품 삭제
 export const deleteProduct: RequestHandler<{ id: string }> = async (req, res, next) => {
@@ -295,5 +308,5 @@ export default {
   deleteProduct,
   forceUpdateProduct,
   forceDeleteProduct,
-  getCategoryTree
+  getCategoryTree,
 };

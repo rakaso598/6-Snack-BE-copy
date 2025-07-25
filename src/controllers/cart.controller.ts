@@ -1,11 +1,27 @@
 import { RequestHandler } from "express";
 import cartService from "../services/cart.service";
-import { TAddToCartDto, TDeleteCartItemsDto, TToggleCheckDto, TToggleParamsDto } from "../dtos/cart.dto";
+import {
+  TAddToCartDto,
+  TDeleteCartItemsDto,
+  TToggleCheckDto,
+  TToggleParamsDto,
+  TToggleAllCheckDto,
+  TUpdateQuantityDto,
+} from "../dtos/cart.dto";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 
 const getMyCart: RequestHandler = async (req, res, next) => {
   try {
-    const cart = await cartService.getMyCart(req.user!.id);
+    const { itemId, selected } = req.query;
+
+    if (itemId) {
+      const item = await cartService.getCartItemById(req.user!.id, parseNumberOrThrow(itemId as string, "itemId"));
+      res.json(item);
+      return;
+    }
+
+    const onlySelected = selected === "true";
+    const cart = await cartService.getMyCart(req.user!.id, onlySelected);
     res.json(cart);
   } catch (err) {
     next(err);
@@ -50,10 +66,31 @@ const toggleCheckItem: RequestHandler<TToggleParamsDto, {}, TToggleCheckDto> = a
   }
 };
 
+const toggleAllItems: RequestHandler<{}, {}, TToggleAllCheckDto> = async (req, res, next) => {
+  try {
+    await cartService.toggleAllCheck(req.user!.id, req.body.isChecked);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+const updateQuantity: RequestHandler<{ item: string }, {}, TUpdateQuantityDto> = async (req, res, next) => {
+  try {
+    const itemId = parseNumberOrThrow(req.params.item, "itemId");
+    await cartService.updateQuantity(req.user!.id, itemId, req.body.quantity);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
 export default {
   getMyCart,
   addToCart,
   deleteSelectedItems,
   deleteCartItem,
   toggleCheckItem,
+  toggleAllItems,
+  updateQuantity,
 };

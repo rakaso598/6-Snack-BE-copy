@@ -28,6 +28,10 @@ export type TCreatorQueryOptions = {
   creatorId: string;
   skip?: number;
   take?: number;
+    orderBy?: {
+    createdAt?: "asc" | "desc";
+    price?: "asc" | "desc";
+  };
 };
 
 // 상품 생성 파라미터
