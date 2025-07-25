@@ -1,44 +1,39 @@
 import nodemailer from 'nodemailer';
 
-interface EmailOptions {
+type TEmailOptions = {
   to: string;
   subject: string;
   html: string;
-}
+};
 
-class EmailService {
-  private transporter: nodemailer.Transporter;
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT || '587'),
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
-  constructor() {
-    this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+const sendEmail = async (options: TEmailOptions): Promise<void> => {
+  try {
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`[이메일 발송 성공] 수신자: ${options.to}`);
+  } catch (error) {
+    console.error('[이메일 발송 실패]', error);
+    throw new Error('이메일 발송에 실패했습니다.');
   }
+};
 
-  async sendEmail(options: EmailOptions): Promise<void> {
-    try {
-      const mailOptions = {
-        from: process.env.SMTP_USER,
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
-      };
-
-      await this.transporter.sendMail(mailOptions);
-      console.log(`[이메일 발송 성공] 수신자: ${options.to}`);
-    } catch (error) {
-      console.error('[이메일 발송 실패]', error);
-      throw new Error('이메일 발송에 실패했습니다.');
-    }
-  }
-
-  generateInviteEmailTemplate(name: string, inviteLink: string, role: string, expiresAt: Date): string {
+const generateInviteEmailTemplate = (name: string, inviteLink: string, role: string, expiresAt: Date): string => {
     const roleText = role === 'ADMIN' ? '관리자' : '일반 사용자';
     const formattedExpiresAt = expiresAt.toLocaleDateString('ko-KR', {
       year: 'numeric',
@@ -147,7 +142,9 @@ class EmailService {
       </body>
       </html>
     `;
-  }
-}
+};
 
-export default new EmailService(); 
+export default {
+  sendEmail,
+  generateInviteEmailTemplate,
+}; 
