@@ -79,10 +79,9 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
       cursor: cursorObj,
     });
 
-    const nextCursor = items.length > 0 ? items[items.length - 1].id : null;
+    const nextCursor = items.length === take ? items[items.length - 1].id : null;
 
-    res.json({ items, nextCursor: nextCursor ? nextCursor.toString() : null });
-    nextCursor;
+    res.json({ items, nextCursor: nextCursor || null });
   } catch (error) {
     next(error instanceof Error ? error : new ServerError("예기치 못한 에러", error));
   }
