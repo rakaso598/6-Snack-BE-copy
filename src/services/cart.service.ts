@@ -3,12 +3,12 @@ import { TAddToCartDto, TDeleteCartItemsDto, TToggleCheckDto } from "../dtos/car
 import { BadRequestError, NotFoundError } from "../types/error";
 import prisma from "../lib/prisma";
 
-const getMyCart = async (userId: string, onlySelected: boolean) => {
+const getMyCart = async (userId: string, isChecked: boolean) => {
   return await prisma.cartItem.findMany({
     where: {
       userId,
       deletedAt: null,
-      ...(onlySelected && { isChecked: true }),
+      ...(isChecked && { isChecked: true }),
     },
     include: {
       product: true,
@@ -19,12 +19,12 @@ const getMyCart = async (userId: string, onlySelected: boolean) => {
   });
 };
 
-const getCartItemById = async (userId: string, itemId: number) => {
-  const item = await cartRepository.findCartItemById(userId, itemId);
+const getCartItemById = async (userId: string, cartItemId: number) => {
+  const item = await cartRepository.findCartItemById(userId, cartItemId);
   if (!item) {
     throw new NotFoundError("장바구니 항목을 찾을 수 없습니다.");
   }
-  return item;
+  return [item];
 };
 
 const addToCart = async (userId: string, dto: TAddToCartDto) => {
