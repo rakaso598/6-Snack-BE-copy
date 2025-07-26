@@ -6,7 +6,7 @@ Content-Type: application/json
 
 {
     "email": "user@codeit.com",
-    "password": "11111111"
+    "password": "1q2w3e4r!"
 }
 
 ### 2. USER가 자기 자신의 프로필 조회 (성공 케이스)
@@ -18,7 +18,7 @@ Content-Type: application/json
 
 {
     "email": "admin@codeit.com",
-    "password": "11111111"
+    "password": "1q2w3e4r!"
 }
 
 ### 4. ADMIN이 자기 자신의 프로필 조회 (성공 케이스)
@@ -30,7 +30,7 @@ Content-Type: application/json
 
 {
     "email": "super_admin@codeit.com",
-    "password": "11111111"
+    "password": "1q2w3e4r!"
 }
 
 ### 6. SUPER_ADMIN이 자기 자신의 프로필 조회 (성공 케이스)
@@ -54,7 +54,7 @@ Content-Type: application/json
 
 {
     "email": "user@codeit.com",
-    "password": "11111111"
+    "password": "1q2w3e4r!"
 }
 
 ###
@@ -66,7 +66,7 @@ Content-Type: application/json
 
 {
     "email": "admin@codeit.com",
-    "password": "11111111"
+    "password": "1q2w3e4r!"
 }
 
 ###

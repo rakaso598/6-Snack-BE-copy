@@ -9,10 +9,15 @@ import {
   TUpdateQuantityDto,
 } from "../dtos/cart.dto";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
+import budgetService from "../services/budget.service";
+import { AuthenticationError } from "../types/error";
 
 const getMyCart: RequestHandler = async (req, res, next) => {
   try {
+    const user = req.user;
     const { cartItemId, isChecked } = req.query;
+
+    if (!user) throw new AuthenticationError("유저 정보를 찾을 수 없습니다.");
 
     if (cartItemId) {
       const item = await cartService.getCartItemById(
@@ -23,9 +28,23 @@ const getMyCart: RequestHandler = async (req, res, next) => {
       return;
     }
 
-    const onlySelected = isChecked === "true";
-    const cart = await cartService.getMyCart(req.user!.id, onlySelected);
-    res.json(cart);
+    const onlyChecked = isChecked === "true";
+    const cart = await cartService.getMyCart(req.user!.id, onlyChecked);
+
+    if (user.role !== "USER") {
+      const budget = await budgetService.getMonthlyBudget(user.companyId);
+
+      res.json({
+        cart,
+        budget: {
+          currentMonthBudget: budget.currentMonthBudget,
+          currentMonthExpense: budget.currentMonthExpense,
+        },
+      });
+      return;
+    }
+
+    res.json({ cart });
   } catch (err) {
     next(err);
   }
