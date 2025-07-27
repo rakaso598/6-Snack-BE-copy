@@ -17,7 +17,38 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Starting database seeding...");
 
-  // 데이터 삭제 (외래키 제약조건을 고려한 순서)
+  // Product 데이터만 업데이트하는 경우
+  const UPDATE_PRODUCTS_ONLY = process.env.UPDATE_PRODUCTS_ONLY === "true";
+
+  if (UPDATE_PRODUCTS_ONLY) {
+    console.log("🔄 Updating products only...");
+
+    // Product에 의존하는 데이터들 삭제
+    console.log("🗑️ Deleting cart items (product dependency)...");
+    await prisma.cartItem.deleteMany();
+
+    console.log("🗑️ Deleting likes (product dependency)...");
+    await prisma.like.deleteMany();
+
+    console.log("🗑️ Deleting ordered items (product dependency)...");
+    await prisma.orderedItem.deleteMany();
+
+    // Product 삭제
+    console.log("🗑️ Deleting products...");
+    await prisma.product.deleteMany();
+
+    // Product만 재생성
+    console.log("🍪 Seeding products...");
+    await prisma.product.createMany({
+      data: productMockData,
+      skipDuplicates: true,
+    });
+
+    console.log("✅ Products updated successfully!");
+    return;
+  }
+
+  // 전체 데이터 삭제 (외래키 제약조건을 고려한 순서)
   console.log("🗑️ Deleting existing data...");
 
   // 1. OrderedItem 삭제 (Order, Receipt에 의존)
