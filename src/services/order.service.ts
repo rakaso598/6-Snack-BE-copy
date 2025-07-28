@@ -90,6 +90,7 @@ const updateOrder = async (orderId: Order["id"], body: Pick<Order, "approver" | 
 // OrderRequest 관련 기능들 추가
 const createOrder = async (orderData: {
   userId: string;
+  companyId: number;
   adminMessage?: string;
   requestMessage?: string;
   cartItemIds: number[];
@@ -149,7 +150,7 @@ const cancelOrder = async (orderId: number, userId: string) => {
 };
 
 // 즉시 구매
-const createInstantOrder = async (orderData: { userId: string; cartItemIds: number[] }) => {
+const createInstantOrder = async (orderData: { userId: string; cartItemIds: number[]; companyId: number }) => {
   // 입력값 검증
   if (!orderData.userId) {
     throw new ValidationError("사용자 ID는 필수입니다.");

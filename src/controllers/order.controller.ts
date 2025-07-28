@@ -37,25 +37,30 @@ const updateOrder: RequestHandler<TGetOrderParamsDto, {}, TUpdateStatusOrderBody
 };
 
 // OrderRequest 관련 기능들 추가
-const createOrder: RequestHandler<{}, {}, { adminMessage?: string; requestMessage?: string; cartItemIds: number[] }> = async (req, res, next) => {
+const createOrder: RequestHandler<
+  {},
+  {},
+  { adminMessage?: string; requestMessage?: string; cartItemIds: number[] }
+> = async (req, res, next) => {
   try {
     const orderData = req.body;
-    
+
     if (!req.user?.id) {
-      throw new AuthenticationError('로그인이 필요합니다.');
+      throw new AuthenticationError("로그인이 필요합니다.");
     }
-    
+
     // 인증된 사용자의 ID를 사용
     const authenticatedOrderData = {
       ...orderData,
-      userId: req.user.id
+      userId: req.user.id,
+      companyId: req.user.companyId,
     };
-    
+
     const result = await orderService.createOrder(authenticatedOrderData);
-    
+
     res.status(201).json({
-      message: '구매 요청이 성공적으로 생성되었습니다.',
-      data: result
+      message: "구매 요청이 성공적으로 생성되었습니다.",
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -64,17 +69,17 @@ const createOrder: RequestHandler<{}, {}, { adminMessage?: string; requestMessag
 
 const getOrderById: RequestHandler<{ orderId: string }> = async (req, res, next) => {
   try {
-    const orderId = parseNumberOrThrow(req.params.orderId, 'orderId');
-    
+    const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
+
     if (!req.user?.id) {
-      throw new AuthenticationError('로그인이 필요합니다.');
+      throw new AuthenticationError("로그인이 필요합니다.");
     }
-    
+
     const result = await orderService.getOrderById(orderId, req.user.id);
-    
+
     res.status(200).json({
-      message: '구매 요청 조회가 완료되었습니다.',
-      data: result
+      message: "구매 요청 조회가 완료되었습니다.",
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -84,33 +89,33 @@ const getOrderById: RequestHandler<{ orderId: string }> = async (req, res, next)
 const getOrdersByUserId: RequestHandler = async (req, res, next) => {
   try {
     if (!req.user?.id) {
-      throw new AuthenticationError('로그인이 필요합니다.');
+      throw new AuthenticationError("로그인이 필요합니다.");
     }
-    
+
     const result = await orderService.getOrdersByUserId(req.user.id);
-    
+
     res.status(200).json({
-      message: '내 구매 요청 리스트 조회가 완료되었습니다.',
-      data: result
+      message: "내 구매 요청 리스트 조회가 완료되었습니다.",
+      data: result,
     });
   } catch (error) {
     next(error);
   }
 };
 
-const cancelOrder: RequestHandler<{ orderId: string }, {}, { status: 'CANCELED' }> = async (req, res, next) => {
+const cancelOrder: RequestHandler<{ orderId: string }, {}, { status: "CANCELED" }> = async (req, res, next) => {
   try {
-    const orderId = parseNumberOrThrow(req.params.orderId, 'orderId');
-    
+    const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
+
     if (!req.user?.id) {
-      throw new AuthenticationError('로그인이 필요합니다.');
+      throw new AuthenticationError("로그인이 필요합니다.");
     }
-    
+
     const result = await orderService.cancelOrder(orderId, req.user.id);
-    
+
     res.status(200).json({
-      message: '구매 요청이 성공적으로 취소되었습니다.',
-      data: result
+      message: "구매 요청이 성공적으로 취소되었습니다.",
+      data: result,
     });
   } catch (error) {
     next(error);
@@ -120,30 +125,31 @@ const cancelOrder: RequestHandler<{ orderId: string }, {}, { status: 'CANCELED' 
 const createInstantOrder: RequestHandler<{}, {}, { cartItemIds: number[] }> = async (req, res, next) => {
   try {
     const orderData = req.body;
-    
+
     if (!req.user?.id) {
-      throw new AuthenticationError('로그인이 필요합니다.');
+      throw new AuthenticationError("로그인이 필요합니다.");
     }
-    
+
     // 인증된 사용자의 ID를 사용 (메시지 필드 제거)
     const authenticatedOrderData = {
       cartItemIds: orderData.cartItemIds,
-      userId: req.user.id
+      userId: req.user.id,
+      companyId: req.user.companyId,
     };
-    
+
     // 1. 주문 생성
     const result = await orderService.createInstantOrder(authenticatedOrderData);
-    
+
     // 2. orderService를 사용하여 승인 처리
     const approvedOrder = await orderService.updateOrder(result.id, {
-      approver: req.user.name || '시스템',
-      adminMessage: '즉시 구매로 자동 승인',
-      status: 'APPROVED'
+      approver: req.user.name || "시스템",
+      adminMessage: "즉시 구매로 자동 승인",
+      status: "APPROVED",
     });
-    
+
     res.status(201).json({
-      message: '즉시 구매가 성공적으로 완료되었습니다.',
-      data: approvedOrder
+      message: "즉시 구매가 성공적으로 완료되었습니다.",
+      data: approvedOrder,
     });
   } catch (error) {
     next(error);
