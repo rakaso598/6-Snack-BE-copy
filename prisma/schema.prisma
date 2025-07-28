@@ -37,6 +37,7 @@ model Company {
   budgets MonthlyBudget[]
   users   User[]
   invites Invite[]
+  Order   Order[]
 }
 
 // 월별 지출&예산
@@ -57,16 +58,17 @@ model MonthlyBudget {
 }
 
 model Product {
-  id         Int       @id @default(autoincrement())
-  categoryId Int
-  creatorId  String
-  name       String
-  price      Int
-  imageUrl   String
-  linkUrl    String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
+  id              Int       @id @default(autoincrement())
+  categoryId      Int
+  creatorId       String
+  name            String
+  price           Int
+  imageUrl        String
+  linkUrl         String
+  cumulativeSales Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
 
   cart         CartItem[]
   likes        Like[]
@@ -92,9 +94,8 @@ model CartItem {
   quantity  Int
   isChecked Boolean   @default(true)
   deletedAt DateTime?
-  createdAt  DateTime @default(now()) 
-  updatedAt  DateTime @updatedAt       
-
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
@@ -103,18 +104,19 @@ model CartItem {
 }
 
 model Receipt {
-  id          Int    @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   productName String
   price       Int
   imageUrl    String
   quantity    Int
-  createdAt  DateTime @default(now()) 
+  createdAt   DateTime @default(now())
 
   orderedItem OrderedItem[]
 }
 
 model Order {
   id             Int         @id @default(autoincrement())
+  companyId      Int
   userId         String
   approver       String?
   adminMessage   String?
@@ -126,6 +128,7 @@ model Order {
 
   orderedItems OrderedItem[]
   user         User          @relation("UserOrders", fields: [userId], references: [id])
+  company      Company       @relation(fields: [companyId], references: [id])
 }
 
 model OrderedItem {
