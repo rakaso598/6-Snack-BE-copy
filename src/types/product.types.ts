@@ -28,7 +28,7 @@ export type TCreatorQueryOptions = {
   creatorId: string;
   skip?: number;
   take?: number;
-    orderBy?: {
+  orderBy?: {
     createdAt?: "asc" | "desc";
     price?: "asc" | "desc";
   };

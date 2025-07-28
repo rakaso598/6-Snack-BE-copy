@@ -75,6 +75,7 @@ const updateOrder = async (
 const createOrder = async (
   orderData: {
     userId: string;
+    companyId: number;
     adminMessage?: string;
     requestMessage?: string;
     cartItemIds: number[];
@@ -120,6 +121,7 @@ const createOrder = async (
   const order = await client.order.create({
     data: {
       userId: orderData.userId,
+      companyId: orderData.companyId,
       adminMessage: orderData.adminMessage,
       requestMessage: orderData.requestMessage,
       totalPrice: totalPrice,
