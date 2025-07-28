@@ -448,7 +448,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    id: 28,
+    id: 27,
     categoryId: 22,
     creatorId: "user-2",
     name: "카라멜 마끼아또 250ml",
@@ -461,7 +461,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    id: 29,
+    id: 28,
     categoryId: 22,
     creatorId: "user-1",
     name: "돌체라떼 250ml",
@@ -474,7 +474,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    id: 30,
+    id: 29,
     categoryId: 22,
     creatorId: "user-2",
     name: "에스프레소 샷 100ml",
