@@ -8,6 +8,7 @@
     "dev": "ts-node-dev --respawn src/app.ts",
     "build": "tsc",
     "test": "jest",
+    "test:coverage": "jest --coverage",
     "ssh": "dotenv -- bash -c 'ssh -i \"$SSH_KEY_PATH\" -L 5432:$DB_HOST:5432 $EC2_USER@$EC2_HOST'",
     "cron": "node dist/cron/autoCreateMonthlyBudget.js"
   },
