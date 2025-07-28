@@ -15,16 +15,18 @@ import { AuthenticationError } from "../types/error";
 const getMyCart: RequestHandler = async (req, res, next) => {
   try {
     const user = req.user;
-    const { cartItemId, isChecked } = req.query;
 
     if (!user) throw new AuthenticationError("유저 정보를 찾을 수 없습니다.");
 
-    if (cartItemId) {
+    const { cartItemId, isChecked } = req.query;
+
+    if (user.role === "USER" && cartItemId) {
       const item = await cartService.getCartItemById(
         req.user!.id,
         parseNumberOrThrow(cartItemId as string, "cartitemId"),
       );
-      res.json(item);
+
+      res.json({ cart: item });
       return;
     }
 
