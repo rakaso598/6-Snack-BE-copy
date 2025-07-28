@@ -27,12 +27,23 @@ const addCartItem = async (userId: string, productId: number, quantity: number) 
     where: {
       userId,
       productId,
-      deletedAt: null, // 살아있는 항목만 찾기
     },
   });
 
   if (existing) {
-    // 수량 누적
+    if (existing.deletedAt) {
+      // 복구 + 수량 업데이트
+      return await prisma.cartItem.update({
+        where: { id: existing.id },
+        data: {
+          quantity: quantity,
+          deletedAt: null,
+          isChecked: true,
+        },
+      });
+    }
+
+    // 기존 항목에 수량 누적
     return await prisma.cartItem.update({
       where: { id: existing.id },
       data: {
@@ -41,16 +52,16 @@ const addCartItem = async (userId: string, productId: number, quantity: number) 
         },
       },
     });
-  } else {
-    // 새로 생성
-    return await prisma.cartItem.create({
-      data: {
-        userId,
-        productId,
-        quantity,
-      },
-    });
   }
+
+  // 없으면 새로 생성
+  return await prisma.cartItem.create({
+    data: {
+      userId,
+      productId,
+      quantity,
+    },
+  });
 };
 
 const deleteCartItems = async (userId: string, itemIds: number[]) => {
