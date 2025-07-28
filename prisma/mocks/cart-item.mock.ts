@@ -52,7 +52,7 @@ export const cartItemMockData = [
   {
     id: 6,
     userId: "user-1",
-    productId: 1,
+    productId: 14,
     quantity: 2,
     isChecked: true,
     deletedAt: null,
@@ -72,7 +72,7 @@ export const cartItemMockData = [
   {
     id: 8,
     userId: "user-3",
-    productId: 4,
+    productId: 6,
     quantity: 1,
     isChecked: true,
     deletedAt: null,
