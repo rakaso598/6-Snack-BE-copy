@@ -1,11 +1,17 @@
+@companyId = 1
+@url=http://localhost:8080
+@token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NTgzOTksImV4cCI6MTc1MTk2MTk5OX0.T1iIV0VSadnAbb_Nm-okXCQ8mVd8CLrjufjx2EKFPYw
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImIwZDVkM2U4LTNiMTYtNDhmYS05ZTJlLTk4MzI5NDJiYzUxNSIsImVtYWlsIjoidGVzdHVzZXJAZXhhbXBsZS5jb20iLCJuYW1lIjoiVGVzdCBVc2VyIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NTE5NjMzMzIsImV4cCI6MTc1MTk2NDIzMn0.qtpZKSF6RsxaGqCogwPBvvFKVwVhAPanxPIqVNcV48k
+@refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU1ODE0OTZkLWQzNWEtNGI3Ny1iMmVkLTNhNGZiNGFlZWUwYyIsImlhdCI6MTc1MjAzOTcyNiwiZXhwIjoxNzUyNjQ0NTI2fQ.KVM4FvB5-pj60hKByYkYnhmXk0LO8T_RgT7C8I_FlBk
+
 ### 예산 및 지출 현황 조회
-GET http://localhost:8080/admin/2/budgets
+GET {{url}}/admin/{{companyId}}/budgets
 
 ### 예산 수정(최고 관리자)
-PATCH http://localhost:8080/super-admin/1/budgets
+PATCH {{url}}/super-admin/{{companyId}}/budgets
 Content-Type: application/json
 
 {
-  "currentMonthBudget": 50000,
-  "monthlyBudget": 900000
+  "currentMonthBudget": 100000,
+  "monthlyBudget": 1000000
 }

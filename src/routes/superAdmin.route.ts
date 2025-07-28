@@ -3,6 +3,7 @@ import authenticateToken from "../middlewares/jwtAuth.middleware";
 import authorizeRoles from "../middlewares/authorizeRoles.middleware";
 import userController from "../controllers/user.controller";
 import companyController from "../controllers/company.controller";
+import budgetController from "../controllers/budget.controller";
 
 const superAdminRouter = Router();
 
@@ -27,5 +28,13 @@ superAdminRouter.patch(
 
 // 최고관리자의 회사 유저목록 조회
 superAdminRouter.get("/users", authenticateToken, authorizeRoles("SUPER_ADMIN"), userController.getUsersByCompany);
+
+// 예산 수정(최고 관리자)
+superAdminRouter.patch(
+  "/:companyId/budgets",
+  authenticateToken,
+  authorizeRoles("SUPER_ADMIN"),
+  budgetController.updateMonthlyBudget,
+);
 
 export default superAdminRouter;
