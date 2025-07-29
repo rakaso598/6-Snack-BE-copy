@@ -8,7 +8,6 @@ import { productMockData } from "./mocks/product.mock";
 import { cartItemMockData } from "./mocks/cart-item.mock";
 import { orderMockData } from "./mocks/order.mock";
 import { receiptMockData } from "./mocks/receipt.mock";
-import { orderedItemMockData } from "./mocks/ordered-item.mock";
 import { inviteMockData } from "./mocks/invite.mock";
 import { likeMockData } from "./mocks/like.mock";
 
@@ -17,49 +16,14 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Starting database seeding...");
 
-  // Product 데이터만 업데이트하는 경우
-  const UPDATE_PRODUCTS_ONLY = process.env.UPDATE_PRODUCTS_ONLY === "true";
-
-  if (UPDATE_PRODUCTS_ONLY) {
-    console.log("🔄 Updating products only...");
-
-    // Product에 의존하는 데이터들 삭제
-    console.log("🗑️ Deleting cart items (product dependency)...");
-    await prisma.cartItem.deleteMany();
-
-    console.log("🗑️ Deleting likes (product dependency)...");
-    await prisma.like.deleteMany();
-
-    console.log("🗑️ Deleting ordered items (product dependency)...");
-    await prisma.orderedItem.deleteMany();
-
-    // Product 삭제
-    console.log("🗑️ Deleting products...");
-    await prisma.product.deleteMany();
-
-    // Product만 재생성
-    console.log("🍪 Seeding products...");
-    await prisma.product.createMany({
-      data: productMockData,
-      skipDuplicates: true,
-    });
-
-    console.log("✅ Products updated successfully!");
-    return;
-  }
-
   // 전체 데이터 삭제 (외래키 제약조건을 고려한 순서)
   console.log("🗑️ Deleting existing data...");
 
-  // 1. OrderedItem 삭제 (Order, Receipt에 의존)
-  console.log("🗑️ Deleting ordered items...");
-  await prisma.orderedItem.deleteMany();
-
-  // 2. Receipt 삭제 (의존성 없음)
+  // 1. Receipt 삭제 (의존성 없음)
   console.log("🗑️ Deleting receipts...");
   await prisma.receipt.deleteMany();
 
-  // 3. Order 삭제 (User에 의존)
+  // 2. Order 삭제 (User에 의존)
   console.log("🗑️ Deleting orders...");
   await prisma.order.deleteMany();
 
@@ -161,13 +125,6 @@ async function main() {
   console.log("🧾 Seeding receipts...");
   await prisma.receipt.createMany({
     data: receiptMockData,
-    skipDuplicates: true,
-  });
-
-  // 9. OrderedItem 데이터 삽입
-  console.log("📦 Seeding ordered items...");
-  await prisma.orderedItem.createMany({
-    data: orderedItemMockData as any,
     skipDuplicates: true,
   });
 

@@ -15,7 +15,7 @@ export const userMockData = [
     email: "super_admin2@codeit.com",
     name: "최고관리자 2",
     password: "1q2w3e4r!",
-    companyId: 1,
+    companyId: 2,
     role: "SUPER_ADMIN",
     createdAt: new Date("2024-01-01"),
     updatedAt: new Date("2024-01-01"),
