@@ -1,7 +1,13 @@
 import { Prisma } from "@prisma/client";
 import productRepository from "../repositories/product.repository";
 import { AuthenticationError, NotFoundError, ServerError, ValidationError } from "../types/error";
-import { TProductQueryOptions, TCreateProductParams, TCategoryMap, TParentCategory, TChildCategory } from "../types/product.types";
+import {
+  TProductQueryOptions,
+  TCreateProductParams,
+  TCategoryMap,
+  TParentCategory,
+  TChildCategory,
+} from "../types/product.types";
 
 // 상품 등록
 const createProduct = async (input: TCreateProductParams, tx?: Prisma.TransactionClient) => {
@@ -28,7 +34,7 @@ const createProduct = async (input: TCreateProductParams, tx?: Prisma.Transactio
     throw new ValidationError("요청 데이터가 유효하지 않습니다.", errors);
   }
 
-    const product = await productRepository.create(input, tx);
+  const product = await productRepository.create(input, tx);
   if (!product) {
     throw new ServerError("상품 생성에 실패했습니다.");
   }
@@ -48,10 +54,7 @@ const getProductById = async (id: number, tx?: Prisma.TransactionClient) => {
 };
 
 // 옵션에 따라 여러 상품 목록 조회
-const getProductList = async (
-  options: TProductQueryOptions,
-  tx?: Prisma.TransactionClient
-) => {
+const getProductList = async (options: TProductQueryOptions, tx?: Prisma.TransactionClient) => {
   return productRepository.findManyAll(options, tx);
 };
 
@@ -60,7 +63,7 @@ const getProductsCreator = async (
   options: Pick<TProductQueryOptions, "creatorId" | "skip" | "take"> & {
     orderBy?: { createdAt?: "asc" | "desc"; price?: "asc" | "desc" };
   },
-  tx?: Prisma.TransactionClient
+  tx?: Prisma.TransactionClient,
 ) => {
   if (!options.creatorId) {
     throw new ValidationError("creatorId는 필수입니다.");
@@ -74,14 +77,13 @@ const getProductsCreator = async (
         take: options.take,
         orderBy: options.orderBy,
       },
-      tx
+      tx,
     ),
     productRepository.countCreator(options.creatorId, tx),
   ]);
 
   return { items, totalCount };
 };
-
 
 // 특정 사용자가 등록한 상품 개수 조회
 const countProducts = async (creatorId: string, tx?: Prisma.TransactionClient) => {
@@ -106,7 +108,6 @@ const updateProduct = async (
 const deleteProduct = async (id: number, tx?: Prisma.TransactionClient) => {
   return await productRepository.softDeleteById(id, tx);
 };
-
 
 // 카테고리
 const getCategory = async (): Promise<TCategoryMap> => {
@@ -140,5 +141,5 @@ export default {
   countProducts,
   updateProduct,
   deleteProduct,
-  getCategory
+  getCategory,
 };

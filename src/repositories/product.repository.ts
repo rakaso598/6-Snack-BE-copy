@@ -55,10 +55,9 @@ const findManyAllPopular = async ({
     include: {
       category: true,
       creator: true,
-      _count: { select: { orderedItems: true } },
     },
     orderBy: {
-      orderedItems: { _count: "desc" },
+      cumulativeSales: "desc",
     },
     skip,
     take,
