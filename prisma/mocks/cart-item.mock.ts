@@ -52,7 +52,7 @@ export const cartItemMockData = [
   {
     id: 6,
     userId: "user-1",
-    productId: 14,
+    productId: 13,
     quantity: 2,
     isChecked: true,
     deletedAt: null,
