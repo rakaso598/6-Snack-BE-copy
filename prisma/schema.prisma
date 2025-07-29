@@ -70,11 +70,11 @@ model Product {
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime?
 
-  cart         CartItem[]
-  likes        Like[]
-  creator      User          @relation("ProductCreator", fields: [creatorId], references: [id])
-  category     Category      @relation(fields: [categoryId], references: [id])
-  orderedItems OrderedItem[]
+  cart     CartItem[]
+  likes    Like[]
+  receipts Receipt[]
+  creator  User       @relation("ProductCreator", fields: [creatorId], references: [id])
+  category Category   @relation(fields: [categoryId], references: [id])
 }
 
 model Category {
@@ -105,13 +105,16 @@ model CartItem {
 
 model Receipt {
   id          Int      @id @default(autoincrement())
+  productId   Int
+  orderId     Int
   productName String
   price       Int
   imageUrl    String
   quantity    Int
   createdAt   DateTime @default(now())
 
-  orderedItem OrderedItem[]
+  product Product @relation(fields: [productId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
 }
 
 model Order {
@@ -126,20 +129,9 @@ model Order {
   updatedAt      DateTime    @updatedAt
   status         OrderStatus
 
-  orderedItems OrderedItem[]
-  user         User          @relation("UserOrders", fields: [userId], references: [id])
-  company      Company       @relation(fields: [companyId], references: [id])
-}
-
-model OrderedItem {
-  id        Int @id @default(autoincrement())
-  orderId   Int
-  receiptId Int
-  productId Int
-
-  order   Order   @relation(fields: [orderId], references: [id])
-  receipt Receipt @relation(fields: [receiptId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
+  receipts Receipt[]
+  user     User      @relation("UserOrders", fields: [userId], references: [id])
+  company  Company   @relation(fields: [companyId], references: [id])
 }
 
 model Invite {
