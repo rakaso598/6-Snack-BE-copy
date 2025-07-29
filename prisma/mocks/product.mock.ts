@@ -1,7 +1,7 @@
 export const productMockData = [
   // 스낵류
   {
-    categoryId: 4, // 파이
+    categoryId: 4, // 파이 (4번째)
     creatorId: "user-1",
     name: "오리온 초코파이",
     price: 1500,
@@ -13,7 +13,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 8, // 비스켓류
+    categoryId: 8, // 비스켓류 (8번째)
     creatorId: "user-1",
     name: "롯데 마가렛트",
     price: 1200,
@@ -25,7 +25,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 2, // 과자
+    categoryId: 2, // 과자 (2번째)
     creatorId: "user-2",
     name: "농심 새우깡",
     price: 800,
@@ -37,7 +37,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 2, // 과자
+    categoryId: 2, // 과자 (2번째)
     creatorId: "user-1",
     name: "해태 홈런볼",
     price: 2500,
@@ -49,7 +49,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 2, // 과자
+    categoryId: 2, // 과자 (2번째)
     creatorId: "user-2",
     name: "오리온 포카칩",
     price: 1800,
@@ -61,7 +61,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 5, // 초콜릿류
+    categoryId: 5, // 초콜릿류 (5번째)
     creatorId: "user-1",
     name: "롯데 칸쵸",
     price: 1500,
@@ -73,7 +73,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 8, // 비스켓류
+    categoryId: 8, // 비스켓류 (8번째)
     creatorId: "user-2",
     name: "크라운 산도",
     price: 2000,
@@ -85,7 +85,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 5, // 초콜릿류
+    categoryId: 5, // 초콜릿류 (5번째)
     creatorId: "user-1",
     name: "페레로로쉐",
     price: 1200,
@@ -97,7 +97,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 4, // 파이
+    categoryId: 4, // 파이 (4번째)
     creatorId: "user-2",
     name: "해태 후렌치파이",
     price: 1800,
@@ -109,7 +109,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 2, // 과자
+    categoryId: 2, // 과자 (2번째)
     creatorId: "user-1",
     name: "오리온 고래밥",
     price: 1500,
@@ -121,7 +121,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 7, // 껌류
+    categoryId: 7, // 껌류 (7번째)
     creatorId: "user-2",
     name: "롯데 자일리톨 껌",
     price: 1200,
@@ -133,7 +133,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 5, // 초콜릿류
+    categoryId: 5, // 초콜릿류 (5번째)
     creatorId: "user-1",
     name: "크라운 뽀또",
     price: 1800,
@@ -145,7 +145,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 9, // 씨리얼바
+    categoryId: 9, // 씨리얼바 (9번째)
     creatorId: "user-2",
     name: "오리온 닥터유 단백질바",
     price: 2500,

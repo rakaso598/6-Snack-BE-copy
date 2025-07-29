@@ -1,7 +1,5 @@
 export const orderMockData = [
   {
-    id: 1,
-    companyId: 1,
     userId: "user-1",
     approver: "최고관리자",
     adminMessage: "스낵 주문이 승인되었습니다. 오후 2시에 배송됩니다.",
@@ -12,8 +10,6 @@ export const orderMockData = [
     updatedAt: new Date("2025-06-15"),
   },
   {
-    id: 2,
-    companyId: 1,
     userId: "user-2",
     adminMessage: null,
     requestMessage: "내일 아침 회의 전에 스낵 준비해주세요.",
@@ -23,8 +19,6 @@ export const orderMockData = [
     updatedAt: new Date("2025-07-01"),
   },
   {
-    id: 3,
-    companyId: 1,
     userId: "user-3",
     approver: "관리자",
     adminMessage: "일부 스낵 재고 부족으로 대체 상품으로 변경되었습니다.",
