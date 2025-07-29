@@ -21,7 +21,7 @@ const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) =>
     orderBy: SORT_OPTIONS[orderBy] || SORT_OPTIONS["latest"],
     include: {
       user: true,
-      orderedItems: { include: { receipt: true } },
+      receipts: true,
     },
   });
 };
@@ -42,7 +42,7 @@ const getOrderByIdAndStatus = async (id: Order["id"], status: "pending" | "appro
     where: { id, status: statusOptions[status] },
     include: {
       user: true,
-      orderedItems: { include: { receipt: true } },
+      receipts: true,
     },
   });
 };
@@ -52,7 +52,7 @@ const getOrderById = async (id: Order["id"]) => {
     where: { id },
     include: {
       user: true,
-      orderedItems: { include: { receipt: true } },
+      receipts: true,
     },
   });
 };
@@ -98,26 +98,12 @@ const createOrder = async (
     throw new Error("일부 카트 아이템을 찾을 수 없습니다.");
   }
 
-  // 2. 각 카트 아이템으로부터 receipt 생성
-  const receipts = await Promise.all(
-    cartItems.map(async (cartItem) => {
-      return await client.receipt.create({
-        data: {
-          productName: cartItem.product.name,
-          price: cartItem.product.price,
-          imageUrl: cartItem.product.imageUrl,
-          quantity: cartItem.quantity,
-        },
-      });
-    }),
-  );
-
-  // 3. 총 가격 계산
-  const totalPrice = receipts.reduce((sum, receipt) => {
-    return sum + receipt.price * receipt.quantity;
+  // 2. 총 가격 계산
+  const totalPrice = cartItems.reduce((sum, cartItem) => {
+    return sum + cartItem.product.price * cartItem.quantity;
   }, 0);
 
-  // 4. 주문 생성
+  // 3. 주문 생성
   const order = await client.order.create({
     data: {
       userId: orderData.userId,
@@ -129,34 +115,33 @@ const createOrder = async (
     },
   });
 
-  // 5. OrderedItem 생성 (주문과 receipt 연결)
-  await Promise.all(
-    receipts.map(async (receipt, index) => {
-      return await client.orderedItem.create({
+  // 4. 각 카트 아이템으로부터 receipt 생성
+  const receipts = await Promise.all(
+    cartItems.map(async (cartItem) => {
+      return await client.receipt.create({
         data: {
+          productId: cartItem.productId,
           orderId: order.id,
-          receiptId: receipt.id,
-          productId: cartItems[index].productId,
+          productName: cartItem.product.name,
+          price: cartItem.product.price,
+          imageUrl: cartItem.product.imageUrl,
+          quantity: cartItem.quantity,
         },
       });
     }),
   );
 
-  // 6. 생성된 주문 정보 반환
+  // 5. 생성된 주문 정보 반환
   const result = await client.order.findUnique({
     where: { id: order.id },
     include: {
-      orderedItems: {
-        include: {
-          receipt: {
-            select: {
-              id: true,
-              productName: true,
-              price: true,
-              imageUrl: true,
-              quantity: true,
-            },
-          },
+      receipts: {
+        select: {
+          id: true,
+          productName: true,
+          price: true,
+          imageUrl: true,
+          quantity: true,
         },
       },
     },
@@ -175,17 +160,13 @@ const getOrdersByUserId = async (userId: string, tx?: Prisma.TransactionClient) 
   return await client.order.findMany({
     where: { userId },
     include: {
-      orderedItems: {
-        include: {
-          receipt: {
-            select: {
-              id: true,
-              productName: true,
-              price: true,
-              imageUrl: true,
-              quantity: true,
-            },
-          },
+      receipts: {
+        select: {
+          id: true,
+          productName: true,
+          price: true,
+          imageUrl: true,
+          quantity: true,
         },
       },
     },
@@ -205,17 +186,13 @@ const updateOrderStatus = async (
       where: { id: orderId },
       data: { status },
       include: {
-        orderedItems: {
-          include: {
-            receipt: {
-              select: {
-                id: true,
-                productName: true,
-                price: true,
-                imageUrl: true,
-                quantity: true,
-              },
-            },
+        receipts: {
+          select: {
+            id: true,
+            productName: true,
+            price: true,
+            imageUrl: true,
+            quantity: true,
           },
         },
       },

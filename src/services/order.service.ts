@@ -17,18 +17,18 @@ const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) =>
 
   const totalCount = await orderRepository.getOrdersTotalCount({ status });
 
-  const formattedOrders = orders.map(({ user, orderedItems, ...rest }) => {
+  const formattedOrders = orders.map(({ user, receipts, ...rest }) => {
     // 주문 상품이 1개 이상일 때
-    if (orderedItems.length >= 2) {
+    if (receipts.length >= 2) {
       return {
         ...rest,
         requester: user.name,
-        productName: `${orderedItems[0].receipt.productName} 외 1건`,
+        productName: `${receipts[0].productName} 외 ${receipts.length - 1}건`,
       };
     }
 
     // 주문 상품이 1개일 때
-    return { ...rest, requester: user.name, productName: orderedItems[0].receipt.productName };
+    return { ...rest, requester: user.name, productName: receipts[0].productName };
   });
 
   return {
@@ -45,12 +45,12 @@ const getOrder = async (orderId: Order["id"], status: "pending" | "approved") =>
     throw new NotFoundError("주문 내역을 찾을 수 없습니다.");
   }
 
-  const { user, orderedItems, ...rest } = order;
+  const { user, receipts, ...rest } = order;
 
   let formattedOrder: TOrderWithBudget = {
     ...rest,
     requester: order.user.name,
-    products: order.orderedItems.map((item) => item.receipt),
+    products: order.receipts,
     budget: { currentMonthBudget: null, currentMonthExpense: null },
   };
 
@@ -97,12 +97,12 @@ const updateOrder = async (
 
     if (!monthlyBudget) throw new NotFoundError("예산이 존재하지 않습니다.");
 
-    const totalCurrentMonthExpense = monthlyBudget.currentMonthExpense + updatedOrder.totalPrice;
+    const totalCurrentMonthExpense = monthlyBudget.currentMonthExpense + updatedOrder.totalPrice + 3000;
 
     // 4. 지출액 증가
     await budgetRepository.updateCurrentMonthExpense({ companyId, year, month }, totalCurrentMonthExpense, tx);
 
-    const productIds = order.orderedItems.map((item) => item.productId);
+    const productIds = order.receipts.map((receipt) => receipt.productId);
 
     // 5. 상품 판매 횟수 증가
     await productRepository.updateCumulativeSales(productIds, tx);
