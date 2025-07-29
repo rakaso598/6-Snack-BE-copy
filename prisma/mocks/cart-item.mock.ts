@@ -1,6 +1,5 @@
 export const cartItemMockData = [
   {
-    id: 1,
     userId: "user-1",
     productId: 1,
     quantity: 2,
@@ -10,7 +9,6 @@ export const cartItemMockData = [
     updatedAt: new Date("2025-06-15T14:30:00Z"),
   },
   {
-    id: 2,
     userId: "user-1",
     productId: 6,
     quantity: 1,
@@ -20,7 +18,6 @@ export const cartItemMockData = [
     updatedAt: new Date("2025-06-15T14:30:00Z"),
   },
   {
-    id: 3,
     userId: "user-2",
     productId: 3,
     quantity: 3,
@@ -30,7 +27,6 @@ export const cartItemMockData = [
     updatedAt: new Date("2025-07-01T11:20:00Z"),
   },
   {
-    id: 4,
     userId: "user-3",
     productId: 9,
     quantity: 1,
@@ -40,7 +36,6 @@ export const cartItemMockData = [
     updatedAt: new Date("2025-07-07T10:15:00Z"),
   },
   {
-    id: 5,
     userId: "user-3",
     productId: 4,
     quantity: 1,
@@ -50,7 +45,6 @@ export const cartItemMockData = [
     updatedAt: new Date("2025-07-07T10:15:00Z"),
   },
   {
-    id: 6,
     userId: "user-1",
     productId: 13,
     quantity: 2,
@@ -60,7 +54,6 @@ export const cartItemMockData = [
     updatedAt: new Date("2025-07-10T08:00:00Z"),
   },
   {
-    id: 7,
     userId: "user-2",
     productId: 4,
     quantity: 1,
@@ -70,7 +63,6 @@ export const cartItemMockData = [
     updatedAt: new Date("2025-07-12T15:20:00Z"),
   },
   {
-    id: 8,
     userId: "user-3",
     productId: 6,
     quantity: 1,
