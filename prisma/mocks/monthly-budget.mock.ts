@@ -1,7 +1,5 @@
 export const monthlyBudgetMockData = [
   {
-    id: 1,
-    companyId: 1,
     currentMonthExpense: 145000,
     currentMonthBudget: 3000000,
     monthlyBudget: 3000000,
@@ -12,8 +10,6 @@ export const monthlyBudgetMockData = [
     deletedAt: null,
   },
   {
-    id: 2,
-    companyId: 1,
     currentMonthExpense: 570000,
     currentMonthBudget: 3500000,
     monthlyBudget: 1500000,
@@ -24,8 +20,6 @@ export const monthlyBudgetMockData = [
     deletedAt: null,
   },
   {
-    id: 3,
-    companyId: 1,
     currentMonthExpense: 45000,
     currentMonthBudget: 2000000,
     monthlyBudget: 2000000,
@@ -36,8 +30,6 @@ export const monthlyBudgetMockData = [
     deletedAt: null,
   },
   {
-    id: 4,
-    companyId: 1,
     currentMonthExpense: 5700,
     currentMonthBudget: 3500000,
     monthlyBudget: 2000000,

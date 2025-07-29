@@ -1,7 +1,6 @@
 export const receiptMockData = [
   // Order 1의 Receipt들 (user-1의 주문: 포카칩 2개 + 콜라 1개 = 4500원)
   {
-    id: 1,
     productId: 1,
     orderId: 1,
     productName: "오리온 초코파이",
@@ -11,7 +10,6 @@ export const receiptMockData = [
     createdAt: new Date("2025-07-15T10:30:00Z"),
   },
   {
-    id: 2,
     productId: 6,
     orderId: 1,
     productName: "롯데 칸쵸",
@@ -23,7 +21,6 @@ export const receiptMockData = [
 
   // Order 2의 Receipt들 (user-2의 주문: 새우깡 3개 = 2400원)
   {
-    id: 3,
     productId: 3,
     orderId: 2,
     productName: "농심 새우깡",
@@ -35,7 +32,6 @@ export const receiptMockData = [
 
   // Order 3의 Receipt들 (user-3의 주문: 홈런볼 1개 + 산도 1개 = 4500원)
   {
-    id: 4,
     productId: 4,
     orderId: 3,
     productName: "해태 홈런볼",
@@ -45,7 +41,6 @@ export const receiptMockData = [
     createdAt: new Date("2025-07-17T09:45:00Z"),
   },
   {
-    id: 5,
     productId: 7,
     orderId: 3,
     productName: "크라운 산도",
