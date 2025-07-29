@@ -1,10 +1,11 @@
-import { Order } from "@prisma/client";
+import { Company, Order } from "@prisma/client";
 import orderRepository from "../repositories/order.repository";
 import { NotFoundError, ValidationError, ForbiddenError, BadRequestError } from "../types/error";
 import { TGetOrdersQuery, TOrderWithBudget } from "../types/order.types";
 import budgetRepository from "../repositories/budget.repository";
 import getDateForBudget from "../utils/getDateForBudget";
 import prisma from "../config/prisma";
+import productRepository from "../repositories/product.repository";
 
 // 구매내역 조회(대기 or 승인)
 const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) => {
@@ -75,16 +76,39 @@ const getOrder = async (orderId: Order["id"], status: "pending" | "approved") =>
 };
 
 // 구매 승인 | 구매 반려
-const updateOrder = async (orderId: Order["id"], body: Pick<Order, "approver" | "adminMessage" | "status">) => {
+const updateOrder = async (
+  orderId: Order["id"],
+  companyId: Company["id"],
+  body: Pick<Order, "approver" | "adminMessage" | "status">,
+) => {
+  const { year, month } = getDateForBudget();
+
+  // 1. Order 조회
   const order = await orderRepository.getOrderById(orderId);
 
-  if (!order) {
-    throw new NotFoundError("주문을 찾을 수 없습니다.");
-  }
+  if (!order) throw new NotFoundError("주문을 찾을 수 없습니다.");
 
-  const updatedOrder = await orderRepository.updateOrder(orderId, body);
+  return await prisma.$transaction(async (tx) => {
+    // 2. Order 상태 업데이트(승인 or 반려)
+    const updatedOrder = await orderRepository.updateOrder(orderId, body, tx);
 
-  return updatedOrder;
+    // 3. 예산 조회
+    const monthlyBudget = await budgetRepository.getMonthlyBudget({ companyId, year, month });
+
+    if (!monthlyBudget) throw new NotFoundError("예산이 존재하지 않습니다.");
+
+    const totalCurrentMonthExpense = monthlyBudget.currentMonthExpense + updatedOrder.totalPrice;
+
+    // 4. 지출액 증가
+    await budgetRepository.updateCurrentMonthExpense({ companyId, year, month }, totalCurrentMonthExpense, tx);
+
+    const productIds = order.orderedItems.map((item) => item.productId);
+
+    // 5. 상품 판매 횟수 증가
+    await productRepository.updateCumulativeSales(productIds, tx);
+
+    return updatedOrder;
+  });
 };
 
 // OrderRequest 관련 기능들 추가

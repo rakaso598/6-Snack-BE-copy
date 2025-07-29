@@ -1,5 +1,5 @@
 import prisma from "../config/prisma";
-import { Prisma } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 import type { TProductQueryOptions, TCreatorQueryOptions, TCreateProductParams } from "../types/product.types";
 
 // 전체 상품을 조건에 맞게 조회
@@ -100,13 +100,8 @@ const create = (data: TCreateProductParams, tx?: Prisma.TransactionClient) => {
 
 // 특정 사용자의 상품 목록 조회
 const findManyCreator = (
-  {
-    creatorId,
-    skip = 0,
-    take = 10,
-    orderBy = { createdAt: "desc" }, 
-  }: TCreatorQueryOptions,
-  tx?: Prisma.TransactionClient
+  { creatorId, skip = 0, take = 10, orderBy = { createdAt: "desc" } }: TCreatorQueryOptions,
+  tx?: Prisma.TransactionClient,
 ) => {
   const client = tx || prisma;
 
@@ -121,7 +116,6 @@ const findManyCreator = (
     orderBy,
   });
 };
-
 
 // 특정 사용자 상품 총 개수 조회
 const countCreator = (creatorId: string, tx?: Prisma.TransactionClient) => {
@@ -177,6 +171,15 @@ const findAllCategories = async () => {
   });
 };
 
+const updateCumulativeSales = async (productIds: number[], tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+
+  return await client.product.updateMany({
+    where: { id: { in: productIds } },
+    data: { cumulativeSales: { increment: 1 } },
+  });
+};
+
 export default {
   create,
   findById,
@@ -187,4 +190,5 @@ export default {
   update,
   softDeleteById,
   findAllCategories,
+  updateCumulativeSales,
 };

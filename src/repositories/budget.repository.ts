@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { MonthlyBudget, Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { TMonthlyBudget, TTotalExpense, TUpdateMonthlyBudgetBody } from "../types/budget.type";
 
@@ -31,8 +31,22 @@ const updateMonthlyBudget = async (
   });
 };
 
+const updateCurrentMonthExpense = async (
+  { companyId, year, month }: TMonthlyBudget,
+  currentMonthExpense: MonthlyBudget["currentMonthExpense"],
+  tx?: Prisma.TransactionClient,
+) => {
+  const client = tx || prisma;
+
+  return await client.monthlyBudget.update({
+    where: { companyId_year_month: { companyId, year, month } },
+    data: { currentMonthExpense },
+  });
+};
+
 export default {
   getMonthlyBudget,
   getTotalExpense,
   updateMonthlyBudget,
+  updateCurrentMonthExpense,
 };

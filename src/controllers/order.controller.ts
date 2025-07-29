@@ -27,11 +27,16 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
 
 // 구매 승인 | 구매 반려
 const updateOrder: RequestHandler<TGetOrderParamsDto, {}, TUpdateStatusOrderBodyDto> = async (req, res, next) => {
-  const approver = req.user!.name;
+  const user = req.user;
+
+  if (!user) throw new AuthenticationError("유효하지 않은 유저입니다.");
+
+  const approver = user.name;
+  const companyId = user.companyId;
   const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
   const { adminMessage = "", status } = req.body;
 
-  const updatedOrder = await orderService.updateOrder(orderId, { approver, adminMessage, status });
+  const updatedOrder = await orderService.updateOrder(orderId, companyId, { approver, adminMessage, status });
 
   res.status(200).json(updatedOrder);
 };
@@ -141,7 +146,7 @@ const createInstantOrder: RequestHandler<{}, {}, { cartItemIds: number[] }> = as
     const result = await orderService.createInstantOrder(authenticatedOrderData);
 
     // 2. orderService를 사용하여 승인 처리
-    const approvedOrder = await orderService.updateOrder(result.id, {
+    const approvedOrder = await orderService.updateOrder(result.id, req.user.companyId, {
       approver: req.user.name || "시스템",
       adminMessage: "즉시 구매로 자동 승인",
       status: "APPROVED",
