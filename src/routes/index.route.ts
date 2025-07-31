@@ -8,6 +8,7 @@ import productRouter from "./product.route";
 import myRouter from "./my.route";
 import inviteRouter from "./invite.route";
 import userRouter from "./user.route";
+import favoritRouter from "./favorite.route";
 
 const indexRouter = Router();
 
@@ -20,7 +21,6 @@ indexRouter.use("/my", myRouter);
 indexRouter.use("/auth", authRouter);
 indexRouter.use("/invite", inviteRouter);
 indexRouter.use("/users", userRouter);
-
-
+indexRouter.use("/favorites", favoritRouter);
 
 export default indexRouter;
