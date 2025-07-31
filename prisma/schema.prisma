@@ -155,6 +155,8 @@ model Like {
 
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
 }
 
 enum Role {

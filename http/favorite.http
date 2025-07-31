@@ -1,0 +1,10 @@
+@BASE_URL=http://localhost:8080
+
+### 내가 찜한 목록 조회
+GET {{BASE_URL}}/favorites
+
+### 찜하기
+POST {{BASE_URL}}/favorites/1
+
+### 찜 해제하기
+DELETE {{BASE_URL}}/favorites/1
