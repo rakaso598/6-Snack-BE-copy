@@ -1,10 +1,12 @@
 import prisma from "../config/prisma";
-import { Like, Product, User } from "@prisma/client";
+import { Product, User } from "@prisma/client";
 
-const getFavorites = async (userId: User["id"]): Promise<Like[]> => {
+const getFavorites = async (userId: User["id"]) => {
   return await prisma.like.findMany({
     where: { userId },
-    include: { product: true },
+    include: {
+      product: { include: { category: true, creator: { select: { id: true, email: true, name: true, role: true } } } },
+    },
   });
 };
 
