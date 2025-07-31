@@ -8,6 +8,12 @@ const getFavorites = async (userId: User["id"]): Promise<Like[]> => {
   });
 };
 
+const getFavorite = async (userId: User["id"], productId: Product["id"]) => {
+  return await prisma.like.findUnique({
+    where: { userId_productId: { userId, productId } },
+  });
+};
+
 const createFavorite = async (userId: User["id"], productId: Product["id"]) => {
   return await prisma.like.create({
     data: { userId, productId },
@@ -15,13 +21,14 @@ const createFavorite = async (userId: User["id"], productId: Product["id"]) => {
 };
 
 const deleteFavorite = async (userId: User["id"], productId: Product["id"]) => {
-  // return await prisma.like.delete({
-  //   where: { userId, productId },
-  // });
+  return await prisma.like.delete({
+    where: { userId_productId: { userId, productId } },
+  });
 };
 
 export default {
   getFavorites,
+  getFavorite,
   createFavorite,
   deleteFavorite,
 };
