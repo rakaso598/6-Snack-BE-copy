@@ -131,7 +131,17 @@ const createOrder = async (
     }),
   );
 
-  // 5. 생성된 주문 정보 반환
+  // 5. 주문에 포함된 카트 아이템들을 장바구니에서 삭제
+  await client.cartItem.updateMany({
+    where: {
+      id: { in: orderData.cartItemIds },
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+
+  // 6. 생성된 주문 정보 반환
   const result = await client.order.findUnique({
     where: { id: order.id },
     include: {
