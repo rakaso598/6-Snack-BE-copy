@@ -97,6 +97,9 @@ const updateOrder = async (
 
     if (!monthlyBudget) throw new NotFoundError("예산이 존재하지 않습니다.");
 
+    if (monthlyBudget.currentMonthExpense < updatedOrder.totalPrice + 3000)
+      throw new BadRequestError("예산이 부족합니다.");
+
     const totalCurrentMonthExpense = monthlyBudget.currentMonthExpense + updatedOrder.totalPrice + 3000;
 
     // 4. 지출액 증가
