@@ -15,27 +15,21 @@ import { AuthenticationError } from "../types/error";
 const getMyCart: RequestHandler = async (req, res, next) => {
   try {
     const user = req.user;
-
     if (!user) throw new AuthenticationError("유저 정보를 찾을 수 없습니다.");
 
     const { cartItemId, isChecked } = req.query;
 
     if (user.role === "USER" && cartItemId) {
-      const item = await cartService.getCartItemById(
-        req.user!.id,
-        parseNumberOrThrow(cartItemId as string, "cartitemId"),
-      );
-
+      const item = await cartService.getCartItemById(user.id, parseNumberOrThrow(cartItemId as string, "cartitemId"));
       res.json({ cart: item });
       return;
     }
 
     const onlyChecked = isChecked === "true";
-    const cart = await cartService.getMyCart(req.user!.id, onlyChecked);
+    const cart = await cartService.getMyCart(user.id, onlyChecked);
 
     if (user.role !== "USER") {
       const budget = await budgetService.getMonthlyBudget(user.companyId);
-
       res.json({
         cart,
         budget: {
@@ -54,7 +48,10 @@ const getMyCart: RequestHandler = async (req, res, next) => {
 
 const addToCart: RequestHandler<{}, {}, TAddToCartDto> = async (req, res, next) => {
   try {
-    const result = await cartService.addToCart(req.user!.id, req.body);
+    const user = req.user;
+    if (!user) throw new AuthenticationError("유저 정보를 찾을 수 없습니다.");
+
+    const result = await cartService.addToCart(user.id, req.body);
     res.status(201).json(result);
   } catch (err) {
     next(err);
@@ -63,7 +60,10 @@ const addToCart: RequestHandler<{}, {}, TAddToCartDto> = async (req, res, next) 
 
 const deleteSelectedItems: RequestHandler<{}, {}, TDeleteCartItemsDto> = async (req, res, next) => {
   try {
-    await cartService.deleteSelectedItems(req.user!.id, req.body);
+    const user = req.user;
+    if (!user) throw new AuthenticationError("유저 정보를 찾을 수 없습니다.");
+
+    await cartService.deleteSelectedItems(user.id, req.body);
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -72,8 +72,11 @@ const deleteSelectedItems: RequestHandler<{}, {}, TDeleteCartItemsDto> = async (
 
 const deleteCartItem: RequestHandler = async (req, res, next) => {
   try {
+    const user = req.user;
+    if (!user) throw new AuthenticationError("유저 정보를 찾을 수 없습니다.");
+
     const itemId = parseNumberOrThrow(req.params.item, "itemId");
-    await cartService.deleteCartItem(req.user!.id, itemId);
+    await cartService.deleteCartItem(user.id, itemId);
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -82,8 +85,11 @@ const deleteCartItem: RequestHandler = async (req, res, next) => {
 
 const toggleCheckItem: RequestHandler<TToggleParamsDto, {}, TToggleCheckDto> = async (req, res, next) => {
   try {
+    const user = req.user;
+    if (!user) throw new AuthenticationError("유저 정보를 찾을 수 없습니다.");
+
     const itemId = parseNumberOrThrow(req.params.item, "itemId");
-    await cartService.toggleCheckCartItem(req.user!.id, itemId, req.body);
+    await cartService.toggleCheckCartItem(user.id, itemId, req.body);
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -92,7 +98,10 @@ const toggleCheckItem: RequestHandler<TToggleParamsDto, {}, TToggleCheckDto> = a
 
 const toggleAllItems: RequestHandler<{}, {}, TToggleAllCheckDto> = async (req, res, next) => {
   try {
-    await cartService.toggleAllCheck(req.user!.id, req.body.isChecked);
+    const user = req.user;
+    if (!user) throw new AuthenticationError("유저 정보를 찾을 수 없습니다.");
+
+    await cartService.toggleAllCheck(user.id, req.body.isChecked);
     res.status(204).send();
   } catch (err) {
     next(err);
@@ -101,8 +110,11 @@ const toggleAllItems: RequestHandler<{}, {}, TToggleAllCheckDto> = async (req, r
 
 const updateQuantity: RequestHandler<{ item: string }, {}, TUpdateQuantityDto> = async (req, res, next) => {
   try {
+    const user = req.user;
+    if (!user) throw new AuthenticationError("유저 정보를 찾을 수 없습니다.");
+
     const itemId = parseNumberOrThrow(req.params.item, "itemId");
-    await cartService.updateQuantity(req.user!.id, itemId, req.body.quantity);
+    await cartService.updateQuantity(user.id, itemId, req.body.quantity);
     res.status(204).send();
   } catch (err) {
     next(err);
