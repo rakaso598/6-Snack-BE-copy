@@ -8,14 +8,14 @@ import prisma from "../config/prisma";
 import productRepository from "../repositories/product.repository";
 
 // 구매내역 조회(대기 or 승인)
-const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) => {
-  const orders = await orderRepository.getOrders({ offset, limit, orderBy, status });
+const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery, companyId: number) => {
+  const orders = await orderRepository.getOrders({ offset, limit, orderBy, status }, companyId);
 
   if (!orders) {
     throw new NotFoundError("주문 내역을 찾을 수 없습니다.");
   }
 
-  const totalCount = await orderRepository.getOrdersTotalCount({ status });
+  const totalCount = await orderRepository.getOrdersTotalCount({ status }, companyId);
 
   const formattedOrders = orders.map(({ user, receipts, ...rest }) => {
     // 주문 상품이 1개 이상일 때
@@ -38,14 +38,14 @@ const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) =>
 };
 
 // 구매내역 상세 조회(대기 or 승인)
-const getOrder = async (orderId: Order["id"], status: "pending" | "approved") => {
-  const order = await orderRepository.getOrderByIdAndStatus(orderId, status);
+const getOrder = async (orderId: Order["id"], status: "pending" | "approved", companyId: number) => {
+  const order = await orderRepository.getOrderByIdAndStatus(orderId, status, companyId);
 
   if (!order) {
     throw new NotFoundError("주문 내역을 찾을 수 없습니다.");
   }
 
-  const { user, receipts, ...rest } = order;
+  const { receipts, ...rest } = order;
 
   let formattedOrder: TOrderWithBudget = {
     ...rest,
@@ -55,7 +55,6 @@ const getOrder = async (orderId: Order["id"], status: "pending" | "approved") =>
   };
 
   if (status === "pending") {
-    const companyId = user.companyId;
     const { year, month } = getDateForBudget();
 
     const budget = await budgetRepository.getMonthlyBudget({ companyId, year, month });
@@ -96,6 +95,9 @@ const updateOrder = async (
     const monthlyBudget = await budgetRepository.getMonthlyBudget({ companyId, year, month });
 
     if (!monthlyBudget) throw new NotFoundError("예산이 존재하지 않습니다.");
+
+    if (monthlyBudget.currentMonthBudget < monthlyBudget.currentMonthExpense + updatedOrder.totalPrice + 3000)
+      throw new BadRequestError("예산이 부족합니다.");
 
     const totalCurrentMonthExpense = monthlyBudget.currentMonthExpense + updatedOrder.totalPrice + 3000;
 

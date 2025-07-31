@@ -1,4 +1,4 @@
-import { Order, Prisma } from "@prisma/client";
+import { Company, Order, Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { TGetOrdersQuery, TGetOrderStatus } from "../types/order.types";
 
@@ -13,9 +13,9 @@ const STATUS_OPTIONS: TGetOrderStatus = {
   approved: "APPROVED",
 };
 
-const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) => {
+const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery, companyId: Company["id"]) => {
   return await prisma.order.findMany({
-    where: { status: STATUS_OPTIONS[status] },
+    where: { status: STATUS_OPTIONS[status], companyId },
     skip: offset,
     take: limit,
     orderBy: SORT_OPTIONS[orderBy] || SORT_OPTIONS["latest"],
@@ -26,20 +26,20 @@ const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery) =>
   });
 };
 
-const getOrdersTotalCount = async ({ status }: Pick<TGetOrdersQuery, "status">) => {
+const getOrdersTotalCount = async ({ status }: Pick<TGetOrdersQuery, "status">, companyId: Company["id"]) => {
   return await prisma.order.count({
-    where: { status: STATUS_OPTIONS[status] },
+    where: { status: STATUS_OPTIONS[status], companyId },
   });
 };
 
-const getOrderByIdAndStatus = async (id: Order["id"], status: "pending" | "approved") => {
+const getOrderByIdAndStatus = async (id: Order["id"], status: "pending" | "approved", companyId: Company["id"]) => {
   const statusOptions: TGetOrderStatus = {
     pending: "PENDING",
     approved: "APPROVED",
   };
 
   return await prisma.order.findFirst({
-    where: { id, status: statusOptions[status] },
+    where: { id, status: statusOptions[status], companyId },
     include: {
       user: true,
       receipts: true,

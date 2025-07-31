@@ -9,8 +9,13 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
   const offset = parseNumberOrThrow(req.query.offset ?? "0", "offset");
   const limit = parseNumberOrThrow(req.query.limit ?? "4", "limit");
   const { orderBy, status } = req.query;
+  const user = req.user;
 
-  const orderList = await orderService.getOrders({ offset, limit, orderBy, status });
+  if (!user) throw new AuthenticationError("유효하지 않은 유저입니다.");
+
+  const companyId = user.companyId;
+
+  const orderList = await orderService.getOrders({ offset, limit, orderBy, status }, companyId);
 
   res.status(200).json(orderList);
 };
@@ -19,8 +24,13 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
 const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> = async (req, res, next) => {
   const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
   const { status } = req.query;
+  const user = req.user;
 
-  const order = await orderService.getOrder(orderId, status);
+  if (!user) throw new AuthenticationError("유효하지 않은 유저입니다.");
+
+  const companyId = user.companyId;
+
+  const order = await orderService.getOrder(orderId, status, companyId);
 
   res.status(200).json(order);
 };
