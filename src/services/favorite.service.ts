@@ -2,7 +2,13 @@ import favoriteRepository from "../repositories/favorite.repository";
 import { BadRequestError } from "../types/error";
 
 const getFavorites = async (userId: string) => {
-  return await favoriteRepository.getFavorites(userId);
+  const favorites = await favoriteRepository.getFavorites(userId);
+
+  const formattedFavorites = favorites.map(({ product, ...favorite }) => {
+    return { ...product };
+  });
+
+  return formattedFavorites;
 };
 
 const createFavorite = async (userId: string, productId: number) => {
