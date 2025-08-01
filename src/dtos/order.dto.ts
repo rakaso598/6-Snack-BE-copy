@@ -1,5 +1,5 @@
 export type TGetOrdersQueryDto = {
-  offset: string;
+  page: string;
   limit: string;
   orderBy: "latest" | "priceLow" | "priceHigh";
   status: "pending" | "approved";

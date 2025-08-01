@@ -8,7 +8,9 @@ import prisma from "../config/prisma";
 import productRepository from "../repositories/product.repository";
 
 // 구매내역 조회(대기 or 승인)
-const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery, companyId: number) => {
+const getOrders = async ({ page, limit, orderBy, status }: TGetOrdersQuery, companyId: number) => {
+  const offset = (page - 1) * limit;
+
   const orders = await orderRepository.getOrders({ offset, limit, orderBy, status }, companyId);
 
   if (!orders) {
@@ -33,7 +35,7 @@ const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery, co
 
   return {
     orders: formattedOrders,
-    meta: { totalCount, currentPage: offset, totalPages: Math.ceil(totalCount / limit) },
+    meta: { totalCount, itemsPerPage: limit, totalPages: Math.ceil(totalCount / limit), currentPage: page },
   };
 };
 
