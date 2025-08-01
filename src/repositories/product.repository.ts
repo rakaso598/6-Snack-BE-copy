@@ -66,7 +66,6 @@ const findManyAll = async (
     },
   });
 
-  // 각 상품에 찜한 상품 여부 추가
   return products.map((product) => ({
     ...product,
     isFavorite: favoriteProductIds.includes(product.id),
@@ -101,7 +100,6 @@ const findManyAllPopular = async ({
     take,
   });
 
-  // 각 상품에 찜한 상품 여부 추가
   return products.map((product) => ({
     ...product,
     isFavorite: favoriteProductIds.includes(product.id),
@@ -194,7 +192,6 @@ const findManyCreator = async (
     orderBy,
   });
 
-  // 각 상품에 찜한 상품 여부 추가
   return products.map((product) => ({
     ...product,
     isFavorite: favoriteProductIds.includes(product.id),
