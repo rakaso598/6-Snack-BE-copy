@@ -5,7 +5,6 @@ import { AuthenticationError, NotFoundError, ServerError } from "../types/error"
 import prisma from "../config/prisma";
 import { Prisma } from "@prisma/client";
 
-
 const JWT_SECRET: string = process.env.JWT_SECRET ?? "your_very_strong_jwt_secret_key_please_change_this_in_production";
 
 declare global {

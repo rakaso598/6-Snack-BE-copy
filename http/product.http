@@ -1,4 +1,15 @@
 # 포스트맨으로 실행시켜주세요
+
+### 로그인 (새로운 토큰 발급)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+    "email": "super_admin@codeit.com",
+    "password": "1q2w3e4r!"
+}
+
+### 상품 등록
 POST http://localhost:8080/products
 # Body
 FormData:
@@ -14,7 +25,7 @@ GET http://localhost:8080/my/products?orderBy=priceLow
 Cookie: accessToken= eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5OWQ0NjYwLWU5M2MtNDA1My04MjUwLWIyMzE4MThlODgzZiIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNzU5OTUsImV4cCI6MTc1MjA3Njg5NX0.YuROnKaa9kg9X1BNCGxCb7TbJeZ_28NWoWKYpW8xAyY;
 
 ### 상품 상세 페이지
-GET http://localhost:8080/products/8
+GET http://localhost:8080/products/1
 Content-Type: application/json
 Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ5OWQ0NjYwLWU5M2MtNDA1My04MjUwLWIyMzE4MThlODgzZiIsImVtYWlsIjoiYXNkMUBleGFtcGxlLmNvbSIsIm5hbWUiOiLqtIDrpqzsnpAiLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTIwNzY5ODAsImV4cCI6MTc1MjA3Nzg4MH0.60Ywhc3zquw0GajtYXbXAD3k1LpT59Jx42dWPQXzd4k;
 
@@ -57,8 +68,9 @@ GET http://localhost:8080/products/category
 Content-Type: application/json
 
 ### 상품 전체 요청 
-GET http://localhost:8080/products
+GET http://localhost:8080/products?limit=50
 Content-Type: application/json
+Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTEiLCJlbWFpbCI6InN1cGVyX2FkbWluQGNvZGVpdC5jb20iLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTQwNTk2ODMsImV4cCI6MTc1NDA2MDU4M30.552pD1Oobi2XkTpszWtJjiXq06UJRNEZx3dVpu2KENU;
 
 # 쿼리스트링 옵션:
 #

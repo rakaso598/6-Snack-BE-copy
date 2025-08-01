@@ -11,11 +11,27 @@ export type TProductQueryOptions = {
   creatorId?: string;
   cursor?: { id: number } | undefined;
   orderBy?: any;
+  userId?: string;
 };
 
 // 내부 확장 옵션
 export type TExtendedProductQueryOptions = TProductQueryOptions & {
   categoryIds?: number[];
+};
+
+// 찜한 상품 여부가 포함된 상품 타입
+export type TProductWithFavorite = Product & {
+  isFavorite: boolean;
+  category: {
+    id: number;
+    name: string;
+    parentId: number | null;
+  };
+  creator: {
+    id: string;
+    name: string;
+    email: string;
+  };
 };
 
 // 판매 수 포함된 상품
@@ -32,6 +48,7 @@ export type TCreatorQueryOptions = {
     createdAt?: "asc" | "desc";
     price?: "asc" | "desc";
   };
+  userId?: string;
 };
 
 // 상품 생성 파라미터

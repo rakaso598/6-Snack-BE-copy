@@ -61,6 +61,7 @@ const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res
 const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req, res, next) => {
   try {
     const { sort = "latest", category, cursor, limit } = req.query;
+    const user = req.user;
 
     const take = limit ? Math.min(parseNumberOrThrow(limit!, "limit"), 50) : 9;
     const cursorId = cursor ? parseNumberOrThrow(cursor!, "cursor") : undefined;
@@ -77,6 +78,7 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
       category: categoryId,
       take,
       cursor: cursorObj,
+      userId: user?.id,
     });
 
     const nextCursor = items.length === take ? items[items.length - 1].id : null;
@@ -121,6 +123,7 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
       skip,
       take: limit,
       orderBy,
+      userId: creatorId,
     });
 
     res.json({
@@ -141,8 +144,9 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
 export const getProductDetail: RequestHandler<TProductIdParamsDto> = async (req, res, next) => {
   try {
     const id = parseNumberOrThrow(req.params.id, "상품 ID");
+    const user = req.user;
 
-    const product = await productService.getProductById(id);
+    const product = await productService.getProductById(id, user?.id);
     res.json(product);
   } catch (error) {
     next(error);
