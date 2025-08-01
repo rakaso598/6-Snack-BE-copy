@@ -70,7 +70,6 @@ Content-Type: application/json
 ### 상품 전체 요청 
 GET http://localhost:8080/products?limit=50
 Content-Type: application/json
-Cookie: accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ1c2VyLTEiLCJlbWFpbCI6InN1cGVyX2FkbWluQGNvZGVpdC5jb20iLCJyb2xlIjoiU1VQRVJfQURNSU4iLCJpYXQiOjE3NTQwNTk2ODMsImV4cCI6MTc1NDA2MDU4M30.552pD1Oobi2XkTpszWtJjiXq06UJRNEZx3dVpu2KENU;
 
 # 쿼리스트링 옵션:
 #
