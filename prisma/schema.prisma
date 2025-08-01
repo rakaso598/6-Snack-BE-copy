@@ -20,7 +20,7 @@ model User {
 
   role      Role
   cartItems CartItem[]
-  likes     Like[]
+  favorites Favorite[]
   company   Company    @relation(fields: [companyId], references: [id])
   orders    Order[]    @relation("UserOrders")
   invites   Invite[]   @relation("InvitedBy")
@@ -70,11 +70,11 @@ model Product {
   updatedAt       DateTime  @updatedAt
   deletedAt       DateTime?
 
-  cart     CartItem[]
-  likes    Like[]
-  receipts Receipt[]
-  creator  User       @relation("ProductCreator", fields: [creatorId], references: [id])
-  category Category   @relation(fields: [categoryId], references: [id])
+  cart      CartItem[]
+  favorites Favorite[]
+  receipts  Receipt[]
+  creator   User       @relation("ProductCreator", fields: [creatorId], references: [id])
+  category  Category   @relation(fields: [categoryId], references: [id])
 }
 
 model Category {
@@ -148,10 +148,11 @@ model Invite {
   invitedBy User    @relation("InvitedBy", fields: [invitedById], references: [id])
 }
 
-model Like {
-  id        Int    @id @default(autoincrement())
+model Favorite {
+  id        Int      @id @default(autoincrement())
   userId    String
   productId Int
+  createdAt DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
