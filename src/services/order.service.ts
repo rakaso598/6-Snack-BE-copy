@@ -91,6 +91,9 @@ const updateOrder = async (
     // 2. Order 상태 업데이트(승인 or 반려)
     const updatedOrder = await orderRepository.updateOrder(orderId, body, tx);
 
+    // 2-1. 반려일 때 얼리 리턴
+    if (body.status === "REJECTED") return updatedOrder;
+
     // 3. 예산 조회
     const monthlyBudget = await budgetRepository.getMonthlyBudget({ companyId, year, month });
 
