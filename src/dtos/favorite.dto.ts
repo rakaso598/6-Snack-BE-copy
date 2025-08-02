@@ -3,6 +3,6 @@ export type TFavoriteParamsDto = {
 };
 
 export type TGetFavoritesQueryDto = {
-  cursor: string | undefined;
+  cursor?: string;
   limit: string;
 };

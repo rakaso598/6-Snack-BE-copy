@@ -1,4 +1,4 @@
 export type TGetFavoritesQuery = {
-  cursor: number | undefined;
+  cursor?: number | undefined;
   limit: number;
 };
