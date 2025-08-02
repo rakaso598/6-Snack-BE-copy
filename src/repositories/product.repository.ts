@@ -7,24 +7,6 @@ import type {
   TProductWithFavorite,
 } from "../types/product.types";
 
-// 사용자가 찜한 상품 ID 목록을 가져오는 함수
-const getFavoritesForUser = async (userId: string, tx?: Prisma.TransactionClient) => {
-  const client = tx || prisma;
-
-  const favorites = await client.like.findMany({
-    where: {
-      userId: userId,
-    },
-    select: {
-      productId: true,
-    },
-  });
-
-  const productIds = favorites.map((favorite) => favorite.productId);
-
-  return productIds;
-};
-
 // 전체 상품을 조건에 맞게 조회 (찜한 상품 여부 포함)
 const findManyAll = async (
   options: TProductQueryOptions = {},
@@ -35,15 +17,12 @@ const findManyAll = async (
 
   const categoryIds = await getCategory(category, client);
 
-  // 사용자가 찜한 상품 ID 목록 가져오기
-  const favoriteProductIds = userId ? await getFavoritesForUser(userId, client) : [];
-
   if (sort === "popular") {
     return findManyAllPopular({
       categoryIds,
       take,
       skip: cursor ? 1 : 0,
-      favoriteProductIds,
+      userId,
     });
   }
 
@@ -63,12 +42,18 @@ const findManyAll = async (
     include: {
       category: true,
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
   });
 
   return products.map((product) => ({
     ...product,
-    isFavorite: favoriteProductIds.includes(product.id),
+    isFavorite: product.favorites && product.favorites.length > 0,
   }));
 };
 
@@ -77,12 +62,12 @@ const findManyAllPopular = async ({
   categoryIds,
   skip = 0,
   take = 6,
-  favoriteProductIds = [],
+  userId,
 }: {
   categoryIds?: number[];
   skip?: number;
   take?: number;
-  favoriteProductIds?: number[];
+  userId?: string;
 }): Promise<TProductWithFavorite[]> => {
   const products = await prisma.product.findMany({
     where: {
@@ -92,6 +77,12 @@ const findManyAllPopular = async ({
     include: {
       category: true,
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
     orderBy: {
       cumulativeSales: "desc",
@@ -102,7 +93,7 @@ const findManyAllPopular = async ({
 
   return products.map((product) => ({
     ...product,
-    isFavorite: favoriteProductIds.includes(product.id),
+    isFavorite: product.favorites && product.favorites.length > 0,
   }));
 };
 
@@ -134,28 +125,20 @@ const findById = async (
     include: {
       category: true,
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
   });
 
   if (!product) return null;
 
-  // 사용자가 찜한 상품인지 확인
-  let isFavorite = false;
-  if (userId) {
-    const favorite = await client.like.findUnique({
-      where: {
-        userId_productId: {
-          userId,
-          productId: id,
-        },
-      },
-    });
-    isFavorite = !!favorite;
-  }
-
   return {
     ...product,
-    isFavorite,
+    isFavorite: product.favorites && product.favorites.length > 0,
   };
 };
 
@@ -178,9 +161,6 @@ const findManyCreator = async (
 ): Promise<TProductWithFavorite[]> => {
   const client = tx || prisma;
 
-  // 사용자가 찜한 상품 ID 목록 가져오기
-  const favoriteProductIds = userId ? await getFavoritesForUser(userId, client) : [];
-
   const products = await client.product.findMany({
     where: { creatorId, deletedAt: null },
     skip,
@@ -188,13 +168,19 @@ const findManyCreator = async (
     include: {
       category: true,
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
     orderBy,
   });
 
   return products.map((product) => ({
     ...product,
-    isFavorite: favoriteProductIds.includes(product.id),
+    isFavorite: product.favorites && product.favorites.length > 0,
   }));
 };
 
@@ -222,28 +208,20 @@ const findProductById = async (
         },
       },
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
   });
 
   if (!product) return null;
 
-  // 사용자가 찜한 상품인지 확인
-  let isFavorite = false;
-  if (userId) {
-    const favorite = await client.like.findUnique({
-      where: {
-        userId_productId: {
-          userId,
-          productId: id,
-        },
-      },
-    });
-    isFavorite = !!favorite;
-  }
-
   return {
     ...product,
-    isFavorite,
+    isFavorite: product.favorites && product.favorites.length > 0,
   };
 };
 const update = async (id: number, data: Partial<TCreateProductParams>, tx?: Prisma.TransactionClient) => {
