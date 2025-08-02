@@ -3,20 +3,20 @@ import { BadRequestError } from "../types/error";
 import { TGetFavoritesQuery } from "../types/favorite.types";
 
 const getFavorites = async (userId: string, params: TGetFavoritesQuery) => {
-  const { limit, page } = params;
-  const offset = (page - 1) * limit;
+  const { cursor, limit } = params;
 
-  const favorites = await favoriteRepository.getFavorites(userId, { offset, limit });
+  const favorites = await favoriteRepository.getFavorites(userId, { cursor, limit });
 
   const totalCount = await favoriteRepository.getFavoritesTotalCount(userId);
 
-  const formattedFavorites = favorites.map(({ product, ...favorite }) => {
-    return { ...product };
-  });
+  const formattedFavorites = favorites.map((favorite) => ({
+    id: favorite.id,
+    product: favorite.product,
+  }));
 
   return {
-    products: formattedFavorites,
-    meta: { totalCount, itemsPerPage: limit, totalPage: Math.ceil(totalCount / limit), currentPage: page },
+    favorites: formattedFavorites,
+    meta: { totalCount, itemsPerPage: limit, totalPage: Math.ceil(totalCount / limit) },
   };
 };
 
