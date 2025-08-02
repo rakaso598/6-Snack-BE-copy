@@ -1,3 +1,4 @@
-export type TFavoriteParamsDto = {
-  productId: string;
+export type TGetFavoritesQuery = {
+  cursor: number | undefined;
+  limit: number;
 };

@@ -1,14 +1,23 @@
 import favoriteRepository from "../repositories/favorite.repository";
 import { BadRequestError } from "../types/error";
+import { TGetFavoritesQuery } from "../types/favorite.types";
 
-const getFavorites = async (userId: string) => {
-  const favorites = await favoriteRepository.getFavorites(userId);
+const getFavorites = async (userId: string, params: TGetFavoritesQuery) => {
+  const { cursor, limit } = params;
 
-  const formattedFavorites = favorites.map(({ product, ...favorite }) => {
-    return { ...product };
-  });
+  const favorites = await favoriteRepository.getFavorites(userId, { cursor, limit });
 
-  return formattedFavorites;
+  const totalCount = await favoriteRepository.getFavoritesTotalCount(userId);
+
+  const formattedFavorites = favorites.map((favorite) => ({
+    id: favorite.id,
+    product: favorite.product,
+  }));
+
+  return {
+    favorites: formattedFavorites,
+    meta: { totalCount, itemsPerPage: limit, totalPage: Math.ceil(totalCount / limit) },
+  };
 };
 
 const createFavorite = async (userId: string, productId: number) => {

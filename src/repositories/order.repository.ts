@@ -1,6 +1,6 @@
 import { Company, Order, Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
-import { TGetOrdersQuery, TGetOrderStatus } from "../types/order.types";
+import { TGetOrdersQuery, TGetOrdersRepositoryQuery, TGetOrderStatus } from "../types/order.types";
 
 const SORT_OPTIONS: Record<"latest" | "priceLow" | "priceHigh", Prisma.OrderOrderByWithRelationInput> = {
   latest: { createdAt: "desc" },
@@ -13,7 +13,7 @@ const STATUS_OPTIONS: TGetOrderStatus = {
   approved: "APPROVED",
 };
 
-const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersQuery, companyId: Company["id"]) => {
+const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersRepositoryQuery, companyId: Company["id"]) => {
   return await prisma.order.findMany({
     where: { status: STATUS_OPTIONS[status], companyId },
     skip: offset,
