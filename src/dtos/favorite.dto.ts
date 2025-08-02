@@ -3,7 +3,6 @@ export type TFavoriteParamsDto = {
 };
 
 export type TGetFavoritesQueryDto = {
-  page: string;
+  cursor: string | undefined;
   limit: string;
-  orderBy: "latest";
 };

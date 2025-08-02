@@ -1,13 +1,16 @@
 import prisma from "../config/prisma";
 import { Product, User } from "@prisma/client";
-import { TGetFavoritesRepositoryQuery } from "../types/favorite.types";
+import { TGetFavoritesQuery } from "../types/favorite.types";
 
-const getFavorites = async (userId: User["id"], params: TGetFavoritesRepositoryQuery) => {
-  const { offset, limit } = params;
+const getFavorites = async (userId: User["id"], params: TGetFavoritesQuery) => {
+  const { cursor, limit } = params;
 
   return await prisma.favorite.findMany({
     where: { userId },
-    skip: offset,
+    ...(cursor && {
+      skip: 1,
+      cursor: { id: cursor },
+    }),
     take: limit,
     orderBy: { createdAt: "desc" },
     include: {
