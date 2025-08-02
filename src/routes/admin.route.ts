@@ -1,14 +1,19 @@
 import { Router } from "express";
 import adminOrderRouter from "./adminOrder.route";
-import adminBudgetRouter from "./adminBudget.route";
 import authenticateToken from "../middlewares/jwtAuth.middleware";
 import authorizeRoles from "../middlewares/authorizeRoles.middleware";
 import productController from "../controllers/product.controller";
+import budgetController from "../controllers/budget.controller";
 
 const adminRouter = Router();
 
 adminRouter.use("/orders", adminOrderRouter);
-adminRouter.use("/:companyId/budgets", adminBudgetRouter);
+adminRouter.get(
+  "/:companyId/budgets",
+  authenticateToken,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  budgetController.getMonthlyBudget,
+);
 adminRouter.delete(
   "/products/:id",
   authenticateToken,
