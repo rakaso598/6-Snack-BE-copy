@@ -39,11 +39,11 @@ Cookie: accessToken={{accessToken}}
 }
 
 ### 관리자 - 구매내역 조회 (대기)
-GET {{BASE_URL}}/admin/orders?status=pending&offset=0&limit=4&orderBy=latest
+GET {{BASE_URL}}/admin/orders?status=pending&page=1&limit=4&orderBy=latest
 Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 조회 (승인)
-GET {{BASE_URL}}/admin/orders?status=approved&offset=0&limit=4&orderBy=latest
+GET {{BASE_URL}}/admin/orders?status=approved&page=1&limit=4&orderBy=latest
 Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 상세 조회 (대기)

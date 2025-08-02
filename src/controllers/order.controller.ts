@@ -6,7 +6,7 @@ import { AuthenticationError } from "../types/error";
 
 // 구매내역 조회(대기 or 승인)
 const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, res, next) => {
-  const offset = parseNumberOrThrow(req.query.offset ?? "0", "offset");
+  const page = parseNumberOrThrow(req.query.page ?? "1", "page");
   const limit = parseNumberOrThrow(req.query.limit ?? "4", "limit");
   const { orderBy, status } = req.query;
   const user = req.user;
@@ -15,7 +15,7 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
 
   const companyId = user.companyId;
 
-  const orderList = await orderService.getOrders({ offset, limit, orderBy, status }, companyId);
+  const orderList = await orderService.getOrders({ page, limit, orderBy, status }, companyId);
 
   res.status(200).json(orderList);
 };
