@@ -12,11 +12,14 @@ describe("AuthController", () => {
   let mockNext: NextFunction;
 
   beforeEach(() => {
-    mockRequest = {};
+    mockRequest = {
+      cookies: {}
+    };
     mockResponse = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
       cookie: jest.fn(),
+      clearCookie: jest.fn(),
     };
     mockNext = jest.fn();
     jest.clearAllMocks();
@@ -129,6 +132,72 @@ describe("AuthController", () => {
 
       // Act
       await AuthController.login(mockRequest as Request, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+  });
+
+  describe("logout", () => {
+    it("should logout successfully", async () => {
+      // Arrange
+      mockRequest.user = { id: "user123", email: "user@test.com" } as any;
+      
+      mockAuthService.logout.mockResolvedValue(undefined);
+
+      // Act
+      await AuthController.logout(mockRequest as Request, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockAuthService.logout).toHaveBeenCalledWith("user123");
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: "성공적으로 로그아웃되었습니다."
+      });
+    });
+
+    it("should handle unauthenticated user", async () => {
+      // Arrange
+      mockRequest.user = undefined;
+
+      // Act
+      await AuthController.logout(mockRequest as Request, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
+    });
+  });
+
+  describe("refreshToken", () => {
+    it("should refresh token successfully", async () => {
+      // Arrange
+      mockRequest.cookies = { refreshToken: "valid-refresh-token" };
+      
+      const mockResult = {
+        newAccessToken: "new-access-token",
+        newRefreshToken: "new-refresh-token",
+        user: { email: "user@test.com" }
+      };
+      
+      mockAuthService.refreshAccessToken.mockResolvedValue(mockResult as any);
+
+      // Act
+      await AuthController.refreshToken(mockRequest as Request, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockAuthService.refreshAccessToken).toHaveBeenCalledWith("valid-refresh-token");
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: "새로운 Access Token이 발급되었습니다."
+      });
+    });
+
+    it("should handle missing refresh token", async () => {
+      // Arrange
+      mockRequest.cookies = {};
+
+      // Act
+      await AuthController.refreshToken(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));

@@ -1,13 +1,16 @@
 import { AuthService } from "./auth.service";
 import authRepository from "../repositories/auth.repository";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 // Mock dependencies
 jest.mock("../repositories/auth.repository");
 jest.mock("bcrypt");
+jest.mock("jsonwebtoken");
 
 const mockAuthRepository = authRepository as jest.Mocked<typeof authRepository>;
 const mockBcrypt = bcrypt as jest.Mocked<typeof bcrypt>;
+const mockJwt = jwt as jest.Mocked<typeof jwt>;
 
 describe("AuthService", () => {
   beforeEach(() => {
@@ -100,6 +103,59 @@ describe("AuthService", () => {
 
       // Act & Assert
       await expect(AuthService.signUpViaInvite("invalid", "password")).rejects.toThrow("유효하지 않은 초대 링크입니다.");
+    });
+  });
+
+  describe("logout", () => {
+    it("should logout successfully", async () => {
+      // Arrange
+      const userId = "user123";
+      mockAuthRepository.updateUserRefreshToken.mockResolvedValue(undefined as any);
+
+      // Act
+      await AuthService.logout(userId);
+
+      // Assert
+      expect(mockAuthRepository.updateUserRefreshToken).toHaveBeenCalledWith("user123", null);
+    });
+  });
+
+  describe("refreshAccessToken", () => {
+    it("should refresh access token successfully", async () => {
+      // Arrange
+      const refreshToken = "valid-refresh-token";
+      const mockUser = {
+        id: "user123",
+        email: "user@test.com",
+        hashedRefreshToken: "hashed-refresh-token"
+      };
+
+      (mockJwt.verify as any).mockReturnValue({ userId: "user123", email: "user@test.com" });
+      mockAuthRepository.findUserById.mockResolvedValue(mockUser as any);
+      (mockBcrypt.compare as any).mockResolvedValue(true);
+      (mockJwt.sign as any).mockReturnValueOnce("new-access-token").mockReturnValueOnce("new-refresh-token");
+      (mockBcrypt.hash as any).mockResolvedValue("new-hashed-refresh-token");
+      mockAuthRepository.updateUserRefreshToken.mockResolvedValue(undefined as any);
+
+      // Act
+      const result = await AuthService.refreshAccessToken(refreshToken);
+
+      // Assert
+      expect(result).toEqual({
+        newAccessToken: "new-access-token",
+        newRefreshToken: "new-refresh-token",
+        user: mockUser
+      });
+      expect(mockAuthRepository.updateUserRefreshToken).toHaveBeenCalledWith("user123", "new-hashed-refresh-token");
+    });
+
+    it("should throw error when user not found", async () => {
+      // Arrange
+      (mockJwt.verify as any).mockReturnValue({ userId: "user123", email: "user@test.com" });
+      mockAuthRepository.findUserById.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(AuthService.refreshAccessToken("invalid-token")).rejects.toThrow("유효하지 않은 리프레시 토큰입니다.");
     });
   });
 });
