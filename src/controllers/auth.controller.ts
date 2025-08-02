@@ -5,7 +5,42 @@ import { BadRequestError, ValidationError } from "../types/error";
 
 export class AuthController {
   /**
-   * 최고 관리자(SUPER_ADMIN) 회원가입
+   * @swagger
+   * /auth/signup:
+   *   post:
+   *     summary: 최고 관리자(SUPER_ADMIN) 회원가입
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - email
+   *               - name
+   *               - password
+   *               - confirmPassword
+   *               - companyName
+   *               - bizNumber
+   *             properties:
+   *               email:
+   *                 type: string
+   *               name:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *               confirmPassword:
+   *                 type: string
+   *               companyName:
+   *                 type: string
+   *               bizNumber:
+   *                 type: string
+   *     responses:
+   *       201:
+   *         description: 회원가입 성공
+   *       400:
+   *         description: 잘못된 요청
    */
   static async signUpSuperAdmin(req: Request, res: Response, next: NextFunction) {
     try {
@@ -65,7 +100,36 @@ export class AuthController {
   }
 
   /**
-   * 초대 링크를 통한 사용자 회원가입
+   * @swagger
+   * /auth/signup/{inviteId}:
+   *   post:
+   *     summary: 초대 링크를 통한 회원가입
+   *     tags: [Auth]
+   *     parameters:
+   *       - in: path
+   *         name: inviteId
+   *         required: true
+   *         schema:
+   *           type: string
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - password
+   *               - confirmPassword
+   *             properties:
+   *               password:
+   *                 type: string
+   *               confirmPassword:
+   *                 type: string
+   *     responses:
+   *       201:
+   *         description: 회원가입 성공
+   *       400:
+   *         description: 잘못된 요청
    */
   static async signUpViaInvite(req: Request, res: Response, next: NextFunction) {
     try {
@@ -102,7 +166,30 @@ export class AuthController {
   }
 
   /**
-   * 사용자 로그인
+   * @swagger
+   * /auth/login:
+   *   post:
+   *     summary: 사용자 로그인
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - email
+   *               - password
+   *             properties:
+   *               email:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: 로그인 성공
+   *       400:
+   *         description: 잘못된 요청
    */
   static async login(req: Request, res: Response, next: NextFunction) {
     try {
@@ -154,7 +241,18 @@ export class AuthController {
   }
 
   /**
-   * Access Token 갱신
+   * @swagger
+   * /auth/refresh-token:
+   *   post:
+   *     summary: Access Token 갱신
+   *     tags: [Auth]
+   *     requestBody:
+   *       required: false
+   *     responses:
+   *       200:
+   *         description: 토큰 갱신 성공
+   *       400:
+   *         description: 잘못된 요청
    */
   static async refreshToken(req: Request, res: Response, next: NextFunction) {
     try {
@@ -194,7 +292,16 @@ export class AuthController {
   }
 
   /**
-   * 사용자 로그아웃
+   * @swagger
+   * /auth/logout:
+   *   post:
+   *     summary: 사용자 로그아웃
+   *     tags: [Auth]
+   *     responses:
+   *       200:
+   *         description: 로그아웃 성공
+   *       400:
+   *         description: 잘못된 요청
    */
   static async logout(req: Request, res: Response, next: NextFunction) {
     try {
