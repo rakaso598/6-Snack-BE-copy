@@ -106,7 +106,7 @@ model CartItem {
 model Receipt {
   id          Int      @id @default(autoincrement())
   productId   Int
-  orderId     Int
+  orderId     String
   productName String
   price       Int
   imageUrl    String
@@ -118,7 +118,7 @@ model Receipt {
 }
 
 model Order {
-  id             Int         @id @default(autoincrement())
+  id             String      @id @default(uuid())
   companyId      Int
   userId         String
   approver       String?
@@ -130,8 +130,24 @@ model Order {
   status         OrderStatus
 
   receipts Receipt[]
+  payment  Payment[]
   user     User      @relation("UserOrders", fields: [userId], references: [id])
   company  Company   @relation(fields: [companyId], references: [id])
+}
+
+model Payment {
+  id             Int     @id @default(autoincrement())
+  paymentKey     String
+  orderId        String
+  orderName      String
+  method         String?
+  requestedAt    String
+  approvedAt     String?
+  totalAmount    Int
+  suppliedAmount Int
+  vat            Int
+
+  order Order @relation(fields: [orderId], references: [id])
 }
 
 model Invite {
