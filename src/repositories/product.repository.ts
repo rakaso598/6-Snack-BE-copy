@@ -1,11 +1,19 @@
 import prisma from "../config/prisma";
 import { Prisma, Product } from "@prisma/client";
-import type { TProductQueryOptions, TCreatorQueryOptions, TCreateProductParams } from "../types/product.types";
+import type {
+  TProductQueryOptions,
+  TCreatorQueryOptions,
+  TCreateProductParams,
+  TProductWithFavorite,
+} from "../types/product.types";
 
-// 전체 상품을 조건에 맞게 조회
-const findManyAll = async (options: TProductQueryOptions = {}, tx?: Prisma.TransactionClient) => {
+// 전체 상품을 조건에 맞게 조회 (찜한 상품 여부 포함)
+const findManyAll = async (
+  options: TProductQueryOptions = {},
+  tx?: Prisma.TransactionClient,
+): Promise<TProductWithFavorite[]> => {
   const client = tx || prisma;
-  const { sort = "latest", category, take = 9, cursor } = options;
+  const { sort = "latest", category, take = 9, cursor, userId } = options;
 
   const categoryIds = await getCategory(category, client);
 
@@ -14,6 +22,7 @@ const findManyAll = async (options: TProductQueryOptions = {}, tx?: Prisma.Trans
       categoryIds,
       take,
       skip: cursor ? 1 : 0,
+      userId,
     });
   }
 
@@ -21,7 +30,7 @@ const findManyAll = async (options: TProductQueryOptions = {}, tx?: Prisma.Trans
   if (sort === "high") orderBy = { price: "desc" };
   if (sort === "low") orderBy = { price: "asc" };
 
-  return client.product.findMany({
+  const products = await client.product.findMany({
     where: {
       deletedAt: null,
       ...(categoryIds ? { categoryId: { in: categoryIds } } : {}),
@@ -33,21 +42,34 @@ const findManyAll = async (options: TProductQueryOptions = {}, tx?: Prisma.Trans
     include: {
       category: true,
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
   });
+
+  return products.map((product) => ({
+    ...product,
+    isFavorite: product.favorites && product.favorites.length > 0,
+  }));
 };
 
-// 인기 상품 전용 정렬
+// 인기 상품 전용 정렬 (찜한 상품 여부 포함)
 const findManyAllPopular = async ({
   categoryIds,
   skip = 0,
   take = 6,
+  userId,
 }: {
   categoryIds?: number[];
   skip?: number;
   take?: number;
-}) => {
-  return prisma.product.findMany({
+  userId?: string;
+}): Promise<TProductWithFavorite[]> => {
+  const products = await prisma.product.findMany({
     where: {
       deletedAt: null,
       ...(categoryIds ? { categoryId: { in: categoryIds } } : {}),
@@ -55,6 +77,12 @@ const findManyAllPopular = async ({
     include: {
       category: true,
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
     orderBy: {
       cumulativeSales: "desc",
@@ -62,6 +90,11 @@ const findManyAllPopular = async ({
     skip,
     take,
   });
+
+  return products.map((product) => ({
+    ...product,
+    isFavorite: product.favorites && product.favorites.length > 0,
+  }));
 };
 
 // 카테고리 + 하위 카테고리 ID 조회
@@ -79,16 +112,34 @@ const getCategory = async (
   return [category, ...subCategories.map((c) => c.id)];
 };
 
-// ID로 단일 상품 조회
-const findById = (id: number, tx?: Prisma.TransactionClient) => {
+// ID로 단일 상품 조회 (찜한 상품 여부 포함)
+const findById = async (
+  id: number,
+  userId?: string,
+  tx?: Prisma.TransactionClient,
+): Promise<TProductWithFavorite | null> => {
   const client = tx || prisma;
-  return client.product.findFirst({
+
+  const product = await client.product.findFirst({
     where: { id, deletedAt: null },
     include: {
       category: true,
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
   });
+
+  if (!product) return null;
+
+  return {
+    ...product,
+    isFavorite: product.favorites && product.favorites.length > 0,
+  };
 };
 
 // 새로운 상품 생성
@@ -97,23 +148,40 @@ const create = (data: TCreateProductParams, tx?: Prisma.TransactionClient) => {
   return client.product.create({ data });
 };
 
-// 특정 사용자의 상품 목록 조회
-const findManyCreator = (
-  { creatorId, skip = 0, take = 10, orderBy = { createdAt: "desc" } }: TCreatorQueryOptions,
+// 특정 사용자의 상품 목록 조회 (찜한 상품 여부 포함)
+const findManyCreator = async (
+  {
+    creatorId,
+    skip = 0,
+    take = 10,
+    orderBy = { createdAt: "desc" },
+    userId,
+  }: TCreatorQueryOptions & { userId?: string },
   tx?: Prisma.TransactionClient,
-) => {
+): Promise<TProductWithFavorite[]> => {
   const client = tx || prisma;
 
-  return client.product.findMany({
+  const products = await client.product.findMany({
     where: { creatorId, deletedAt: null },
     skip,
     take,
     include: {
       category: true,
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
     orderBy,
   });
+
+  return products.map((product) => ({
+    ...product,
+    isFavorite: product.favorites && product.favorites.length > 0,
+  }));
 };
 
 // 특정 사용자 상품 총 개수 조회
@@ -124,19 +192,37 @@ const countCreator = (creatorId: string, tx?: Prisma.TransactionClient) => {
   });
 };
 
-const findProductById = async (id: number, tx?: Prisma.TransactionClient) => {
+const findProductById = async (
+  id: number,
+  userId?: string,
+  tx?: Prisma.TransactionClient,
+): Promise<TProductWithFavorite | null> => {
   const client = tx || prisma;
-  return await client.product.findFirst({
+
+  const product = await client.product.findFirst({
     where: { id, deletedAt: null },
     include: {
       category: {
         include: {
-          parent: true, // ✅ 대분류 카테고리 정보 포함
+          parent: true,
         },
       },
       creator: true,
+      favorites: userId
+        ? {
+            where: { userId },
+            select: { id: true },
+          }
+        : false,
     },
   });
+
+  if (!product) return null;
+
+  return {
+    ...product,
+    isFavorite: product.favorites && product.favorites.length > 0,
+  };
 };
 const update = async (id: number, data: Partial<TCreateProductParams>, tx?: Prisma.TransactionClient) => {
   const client = tx || prisma;

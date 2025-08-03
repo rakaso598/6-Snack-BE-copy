@@ -39,12 +39,12 @@ const createProduct = async (input: TCreateProductParams, tx?: Prisma.Transactio
     throw new ServerError("상품 생성에 실패했습니다.");
   }
 
-  return productRepository.findById(product.id, tx);
+  return productRepository.findById(product.id, undefined, tx);
 };
 
 // 상품 ID로 단일 상품 조회
-const getProductById = async (id: number, tx?: Prisma.TransactionClient) => {
-  const product = await productRepository.findProductById(id, tx);
+const getProductById = async (id: number, userId?: string, tx?: Prisma.TransactionClient) => {
+  const product = await productRepository.findProductById(id, userId, tx);
 
   if (!product) {
     throw new NotFoundError("상품을 찾을 수 없습니다.");
@@ -62,6 +62,7 @@ const getProductList = async (options: TProductQueryOptions, tx?: Prisma.Transac
 const getProductsCreator = async (
   options: Pick<TProductQueryOptions, "creatorId" | "skip" | "take"> & {
     orderBy?: { createdAt?: "asc" | "desc"; price?: "asc" | "desc" };
+    userId?: string;
   },
   tx?: Prisma.TransactionClient,
 ) => {
@@ -76,6 +77,7 @@ const getProductsCreator = async (
         skip: options.skip,
         take: options.take,
         orderBy: options.orderBy,
+        userId: options.userId,
       },
       tx,
     ),
@@ -96,13 +98,22 @@ const updateProduct = async (
   input: Partial<TCreateProductParams>,
   tx?: Prisma.TransactionClient,
 ) => {
-  const existing = await productRepository.findProductById(productId, tx);
+  const existing = await productRepository.findProductById(productId, undefined, tx);
 
-  if (!existing || existing.creatorId !== creatorId) {
-    throw new NotFoundError("수정할 수 있는 상품이 없거나 권한이 없습니다.");
+  if (!existing) {
+    throw new NotFoundError("상품을 찾을 수 없습니다.");
   }
 
-  return await productRepository.update(productId, input, tx);
+  if (existing.creatorId !== creatorId) {
+    throw new AuthenticationError("상품을 수정할 권한이 없습니다.");
+  }
+
+  const updated = await productRepository.update(productId, input, tx);
+  if (!updated) {
+    throw new ServerError("상품 수정에 실패했습니다.");
+  }
+
+  return productRepository.findProductById(productId, undefined, tx);
 };
 
 const deleteProduct = async (id: number, tx?: Prisma.TransactionClient) => {

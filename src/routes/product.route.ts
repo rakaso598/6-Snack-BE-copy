@@ -10,6 +10,6 @@ router.post("/", authenticateToken, upload.single("image"), productController.cr
 router.get("/:id", authenticateToken, productController.getProductDetail);
 router.patch("/:id", authenticateToken, productController.updateProduct);
 router.delete("/:id", authenticateToken, productController.deleteProduct);
-router.get("/", productController.getProducts);
+router.get("/", authenticateToken, productController.getProducts);
 
 export default router;

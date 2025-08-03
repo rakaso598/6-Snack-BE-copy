@@ -4,7 +4,7 @@
 GET {{BASE_URL}}/favorites?cursor=3&limit=6
 
 ### 찜하기
-POST {{BASE_URL}}/favorites/1
+POST {{BASE_URL}}/favorites/7
 
 ### 찜 해제하기
-DELETE {{BASE_URL}}/favorites/1
+DELETE {{BASE_URL}}/favorites/8
