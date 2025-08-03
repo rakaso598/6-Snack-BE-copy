@@ -9,7 +9,7 @@ import { cartItemMockData } from "./mocks/cart-item.mock";
 import { orderMockData } from "./mocks/order.mock";
 import { receiptMockData } from "./mocks/receipt.mock";
 import { inviteMockData } from "./mocks/invite.mock";
-import { likeMockData } from "./mocks/like.mock";
+import { favoriteMockData } from "./mocks/favorite.mock";
 
 const prisma = new PrismaClient();
 
@@ -27,9 +27,9 @@ async function main() {
   console.log("🗑️ Deleting orders...");
   await prisma.order.deleteMany();
 
-  // 3. Like 삭제 (User, Product에 의존)
-  console.log("🗑️ Deleting likes...");
-  await prisma.like.deleteMany();
+  // 3. Favorite 삭제 (User, Product에 의존)
+  console.log("🗑️ Deleting favorites...");
+  await prisma.favorite.deleteMany();
 
   // 4. Invite 삭제 (User, Company에 의존)
   console.log("🗑️ Deleting invites...");
@@ -69,7 +69,7 @@ async function main() {
   await prisma.$executeRaw`ALTER SEQUENCE "CartItem_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "Order_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "Receipt_id_seq" RESTART WITH 1;`;
-  await prisma.$executeRaw`ALTER SEQUENCE "Like_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "Favorite_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "MonthlyBudget_id_seq" RESTART WITH 1;`;
 
   // 1. Company 데이터 삽입
@@ -106,10 +106,11 @@ async function main() {
 
   // 3. MonthlyBudget 데이터 삽입
   console.log("💰 Seeding monthly budgets...");
+  
   await prisma.monthlyBudget.createMany({
     data: monthlyBudgetMockData.map((budget) => ({
       ...budget,
-      companyId: firstCompanyId, // 첫 번째 회사에 할당
+      companyId: budget.companyId === 1 ? firstCompanyId : secondCompanyId,
     })),
     skipDuplicates: true,
   });
@@ -172,11 +173,12 @@ async function main() {
 
   // 7. Order 데이터 삽입
   console.log("📋 Seeding orders...");
+  
   await prisma.order.createMany({
     data: orderMockData.map((order) => ({
       ...order,
-      companyId: firstCompanyId, // 첫 번째 회사에 할당
-      status: order.status as any, // OrderStatus enum으로 캐스팅
+      companyId: order.companyId === 1 ? firstCompanyId : secondCompanyId,
+      status: order.status as any,
     })),
     skipDuplicates: true,
   });
@@ -210,12 +212,12 @@ async function main() {
     skipDuplicates: true,
   });
 
-  // 10. Like 데이터 삽입
-  console.log("❤️ Seeding likes...");
-  await prisma.like.createMany({
-    data: likeMockData.map((like) => ({
-      ...like,
-      productId: productIdMap.get(like.productId), // 실제 생성된 Product id로 매핑
+  // 10. Favorite 데이터 삽입
+  console.log("❤️ Seeding favorites...");
+  await prisma.favorite.createMany({
+    data: favoriteMockData.map((favorite) => ({
+      ...favorite,
+      productId: productIdMap.get(favorite.productId), // 실제 생성된 Product id로 매핑
     })),
     skipDuplicates: true,
   });
