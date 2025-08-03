@@ -4,6 +4,7 @@ import authorizeRoles from "../middlewares/authorizeRoles.middleware";
 import userController from "../controllers/user.controller";
 import companyController from "../controllers/company.controller";
 import budgetController from "../controllers/budget.controller";
+import validateBudgetBody from "../middlewares/validateBudgetBody.middleware";
 
 const superAdminRouter = Router();
 
@@ -34,6 +35,7 @@ superAdminRouter.patch(
   "/:companyId/budgets",
   authenticateToken,
   authorizeRoles("SUPER_ADMIN"),
+  validateBudgetBody,
   budgetController.updateMonthlyBudget,
 );
 

@@ -14,9 +14,11 @@ const getFavorites = async (userId: string, params: TGetFavoritesQuery) => {
     product: favorite.product,
   }));
 
+  const nextCursor = favorites.length === Number(limit) ? favorites[favorites.length - 1].id : undefined;
+
   return {
     favorites: formattedFavorites,
-    meta: { totalCount, itemsPerPage: limit, totalPage: Math.ceil(totalCount / limit) },
+    meta: { totalCount, itemsPerPage: limit, totalPages: Math.ceil(totalCount / limit), nextCursor },
   };
 };
 
