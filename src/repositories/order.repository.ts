@@ -185,7 +185,7 @@ const getOrdersByUserId = async (userId: string, tx?: Prisma.TransactionClient) 
 };
 
 const updateOrderStatus = async (
-  orderId: number,
+  orderId: Order["id"],
   status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELED",
   tx?: Prisma.TransactionClient,
 ) => {

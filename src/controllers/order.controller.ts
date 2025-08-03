@@ -360,7 +360,7 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
 
 // 구매내역 상세 조회(대기 or 승인)
 const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> = async (req, res, next) => {
-  const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
+  const orderId = req.params.orderId;
   const { status } = req.query;
   const user = req.user;
 
@@ -512,7 +512,7 @@ const updateOrder: RequestHandler<TGetOrderParamsDto, {}, TUpdateStatusOrderBody
 
   const approver = user.name;
   const companyId = user.companyId;
-  const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
+  const orderId = req.params.orderId;
   const { adminMessage = "", status } = req.body;
 
   const updatedOrder = await orderService.updateOrder(orderId, companyId, { approver, adminMessage, status });
@@ -553,7 +553,7 @@ const createOrder: RequestHandler<
 
 const getOrderById: RequestHandler<{ orderId: string }> = async (req, res, next) => {
   try {
-    const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
+    const orderId = req.params.orderId;
 
     if (!req.user?.id) {
       throw new AuthenticationError("로그인이 필요합니다.");
@@ -589,7 +589,7 @@ const getOrdersByUserId: RequestHandler = async (req, res, next) => {
 
 const cancelOrder: RequestHandler<{ orderId: string }, {}, { status: "CANCELED" }> = async (req, res, next) => {
   try {
-    const orderId = parseNumberOrThrow(req.params.orderId, "orderId");
+    const orderId = req.params.orderId;
 
     if (!req.user?.id) {
       throw new AuthenticationError("로그인이 필요합니다.");
