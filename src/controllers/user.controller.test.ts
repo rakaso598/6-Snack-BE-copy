@@ -187,4 +187,46 @@ describe("UserController", () => {
       expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
+
+  describe("updatePassword", () => {
+    it("유저 비밀번호 수정이 성공적으로 완료", async () => {
+      // Arrange
+      mockRequest.params = { userId: "user123" };
+      mockRequest.body = {
+        newPassword: "newPassword123",
+        newPasswordConfirm: "newPassword123"
+      };
+      
+      const serviceResponse = {
+        message: "비밀번호가 성공적으로 변경되었습니다."
+      };
+      mockUserService.updatePassword.mockResolvedValue(serviceResponse);
+
+      // Act
+      await userController.updatePassword(mockRequest as any, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockUserService.updatePassword).toHaveBeenCalledWith("user123", mockRequest.body, mockRequest.user);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(serviceResponse);
+    });
+
+    it("유저 비밀번호 수정 시 에러를 처리", async () => {
+      // Arrange
+      mockRequest.params = { userId: "user123" };
+      mockRequest.body = {
+        newPassword: "newPassword123",
+        newPasswordConfirm: "newPassword123"
+      };
+      
+      const error = new Error("자기 자신의 비밀번호만 변경할 수 있습니다.");
+      mockUserService.updatePassword.mockRejectedValue(error);
+
+      // Act
+      await userController.updatePassword(mockRequest as any, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockNext).toHaveBeenCalledWith(error);
+    });
+  });
 });

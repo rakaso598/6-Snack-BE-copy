@@ -187,4 +187,40 @@ describe("UserService", () => {
       );
     });
   });
+
+  describe("updatePassword", () => {
+    test("유저 비밀번호 수정이 성공적으로 완료", async () => {
+      // Arrange
+      const userId = "user123";
+      const passwordData = {
+        newPassword: "newPassword123",
+        newPasswordConfirm: "newPassword123",
+      };
+      const currentUser = { id: "user123", role: "USER" } as any;
+
+      mockUserRepository.updatePassword.mockResolvedValue(currentUser as any);
+
+      // Act
+      const result = await userService.updatePassword(userId, passwordData, currentUser);
+
+      // Assert
+      expect(mockUserRepository.updatePassword).toHaveBeenCalledWith("user123", expect.any(String));
+      expect(result.message).toBe("비밀번호가 성공적으로 변경되었습니다.");
+    });
+
+    test("다른 유저의 비밀번호를 수정하려고 하면 예외 발생", async () => {
+      // Arrange
+      const userId = "other123";
+      const passwordData = {
+        newPassword: "newPassword123",
+        newPasswordConfirm: "newPassword123",
+      };
+      const currentUser = { id: "user123", role: "USER" } as any;
+
+      // Act & Assert
+      await expect(userService.updatePassword(userId, passwordData, currentUser)).rejects.toThrow(
+        "자기 자신의 비밀번호만 변경할 수 있습니다.",
+      );
+    });
+  });
 });
