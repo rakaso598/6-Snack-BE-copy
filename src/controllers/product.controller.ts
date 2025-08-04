@@ -12,6 +12,88 @@ import {
 } from "../dtos/product.dto";
 import { Role } from "@prisma/client";
 
+/**
+ * @swagger
+ * /products:
+ *   post:
+ *     summary: 상품 등록
+ *     description: 새로운 상품을 등록합니다. 이미지 파일 업로드도 지원합니다.
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - price
+ *               - categoryId
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: 상품명 (2-20자)
+ *                 example: "테스트 상품"
+ *               price:
+ *                 type: string
+ *                 description: 가격 (0 이상)
+ *                 example: "10000"
+ *               linkUrl:
+ *                 type: string
+ *                 description: 상품 링크 URL
+ *                 example: "https://example.com"
+ *               categoryId:
+ *                 type: string
+ *                 description: 카테고리 ID
+ *                 example: "1"
+ *               file:
+ *                 type: string
+ *                 format: binary
+ *                 description: 상품 이미지 파일 (선택사항)
+ *     responses:
+ *       201:
+ *         description: 상품이 성공적으로 생성됨
+ *         headers:
+ *           Location:
+ *             description: 생성된 상품의 URL
+ *             schema:
+ *               type: string
+ *               example: "/products/1"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: "테스트 상품"
+ *                 price:
+ *                   type: integer
+ *                   example: 10000
+ *                 linkUrl:
+ *                   type: string
+ *                   example: "https://example.com"
+ *                 imageUrl:
+ *                   type: string
+ *                   example: "https://s3.amazonaws.com/image.jpg"
+ *                 categoryId:
+ *                   type: integer
+ *                   example: 1
+ *                 creatorId:
+ *                   type: string
+ *                   example: "user123"
+ *       401:
+ *         description: 로그인이 필요합니다
+ *       400:
+ *         description: 잘못된 요청 데이터
+ *       500:
+ *         description: 서버 에러
+ */
 //상품등록
 const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res) => {
   try {
@@ -57,6 +139,74 @@ const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res
   }
 };
 
+/**
+ * @swagger
+ * /products:
+ *   get:
+ *     summary: 상품 목록 조회
+ *     description: 상품 목록을 조회합니다. 정렬, 카테고리 필터링, 페이지네이션을 지원합니다.
+ *     tags: [Products]
+ *     parameters:
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [latest, popular, low, high]
+ *         description: 정렬 기준
+ *         example: "latest"
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: 카테고리 ID로 필터링
+ *         example: "1"
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: string
+ *         description: 한 번에 가져올 상품 수 (최대 50)
+ *         example: "9"
+ *       - in: query
+ *         name: cursor
+ *         schema:
+ *           type: string
+ *         description: 커서 기반 페이지네이션을 위한 상품 ID
+ *         example: "10"
+ *     responses:
+ *       200:
+ *         description: 상품 목록 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       name:
+ *                         type: string
+ *                         example: "테스트 상품"
+ *                       price:
+ *                         type: integer
+ *                         example: 10000
+ *                       imageUrl:
+ *                         type: string
+ *                         example: "https://s3.amazonaws.com/image.jpg"
+ *                 nextCursor:
+ *                   type: integer
+ *                   nullable: true
+ *                   description: 다음 페이지를 위한 커서
+ *                   example: 15
+ *       400:
+ *         description: 잘못된 요청 데이터
+ *       500:
+ *         description: 서버 에러
+ */
 //상품 조회
 const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req, res, next) => {
   try {
@@ -89,6 +239,84 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
   }
 };
 
+/**
+ * @swagger
+ * /products/my:
+ *   get:
+ *     summary: 내가 등록한 상품 목록 조회
+ *     description: 현재 로그인한 사용자가 등록한 상품 목록을 조회합니다.
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: string
+ *         description: 페이지 번호 (기본값: 1)
+ *         example: "1"
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: string
+ *         description: 한 페이지당 상품 수 (기본값: 10)
+ *         example: "10"
+ *       - in: query
+ *         name: orderBy
+ *         schema:
+ *           type: string
+ *           enum: [latest, oldest, priceLow, priceHigh]
+ *         description: 정렬 기준 (기본값: latest)
+ *         example: "latest"
+ *     responses:
+ *       200:
+ *         description: 내 상품 목록 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       name:
+ *                         type: string
+ *                         example: "내 상품1"
+ *                       price:
+ *                         type: integer
+ *                         example: 10000
+ *                       imageUrl:
+ *                         type: string
+ *                         example: "https://s3.amazonaws.com/image.jpg"
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                         example: "2024-01-01T00:00:00Z"
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     totalCount:
+ *                       type: integer
+ *                       example: 25
+ *                     currentPage:
+ *                       type: integer
+ *                       example: 1
+ *                     itemsPerPage:
+ *                       type: integer
+ *                       example: 10
+ *                     totalPages:
+ *                       type: integer
+ *                       example: 3
+ *       401:
+ *         description: 로그인이 필요합니다
+ *       500:
+ *         description: 서버 에러
+ */
 // 유저가 등록한 상품 목록
 const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async (req, res, next) => {
   try {
@@ -141,6 +369,81 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
 };
 
 //상품 상세 페이지
+/**
+ * @swagger
+ * /products/{id}:
+ *   get:
+ *     summary: 상품 상세 정보 조회
+ *     description: 특정 상품의 상세 정보를 조회합니다.
+ *     tags: [Products]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 상품 ID
+ *         example: "1"
+ *     responses:
+ *       200:
+ *         description: 상품 상세 정보 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   example: 1
+ *                 name:
+ *                   type: string
+ *                   example: "테스트 상품"
+ *                 price:
+ *                   type: integer
+ *                   example: 10000
+ *                 linkUrl:
+ *                   type: string
+ *                   example: "https://example.com"
+ *                 imageUrl:
+ *                   type: string
+ *                   example: "https://s3.amazonaws.com/image.jpg"
+ *                 categoryId:
+ *                   type: integer
+ *                   example: 1
+ *                 creatorId:
+ *                   type: string
+ *                   example: "user123"
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-01-01T00:00:00Z"
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2024-01-01T00:00:00Z"
+ *                 category:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     name:
+ *                       type: string
+ *                       example: "음료"
+ *                 creator:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: "user123"
+ *                     name:
+ *                       type: string
+ *                       example: "테스트 유저"
+ *       404:
+ *         description: 상품을 찾을 수 없습니다
+ *       500:
+ *         description: 서버 에러
+ */
 export const getProductDetail: RequestHandler<TProductIdParamsDto> = async (req, res, next) => {
   try {
     const id = parseNumberOrThrow(req.params.id, "상품 ID");
@@ -249,6 +552,33 @@ export const forceUpdateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdate
 };
 
 //상품 삭제
+/**
+ * @swagger
+ * /products/{id}:
+ *   delete:
+ *     summary: 상품 삭제
+ *     description: 자신이 등록한 상품을 삭제합니다 (소프트 삭제).
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 삭제할 상품 ID
+ *         example: "1"
+ *     responses:
+ *       204:
+ *         description: 상품 삭제 성공
+ *       401:
+ *         description: 로그인이 필요하거나 권한이 없습니다
+ *       404:
+ *         description: 상품을 찾을 수 없습니다
+ *       500:
+ *         description: 서버 에러
+ */
 export const deleteProduct: RequestHandler<{ id: string }> = async (req, res, next) => {
   try {
     const productId = parseNumberOrThrow(req.params.id, "상품 ID");
@@ -272,6 +602,35 @@ export const deleteProduct: RequestHandler<{ id: string }> = async (req, res, ne
 };
 
 //상품 삭제 어드민
+/**
+ * @swagger
+ * /admin/products/{id}:
+ *   delete:
+ *     summary: 관리자 상품 강제 삭제
+ *     description: 관리자가 모든 상품을 강제로 삭제합니다 (소프트 삭제).
+ *     tags: [Products]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 삭제할 상품 ID
+ *         example: "1"
+ *     responses:
+ *       204:
+ *         description: 상품 강제 삭제 성공
+ *       401:
+ *         description: 로그인이 필요합니다
+ *       403:
+ *         description: 관리자 권한이 필요합니다
+ *       404:
+ *         description: 상품을 찾을 수 없습니다
+ *       500:
+ *         description: 서버 에러
+ */
 export const forceDeleteProduct: RequestHandler<{ id: string }> = async (req, res, next) => {
   try {
     const productId = parseNumberOrThrow(req.params.id, "상품 ID");
@@ -294,6 +653,59 @@ export const forceDeleteProduct: RequestHandler<{ id: string }> = async (req, re
   }
 };
 
+/**
+ * @swagger
+ * /categories:
+ *   get:
+ *     summary: 카테고리 트리 조회
+ *     description: 상품 카테고리의 계층 구조를 조회합니다.
+ *     tags: [Products]
+ *     responses:
+ *       200:
+ *         description: 카테고리 트리 조회 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 parentCategory:
+ *                   type: array
+ *                   description: 부모 카테고리 목록
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         example: 1
+ *                       name:
+ *                         type: string
+ *                         example: "음료"
+ *                 childrenCategory:
+ *                   type: object
+ *                   description: 자식 카테고리 목록 (부모 카테고리명을 키로 사용)
+ *                   additionalProperties:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                           example: 3
+ *                         name:
+ *                           type: string
+ *                           example: "콜라"
+ *                   example:
+ *                     음료:
+ *                       - id: 3
+ *                         name: "콜라"
+ *                       - id: 4
+ *                         name: "사이다"
+ *                     과자:
+ *                       - id: 5
+ *                         name: "초코파이"
+ *       500:
+ *         description: 서버 에러
+ */
 const getCategoryTree: RequestHandler = async (req, res, next) => {
   try {
     const categories = await productService.getCategory();
