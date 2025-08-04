@@ -223,4 +223,67 @@ describe("UserService", () => {
       );
     });
   });
+
+  describe("getUsersByCompany", () => {
+    test("회사 유저 목록 조회가 성공적으로 완료", async () => {
+      // Arrange
+      const currentUser = { 
+        id: "super-admin-id", 
+        role: "SUPER_ADMIN",
+        companyId: 1 
+      } as any;
+      const query = { name: "test", cursor: "user123", limit: 5 };
+      const mockUsers = [
+        { id: "user1", email: "user1@test.com", name: "User1", role: "ADMIN" },
+        { id: "user2", email: "user2@test.com", name: "User2", role: "USER" }
+      ];
+      const mockPagination = {
+        hasNext: false,
+        hasPrev: false
+      };
+
+      mockUserRepository.findUsersByCompanyId.mockResolvedValue({
+        users: mockUsers,
+        pagination: mockPagination
+      } as any);
+
+      // Act
+      const result = await userService.getUsersByCompany(currentUser, query);
+
+      // Assert
+      expect(mockUserRepository.findUsersByCompanyId).toHaveBeenCalledWith(1, "test", "user123", 5);
+      expect(result.message).toBe("회사 유저 목록 조회 완료");
+      expect(result.users).toEqual(mockUsers);
+      expect(result.pagination).toEqual(mockPagination);
+    });
+
+    test("쿼리 파라미터 없이 회사 유저 목록 조회가 성공적으로 완료", async () => {
+      // Arrange
+      const currentUser = { 
+        id: "super-admin-id", 
+        role: "SUPER_ADMIN",
+        companyId: 1 
+      } as any;
+      const query = {};
+      const mockUsers = [
+        { id: "user1", email: "user1@test.com", name: "User1", role: "ADMIN" }
+      ];
+      const mockPagination = {
+        hasNext: false,
+        hasPrev: false
+      };
+
+      mockUserRepository.findUsersByCompanyId.mockResolvedValue({
+        users: mockUsers,
+        pagination: mockPagination
+      } as any);
+
+      // Act
+      const result = await userService.getUsersByCompany(currentUser, query);
+
+      // Assert
+      expect(mockUserRepository.findUsersByCompanyId).toHaveBeenCalledWith(1, undefined, undefined, 5);
+      expect(result.message).toBe("회사 유저 목록 조회 완료");
+    });
+  });
 });

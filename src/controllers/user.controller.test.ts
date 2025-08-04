@@ -194,11 +194,11 @@ describe("UserController", () => {
       mockRequest.params = { userId: "user123" };
       mockRequest.body = {
         newPassword: "newPassword123",
-        newPasswordConfirm: "newPassword123"
+        newPasswordConfirm: "newPassword123",
       };
-      
+
       const serviceResponse = {
-        message: "비밀번호가 성공적으로 변경되었습니다."
+        message: "비밀번호가 성공적으로 변경되었습니다.",
       };
       mockUserService.updatePassword.mockResolvedValue(serviceResponse);
 
@@ -216,14 +216,56 @@ describe("UserController", () => {
       mockRequest.params = { userId: "user123" };
       mockRequest.body = {
         newPassword: "newPassword123",
-        newPasswordConfirm: "newPassword123"
+        newPasswordConfirm: "newPassword123",
       };
-      
+
       const error = new Error("자기 자신의 비밀번호만 변경할 수 있습니다.");
       mockUserService.updatePassword.mockRejectedValue(error);
 
       // Act
       await userController.updatePassword(mockRequest as any, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockNext).toHaveBeenCalledWith(error);
+    });
+  });
+
+  describe("getUsersByCompany", () => {
+    it("회사 유저 목록 조회가 성공적으로 완료", async () => {
+      // Arrange
+      mockRequest.query = { name: "test", cursor: "user123", limit: "5" };
+
+      const serviceResponse = {
+        message: "회사 유저 목록 조회 완료",
+        users: [
+          { id: "user1", email: "user1@test.com", name: "User1", role: "ADMIN" as const },
+          { id: "user2", email: "user2@test.com", name: "User2", role: "USER" as const },
+        ],
+        pagination: {
+          hasNext: false,
+          hasPrev: false,
+        },
+      };
+      mockUserService.getUsersByCompany.mockResolvedValue(serviceResponse);
+
+      // Act
+      await userController.getUsersByCompany(mockRequest as any, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockUserService.getUsersByCompany).toHaveBeenCalledWith(mockRequest.user, mockRequest.query);
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+      expect(mockResponse.json).toHaveBeenCalledWith(serviceResponse);
+    });
+
+    it("회사 유저 목록 조회 시 에러를 처리", async () => {
+      // Arrange
+      mockRequest.query = {};
+
+      const error = new Error("회사 정보를 찾을 수 없습니다");
+      mockUserService.getUsersByCompany.mockRejectedValue(error);
+
+      // Act
+      await userController.getUsersByCompany(mockRequest as any, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockNext).toHaveBeenCalledWith(error);
