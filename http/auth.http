@@ -66,7 +66,7 @@ POST {{url}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "han.backend@codeit.com",
+    "email": "super_admin@codeit.com",
     "password": "1q2w3e4r!"
 }
 

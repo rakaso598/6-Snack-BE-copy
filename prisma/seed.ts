@@ -105,7 +105,7 @@ async function main() {
 
   // 3. MonthlyBudget 데이터 삽입
   console.log("💰 Seeding monthly budgets...");
-  
+
   await prisma.monthlyBudget.createMany({
     data: monthlyBudgetMockData.map((budget) => ({
       ...budget,
@@ -172,7 +172,7 @@ async function main() {
 
   // 7. Order 데이터 삽입
   console.log("📋 Seeding orders...");
-  
+
   await prisma.order.createMany({
     data: orderMockData.map((order) => ({
       ...order,
@@ -191,12 +191,122 @@ async function main() {
 
   // 8. Receipt 데이터 삽입
   console.log("🧾 Seeding receipts...");
+
+  // 각 Order에 맞는 Receipt 데이터를 동적으로 생성
+  const receiptDataToInsert: any[] = [];
+
+  // Order 1: 초코파이 2개 + 칸쵸 1개
+  receiptDataToInsert.push(
+    {
+      productId: productIdMap.get(1),
+      orderId: orderIdMap.get(1),
+      productName: "오리온 초코파이",
+      price: 1500,
+      imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/orion-chocopie.png",
+      quantity: 2,
+      createdAt: new Date("2025-07-15T10:30:00Z"),
+    },
+    {
+      productId: productIdMap.get(6),
+      orderId: orderIdMap.get(1),
+      productName: "롯데 칸쵸",
+      price: 1500,
+      imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/lotte-kancho.png",
+      quantity: 1,
+      createdAt: new Date("2025-07-15T10:30:00Z"),
+    },
+  );
+
+  // Order 2: 새우깡 3개
+  receiptDataToInsert.push({
+    productId: productIdMap.get(3),
+    orderId: orderIdMap.get(2),
+    productName: "농심 새우깡",
+    price: 800,
+    imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/nongshim-saewookang.png",
+    quantity: 3,
+    createdAt: new Date("2025-07-16T14:15:00Z"),
+  });
+
+  // Order 3: 홈런볼 1개 + 산도 1개
+  receiptDataToInsert.push(
+    {
+      productId: productIdMap.get(4),
+      orderId: orderIdMap.get(3),
+      productName: "해태 홈런볼",
+      price: 2500,
+      imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/haetae-homerunball.png",
+      quantity: 1,
+      createdAt: new Date("2025-07-17T09:45:00Z"),
+    },
+    {
+      productId: productIdMap.get(7),
+      orderId: orderIdMap.get(3),
+      productName: "크라운 산도",
+      price: 2000,
+      imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/crown-sando.png",
+      quantity: 1,
+      createdAt: new Date("2025-07-17T09:45:00Z"),
+    },
+  );
+
+  // Order 4: 포카칩 2개
+  receiptDataToInsert.push({
+    productId: productIdMap.get(5),
+    orderId: orderIdMap.get(4),
+    productName: "오리온 포카칩",
+    price: 1600,
+    imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/orion-pocachip.png",
+    quantity: 2,
+    createdAt: new Date("2025-07-18T11:20:00Z"),
+  });
+
+  // Order 5: 고래밥 2개
+  receiptDataToInsert.push({
+    productId: productIdMap.get(8),
+    orderId: orderIdMap.get(5),
+    productName: "오리온 고래밥",
+    price: 900,
+    imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/orion-goraebap.png",
+    quantity: 2,
+    createdAt: new Date("2025-07-19T16:45:00Z"),
+  });
+
+  // Order 6: 마가렛트 2개
+  receiptDataToInsert.push({
+    productId: productIdMap.get(2),
+    orderId: orderIdMap.get(6),
+    productName: "롯데 마가렛트",
+    price: 1400,
+    imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/lotte-margaret.png",
+    quantity: 2,
+    createdAt: new Date("2025-07-20T13:10:00Z"),
+  });
+
+  // Order 7: 초코파이 3개 + 칸쵸 1개
+  receiptDataToInsert.push(
+    {
+      productId: productIdMap.get(1),
+      orderId: orderIdMap.get(7),
+      productName: "오리온 초코파이",
+      price: 1500,
+      imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/orion-chocopie.png",
+      quantity: 3,
+      createdAt: new Date("2025-07-21T09:30:00Z"),
+    },
+    {
+      productId: productIdMap.get(6),
+      orderId: orderIdMap.get(7),
+      productName: "롯데 칸쵸",
+      price: 1000,
+      imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/lotte-kancho.png",
+      quantity: 1,
+      createdAt: new Date("2025-07-21T09:30:00Z"),
+    },
+  );
+
   await prisma.receipt.createMany({
-    data: receiptMockData.map((receipt) => ({
-      ...receipt,
-      productId: productIdMap.get(receipt.productId), // 실제 생성된 Product id로 매핑
-      orderId: orderIdMap.get(receipt.orderId), // 실제 생성된 Order id로 매핑
-    })),
+    data: receiptDataToInsert,
     skipDuplicates: true,
   });
 
