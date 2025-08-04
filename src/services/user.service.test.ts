@@ -15,7 +15,7 @@ describe("UserService", () => {
   });
 
   describe("getUserInfo", () => {
-    it("should get user info for regular user", async () => {
+    it("일반 유저 정보 조회가 성공적으로 완료", async () => {
       // Arrange
       const userId = "user123";
       const currentUser = {
@@ -23,7 +23,7 @@ describe("UserService", () => {
         email: "user@test.com",
         name: "Test User",
         role: "USER",
-        company: { name: "Test Company" }
+        company: { name: "Test Company" },
       } as any;
 
       // Act
@@ -35,12 +35,12 @@ describe("UserService", () => {
         user: {
           company: { name: "Test Company" },
           name: "Test User",
-          email: "user@test.com"
-        }
+          email: "user@test.com",
+        },
       });
     });
 
-    it("should get user info for admin user", async () => {
+    it("관리자 유저 정보 조회가 성공적으로 완료", async () => {
       // Arrange
       const userId = "admin123";
       const currentUser = {
@@ -48,7 +48,7 @@ describe("UserService", () => {
         email: "admin@test.com",
         name: "Admin User",
         role: "ADMIN",
-        company: { name: "Test Company" }
+        company: { name: "Test Company" },
       } as any;
 
       // Act
@@ -61,23 +61,25 @@ describe("UserService", () => {
           company: { name: "Test Company" },
           role: "ADMIN",
           name: "Admin User",
-          email: "admin@test.com"
-        }
+          email: "admin@test.com",
+        },
       });
     });
 
-    it("should throw error when user tries to access another user's info", async () => {
+    it("다른 유저 정보 접근 시 에러 발생", async () => {
       // Arrange
       const userId = "other123";
       const currentUser = {
         id: "user123",
         email: "user@test.com",
         name: "Test User",
-        role: "USER"
+        role: "USER",
       } as any;
 
       // Act & Assert
-      await expect(userService.getUserInfo(userId, currentUser)).rejects.toThrow("자기 자신의 정보만 조회할 수 있습니다.");
+      await expect(userService.getUserInfo(userId, currentUser)).rejects.toThrow(
+        "자기 자신의 정보만 조회할 수 있습니다.",
+      );
     });
   });
 
@@ -85,36 +87,50 @@ describe("UserService", () => {
     it("should delete user successfully", async () => {
       // Arrange
       const userId = "user123";
-      const currentUser = { id: "admin123", role: "ADMIN" } as any;
-      
+      const currentUser = { id: "admin123", role: "SUPER_ADMIN" } as any;
+
       const mockUser = { id: "user123", name: "Test User" };
-      const mockResult = { message: "사용자가 성공적으로 삭제되었습니다." };
+      const expectedResult = { message: "사용자가 성공적으로 삭제되었습니다." };
 
       mockUserRepository.findActiveUserById.mockResolvedValue(mockUser as any);
-      (mockUserRepository as any).deleteUser.mockResolvedValue(mockResult);
+      mockUserRepository.deleteUser.mockResolvedValue(mockUser as any);
 
       // Act
       const result = await userService.deleteUser(userId, currentUser);
 
       // Assert
       expect(mockUserRepository.findActiveUserById).toHaveBeenCalledWith("user123");
-      expect(result).toEqual(mockResult);
+      expect(mockUserRepository.deleteUser).toHaveBeenCalledWith("user123");
+      expect(result).toEqual(expectedResult);
     });
 
-    it("should throw error when user not found", async () => {
+    it("유저가 존재하지 않으면 예외 발생", async () => {
       // Arrange
       const userId = "nonexistent";
-      const currentUser = { id: "admin123", role: "ADMIN" } as any;
+      const currentUser = { id: "admin123", role: "SUPER_ADMIN" } as any;
 
       mockUserRepository.findActiveUserById.mockResolvedValue(null);
 
       // Act & Assert
       await expect(userService.deleteUser(userId, currentUser)).rejects.toThrow("유저가 존재하지 않습니다");
     });
+
+    it("최고관리자가 자신을 삭제하려고 하면 예외 발생", async () => {
+      // Arrange
+      const userId = "admin123";
+      const currentUser = { id: "admin123", role: "SUPER_ADMIN" } as any;
+
+      mockUserRepository.findActiveUserById.mockResolvedValue(currentUser as any);
+
+      // Act & Assert
+      await expect(userService.deleteUser(userId, currentUser)).rejects.toThrow(
+        "최고 관리자는 자기 자신을 삭제할 수 없습니다.",
+      );
+    });
   });
 
   describe("getMe", () => {
-    it("should get current user info", async () => {
+    it("현재 유저 정보 조회가 성공적으로 완료", async () => {
       // Arrange
       const userId = "user123";
       const mockUser = {
@@ -122,7 +138,7 @@ describe("UserService", () => {
         email: "user@test.com",
         name: "Test User",
         role: "USER",
-        company: { id: 1, name: "Test Company" }
+        company: { id: 1, name: "Test Company" },
       };
 
       (mockUserRepository as any).findUserWithCompanyById.mockResolvedValue(mockUser);
@@ -135,8 +151,139 @@ describe("UserService", () => {
       expect((mockUserRepository as any).findUserWithCompanyById).toHaveBeenCalledWith("user123");
       expect(result).toEqual({
         ...mockUser,
-        cartItemCount: 0
+        cartItemCount: 0,
       });
+    });
+  });
+
+  describe("updateRole", () => {
+    test("유저 권한 수정이 성공적으로 완료", async () => {
+      // Arrange
+      const userId = "user123";
+      const newRole = "ADMIN";
+      const currentUser = { id: "admin123", role: "SUPER_ADMIN" } as any;
+      const mockUser = { id: "user123", role: "ADMIN" };
+
+      mockUserRepository.findActiveUserById.mockResolvedValue(mockUser as any);
+      mockUserRepository.updateUserRole.mockResolvedValue(mockUser as any);
+
+      // Act
+      const result = await userService.updateRole(userId, newRole, currentUser);
+
+      // Assert
+      expect(mockUserRepository.findActiveUserById).toHaveBeenCalledWith("user123");
+      expect(mockUserRepository.updateUserRole).toHaveBeenCalledWith("user123", "ADMIN");
+      expect(result.message).toBe("사용자 권한이 성공적으로 변경되었습니다.");
+    });
+
+    test("수정할 유저가 존재하지 않으면 예외 발생", async () => {
+      // Arrange
+      const currentUser = { id: "admin123", role: "SUPER_ADMIN" } as any;
+      mockUserRepository.findActiveUserById.mockResolvedValue(null);
+
+      // Act & Assert
+      await expect(userService.updateRole("nonexistent", "ADMIN", currentUser)).rejects.toThrow(
+        "유저가 존재하지 않습니다",
+      );
+    });
+  });
+
+  describe("updatePassword", () => {
+    test("유저 비밀번호 수정이 성공적으로 완료", async () => {
+      // Arrange
+      const userId = "user123";
+      const passwordData = {
+        newPassword: "newPassword123",
+        newPasswordConfirm: "newPassword123",
+      };
+      const currentUser = { id: "user123", role: "USER" } as any;
+
+      mockUserRepository.updatePassword.mockResolvedValue(currentUser as any);
+
+      // Act
+      const result = await userService.updatePassword(userId, passwordData, currentUser);
+
+      // Assert
+      expect(mockUserRepository.updatePassword).toHaveBeenCalledWith("user123", expect.any(String));
+      expect(result.message).toBe("비밀번호가 성공적으로 변경되었습니다.");
+    });
+
+    test("다른 유저의 비밀번호를 수정하려고 하면 예외 발생", async () => {
+      // Arrange
+      const userId = "other123";
+      const passwordData = {
+        newPassword: "newPassword123",
+        newPasswordConfirm: "newPassword123",
+      };
+      const currentUser = { id: "user123", role: "USER" } as any;
+
+      // Act & Assert
+      await expect(userService.updatePassword(userId, passwordData, currentUser)).rejects.toThrow(
+        "자기 자신의 비밀번호만 변경할 수 있습니다.",
+      );
+    });
+  });
+
+  describe("getUsersByCompany", () => {
+    test("회사 유저 목록 조회가 성공적으로 완료", async () => {
+      // Arrange
+      const currentUser = { 
+        id: "super-admin-id", 
+        role: "SUPER_ADMIN",
+        companyId: 1 
+      } as any;
+      const query = { name: "test", cursor: "user123", limit: 5 };
+      const mockUsers = [
+        { id: "user1", email: "user1@test.com", name: "User1", role: "ADMIN" },
+        { id: "user2", email: "user2@test.com", name: "User2", role: "USER" }
+      ];
+      const mockPagination = {
+        hasNext: false,
+        hasPrev: false
+      };
+
+      mockUserRepository.findUsersByCompanyId.mockResolvedValue({
+        users: mockUsers,
+        pagination: mockPagination
+      } as any);
+
+      // Act
+      const result = await userService.getUsersByCompany(currentUser, query);
+
+      // Assert
+      expect(mockUserRepository.findUsersByCompanyId).toHaveBeenCalledWith(1, "test", "user123", 5);
+      expect(result.message).toBe("회사 유저 목록 조회 완료");
+      expect(result.users).toEqual(mockUsers);
+      expect(result.pagination).toEqual(mockPagination);
+    });
+
+    test("쿼리 파라미터 없이 회사 유저 목록 조회가 성공적으로 완료", async () => {
+      // Arrange
+      const currentUser = { 
+        id: "super-admin-id", 
+        role: "SUPER_ADMIN",
+        companyId: 1 
+      } as any;
+      const query = {};
+      const mockUsers = [
+        { id: "user1", email: "user1@test.com", name: "User1", role: "ADMIN" }
+      ];
+      const mockPagination = {
+        hasNext: false,
+        hasPrev: false
+      };
+
+      mockUserRepository.findUsersByCompanyId.mockResolvedValue({
+        users: mockUsers,
+        pagination: mockPagination
+      } as any);
+
+      // Act
+      const result = await userService.getUsersByCompany(currentUser, query);
+
+      // Assert
+      expect(mockUserRepository.findUsersByCompanyId).toHaveBeenCalledWith(1, undefined, undefined, 5);
+      expect(result.message).toBe("회사 유저 목록 조회 완료");
     });
   });
 });
