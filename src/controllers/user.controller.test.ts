@@ -13,7 +13,7 @@ describe("UserController", () => {
 
   beforeEach(() => {
     mockRequest = {
-      user: { id: "user123", email: "test@test.com", role: "ADMIN" } as any
+      user: { id: "user123", email: "test@test.com", role: "ADMIN" } as any,
     };
     mockResponse = {
       status: jest.fn().mockReturnThis(),
@@ -27,14 +27,14 @@ describe("UserController", () => {
     it("should get user info successfully", async () => {
       // Arrange
       mockRequest.params = { userId: "user123" };
-      
+
       const mockUserInfo = {
         id: "user123",
         email: "user@test.com",
         name: "Test User",
-        role: "ADMIN"
+        role: "ADMIN",
       };
-      
+
       mockUserService.getUserInfo.mockResolvedValue(mockUserInfo as any);
 
       // Act
@@ -49,7 +49,7 @@ describe("UserController", () => {
     it("should handle user not found", async () => {
       // Arrange
       mockRequest.params = { userId: "nonexistent" };
-      
+
       const error = new Error("User not found");
       mockUserService.getUserInfo.mockRejectedValue(error);
 
@@ -68,9 +68,9 @@ describe("UserController", () => {
         id: "user123",
         email: "test@test.com",
         name: "Test User",
-        role: "ADMIN"
+        role: "ADMIN",
       };
-      
+
       mockUserService.getMe.mockResolvedValue(mockUserInfo as any);
 
       // Act
@@ -99,8 +99,8 @@ describe("UserController", () => {
       // Arrange
       mockRequest.params = { userId: "user123" };
       mockRequest.body = { role: "MANAGER" };
-      
-      const mockResult = { message: "Role updated successfully" };
+
+      const mockResult = { message: "사용자 권한이 성공적으로 변경되었습니다." };
       mockUserService.updateRole.mockResolvedValue(mockResult as any);
 
       // Act
@@ -117,8 +117,8 @@ describe("UserController", () => {
     it("should delete user successfully", async () => {
       // Arrange
       mockRequest.params = { userId: "user123" };
-      
-      const mockResult = { message: "User deleted successfully" };
+
+      const mockResult = { message: "사용자가 성공적으로 삭제되었습니다." };
       mockUserService.deleteUser.mockResolvedValue(mockResult as any);
 
       // Act
@@ -128,6 +128,48 @@ describe("UserController", () => {
       expect(mockUserService.deleteUser).toHaveBeenCalledWith("user123", mockRequest.user);
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(mockResult);
+    });
+
+    it("should handle user not found", async () => {
+      // Arrange
+      mockRequest.params = { userId: "nonexistent" };
+
+      const error = new Error("유저가 존재하지 않습니다");
+      mockUserService.deleteUser.mockRejectedValue(error);
+
+      // Act
+      await userController.deleteUser(mockRequest as any, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockNext).toHaveBeenCalledWith(error);
+    });
+
+    it("should handle super admin trying to delete themselves", async () => {
+      // Arrange
+      mockRequest.params = { userId: "user123" }; // 자기 자신을 삭제하려는 상황
+
+      const error = new Error("최고 관리자는 자기 자신을 삭제할 수 없습니다.");
+      mockUserService.deleteUser.mockRejectedValue(error);
+
+      // Act
+      await userController.deleteUser(mockRequest as any, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockNext).toHaveBeenCalledWith(error);
+    });
+
+    it("should handle internal server error", async () => {
+      // Arrange
+      mockRequest.params = { userId: "user123" };
+
+      const error = new Error("데이터베이스 연결 실패");
+      mockUserService.deleteUser.mockRejectedValue(error);
+
+      // Act
+      await userController.deleteUser(mockRequest as any, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockNext).toHaveBeenCalledWith(error);
     });
   });
 });
