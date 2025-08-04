@@ -2,6 +2,42 @@ import { TGetUsersQueryDto, TUpdatePasswordDto, TUpdateRoleDto, TUserIdParamsDto
 import userService from "../services/user.service";
 import { RequestHandler } from "express";
 
+/**
+ * @swagger
+ * /super-admin/users/invite:
+ *   post:
+ *     summary: (최고관리자) 유저 초대
+ *     tags: [SuperAdmin]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - name
+ *               - role
+ *               - companyId
+ *               - invitedById
+ *             properties:
+ *               email:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *               companyId:
+ *                 type: string
+ *               invitedById:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: 초대 성공
+ *       400:
+ *         description: 잘못된 요청
+ */
+
 // 유저 프로필 조회
 const getUserInfo: RequestHandler<TUserIdParamsDto> = async (req, res, next) => {
   try {
