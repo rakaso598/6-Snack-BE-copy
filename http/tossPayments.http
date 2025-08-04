@@ -1,0 +1,11 @@
+@BASE_URL=http://localhost:8080
+
+### 결제 테스트
+POST {{BASE_URL}}/payments/confirm
+Content-Type: application/json
+
+{
+  "paymentKey": "tgen_20250803201607MtVb1",
+  "orderId": "eYUTmd6RKOPf9t3IeY3rX",
+  "amount": "50000"
+}

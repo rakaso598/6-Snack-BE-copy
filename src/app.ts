@@ -34,6 +34,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.get("/health", (req: Request, res: Response) => {
