@@ -12,6 +12,38 @@ import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 import budgetService from "../services/budget.service";
 import { AuthenticationError } from "../types/error";
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Cart
+ *     description: 장바구니 관련 API
+ */
+
+/**
+ * @swagger
+ * /cart:
+ *   get:
+ *     summary: 내 장바구니 조회
+ *     tags: [Cart]
+ *     parameters:
+ *       - in: query
+ *         name: cartItemId
+ *         schema:
+ *           type: string
+ *         description: 특정 장바구니 항목 ID
+ *       - in: query
+ *         name: isChecked
+ *         schema:
+ *           type: string
+ *           enum: [true, false]
+ *         description: 체크된 항목만 조회할지 여부
+ *     responses:
+ *       200:
+ *         description: 장바구니 조회 성공
+ *       401:
+ *         description: 인증 실패
+ */
+
 const getMyCart: RequestHandler = async (req, res, next) => {
   try {
     const user = req.user;
@@ -46,6 +78,33 @@ const getMyCart: RequestHandler = async (req, res, next) => {
   }
 };
 
+/**
+ * @swagger
+ * /cart:
+ *   post:
+ *     summary: 장바구니에 상품 추가
+ *     tags: [Cart]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - productId
+ *               - quantity
+ *             properties:
+ *               productId:
+ *                 type: number
+ *               quantity:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: 장바구니 추가 성공
+ *       400:
+ *         description: 잘못된 요청
+ */
+
 const addToCart: RequestHandler<{}, {}, TAddToCartDto> = async (req, res, next) => {
   try {
     const user = req.user;
@@ -58,6 +117,26 @@ const addToCart: RequestHandler<{}, {}, TAddToCartDto> = async (req, res, next) 
   }
 };
 
+/**
+ * @swagger
+ * /cart/{item}:
+ *   delete:
+ *     summary: 단일 장바구니 항목 삭제
+ *     tags: [Cart]
+ *     parameters:
+ *       - in: path
+ *         name: item
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 장바구니 항목 ID
+ *     responses:
+ *       204:
+ *         description: 삭제 성공
+ *       400:
+ *         description: 잘못된 요청
+ */
+
 const deleteSelectedItems: RequestHandler<{}, {}, TDeleteCartItemsDto> = async (req, res, next) => {
   try {
     const user = req.user;
@@ -69,6 +148,32 @@ const deleteSelectedItems: RequestHandler<{}, {}, TDeleteCartItemsDto> = async (
     next(err);
   }
 };
+
+/**
+ * @swagger
+ * /cart/delete:
+ *   post:
+ *     summary: 선택한 장바구니 항목 삭제
+ *     tags: [Cart]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - cartItemIds
+ *             properties:
+ *               cartItemIds:
+ *                 type: array
+ *                 items:
+ *                   type: number
+ *     responses:
+ *       204:
+ *         description: 삭제 성공
+ *       400:
+ *         description: 잘못된 요청
+ */
 
 const deleteCartItem: RequestHandler = async (req, res, next) => {
   try {
@@ -83,6 +188,37 @@ const deleteCartItem: RequestHandler = async (req, res, next) => {
   }
 };
 
+/**
+ * @swagger
+ * /cart/{item}/check:
+ *   patch:
+ *     summary: 특정 장바구니 항목 체크/해제
+ *     tags: [Cart]
+ *     parameters:
+ *       - in: path
+ *         name: item
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 장바구니 항목 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - isChecked
+ *             properties:
+ *               isChecked:
+ *                 type: boolean
+ *     responses:
+ *       204:
+ *         description: 체크 상태 변경 성공
+ *       400:
+ *         description: 잘못된 요청
+ */
+
 const toggleCheckItem: RequestHandler<TToggleParamsDto, {}, TToggleCheckDto> = async (req, res, next) => {
   try {
     const user = req.user;
@@ -96,6 +232,30 @@ const toggleCheckItem: RequestHandler<TToggleParamsDto, {}, TToggleCheckDto> = a
   }
 };
 
+/**
+ * @swagger
+ * /cart/check/all:
+ *   patch:
+ *     summary: 전체 장바구니 항목 체크/해제
+ *     tags: [Cart]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - isChecked
+ *             properties:
+ *               isChecked:
+ *                 type: boolean
+ *     responses:
+ *       204:
+ *         description: 전체 체크 상태 변경 성공
+ *       400:
+ *         description: 잘못된 요청
+ */
+
 const toggleAllItems: RequestHandler<{}, {}, TToggleAllCheckDto> = async (req, res, next) => {
   try {
     const user = req.user;
@@ -107,6 +267,38 @@ const toggleAllItems: RequestHandler<{}, {}, TToggleAllCheckDto> = async (req, r
     next(err);
   }
 };
+
+/**
+ * @swagger
+ * /cart/{item}/quantity:
+ *   patch:
+ *     summary: 장바구니 항목 수량 수정
+ *     tags: [Cart]
+ *     parameters:
+ *       - in: path
+ *         name: item
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 장바구니 항목 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - quantity
+ *             properties:
+ *               quantity:
+ *                 type: number
+ *                 minimum: 1
+ *     responses:
+ *       204:
+ *         description: 수량 변경 성공
+ *       400:
+ *         description: 잘못된 요청
+ */
 
 const updateQuantity: RequestHandler<{ item: string }, {}, TUpdateQuantityDto> = async (req, res, next) => {
   try {

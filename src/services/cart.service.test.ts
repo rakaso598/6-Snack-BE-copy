@@ -1,0 +1,98 @@
+import prisma from "../config/prisma";
+import cartService from "./cart.service";
+import { BadRequestError, NotFoundError } from "../types/error";
+
+describe("장바구니 서비스", () => {
+  let userId: string;
+  let productId: number;
+
+  beforeAll(async () => {
+    const user = await prisma.user.findFirst();
+    const product = await prisma.product.findFirst();
+    if (!user || !product) throw new Error("테스트 유저 또는 상품이 없습니다.");
+    userId = user.id;
+    productId = product.id;
+  });
+
+  describe("getMyCart", () => {
+    test("체크 여부에 따라 장바구니 목록을 가져온다", async () => {
+      const allItems = await cartService.getMyCart(userId, false);
+      const checkedItems = await cartService.getMyCart(userId, true);
+      expect(Array.isArray(allItems)).toBe(true);
+      expect(Array.isArray(checkedItems)).toBe(true);
+    });
+  });
+
+  describe("addToCart", () => {
+    test("유효한 상품과 수량으로 장바구니에 추가된다", async () => {
+      const item = await cartService.addToCart(userId, { productId, quantity: 2 });
+      expect(item).toHaveProperty("id");
+      expect(item.productId).toBe(productId);
+    });
+
+    test("수량이 0 이하면 예외가 발생한다", async () => {
+      await expect(cartService.addToCart(userId, { productId, quantity: 0 })).rejects.toThrow(BadRequestError);
+    });
+  });
+
+  describe("getCartItemById", () => {
+    test("존재하는 장바구니 항목을 가져온다", async () => {
+      const items = await cartService.getMyCart(userId, false);
+      const result = await cartService.getCartItemById(userId, items[0].id);
+      expect(result[0]).toHaveProperty("id", items[0].id);
+    });
+
+    test("없는 항목이면 예외가 발생한다", async () => {
+      await expect(cartService.getCartItemById(userId, 999999)).rejects.toThrow(NotFoundError);
+    });
+  });
+
+  describe("deleteSelectedItems", () => {
+    test("선택된 항목들을 삭제한다", async () => {
+      const item = await cartService.addToCart(userId, { productId, quantity: 1 });
+      const result = await cartService.deleteSelectedItems(userId, { itemIds: [item.id] });
+      expect(result.count).toBeGreaterThan(0);
+    });
+  });
+
+  describe("deleteCartItem", () => {
+    test("단일 항목 삭제", async () => {
+      const item = await cartService.addToCart(userId, { productId, quantity: 1 });
+      await expect(cartService.deleteCartItem(userId, item.id)).resolves.toBeUndefined();
+    });
+
+    test("없는 항목 삭제 시 예외 발생", async () => {
+      await expect(cartService.deleteCartItem(userId, 999999)).rejects.toThrow(NotFoundError);
+    });
+  });
+
+  describe("toggleCheckCartItem", () => {
+    test("체크 상태를 토글한다", async () => {
+      const item = await cartService.addToCart(userId, { productId, quantity: 1 });
+      const result = await cartService.toggleCheckCartItem(userId, item.id, { isChecked: false });
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe("toggleAllCheck", () => {
+    test("전체 체크 상태 변경", async () => {
+      await expect(cartService.toggleAllCheck(userId, true)).resolves.toBeUndefined();
+    });
+  });
+
+  describe("updateQuantity", () => {
+    test("수량을 업데이트한다", async () => {
+      const item = await cartService.addToCart(userId, { productId, quantity: 1 });
+      await expect(cartService.updateQuantity(userId, item.id, 5)).resolves.toBeUndefined();
+    });
+
+    test("수량이 0 이하면 예외 발생", async () => {
+      const item = await cartService.addToCart(userId, { productId, quantity: 1 });
+      await expect(cartService.updateQuantity(userId, item.id, 0)).rejects.toThrow(BadRequestError);
+    });
+
+    test("존재하지 않는 항목 업데이트 시 예외", async () => {
+      await expect(cartService.updateQuantity(userId, 999999, 3)).rejects.toThrow(NotFoundError);
+    });
+  });
+});
