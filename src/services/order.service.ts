@@ -144,7 +144,7 @@ const createOrder = async (orderData: {
   return result;
 };
 
-const getOrderById = async (orderId: number, userId: string) => {
+const getOrderById = async (orderId: string, userId: string) => {
   const order = await orderRepository.getOrderById(orderId);
 
   if (!order) {
@@ -162,7 +162,7 @@ const getOrdersByUserId = async (userId: string) => {
   return await orderRepository.getOrdersByUserId(userId);
 };
 
-const cancelOrder = async (orderId: number, userId: string) => {
+const cancelOrder = async (orderId: string, userId: string) => {
   const order = await orderRepository.getOrderById(orderId);
 
   if (!order) {
