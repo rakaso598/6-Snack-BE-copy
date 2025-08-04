@@ -85,7 +85,7 @@ Content-Type: application/json
 
 {
   "email": "super_admin@codeit.com",
-  "password": "11111111"
+  "password": "1q2w3e4r!"
 }
 
 ### 전체 회사 유저 목록 조회 (첫 페이지)
