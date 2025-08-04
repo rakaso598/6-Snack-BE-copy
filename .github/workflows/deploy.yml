@@ -1,0 +1,25 @@
+name: Deploy To EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest # 깃헙액션 워크플로우가 실행되는 OS 환경. EC2 OS와 같은 필요 없음
+    steps:
+      - name: 6-Snack-BE
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }} # EC2의 주소
+          username: ${{ secrets.EC2_USERNAME }} # EC2 접속 username
+          key: ${{ secrets.EC2_PRIVATE_KEY }} # EC2의 Key 파일의 내부 텍스트
+          script_stop: true # 아래 script 중 실패하는 명령이 하나라도 있으면 실패로 처리
+          script: |
+            cd /home/ec2-user/6-Snack-BE
+            git pull origin main
+            npm ci
+            npm run build
+            pm2 kill
+            pm2 start dist/app.js --name "express-server"
