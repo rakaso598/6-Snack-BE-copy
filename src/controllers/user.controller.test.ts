@@ -82,7 +82,7 @@ describe("UserController", () => {
       expect(mockResponse.json).toHaveBeenCalledWith({ user: mockUserInfo });
     });
 
-    it("should handle missing user", async () => {
+    it("유저 정보가 없으면 에러를 처리", async () => {
       // Arrange
       mockRequest.user = undefined;
 
