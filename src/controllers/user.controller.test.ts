@@ -24,7 +24,7 @@ describe("UserController", () => {
   });
 
   describe("getUserInfo", () => {
-    it("should get user info successfully", async () => {
+    it("유저 정보 조회가 성공적으로 완료", async () => {
       // Arrange
       mockRequest.params = { userId: "user123" };
 
@@ -62,7 +62,7 @@ describe("UserController", () => {
   });
 
   describe("getMe", () => {
-    it("should get current user info successfully", async () => {
+    it("현재 유저 정보 조회가 성공적으로 완료", async () => {
       // Arrange
       const mockUserInfo = {
         id: "user123",
@@ -95,7 +95,7 @@ describe("UserController", () => {
   });
 
   describe("updateRole", () => {
-    it("should update user role successfully", async () => {
+    it("유저 권한 수정이 성공적으로 완료", async () => {
       // Arrange
       mockRequest.params = { userId: "user123" };
       mockRequest.body = { role: "MANAGER" };
@@ -111,10 +111,25 @@ describe("UserController", () => {
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(mockResult);
     });
+
+    it("유저 권한 수정 시 유저가 존재하지 않으면 에러를 처리한다", async () => {
+      // Arrange
+      mockRequest.params = { userId: "nonexistent" };
+      mockRequest.body = { role: "ADMIN" };
+
+      const error = new Error("유저가 존재하지 않습니다");
+      mockUserService.updateRole.mockRejectedValue(error);
+
+      // Act
+      await userController.updateRole(mockRequest as any, mockResponse as Response, mockNext);
+
+      // Assert
+      expect(mockNext).toHaveBeenCalledWith(error);
+    });
   });
 
   describe("deleteUser", () => {
-    it("should delete user successfully", async () => {
+    it("유저 삭제가 성공적으로 완료", async () => {
       // Arrange
       mockRequest.params = { userId: "user123" };
 
