@@ -50,6 +50,10 @@ describe("회사 컨트롤러", () => {
       // Arrange
       const serviceResponse = {
         message: "회사 정보가 성공적으로 수정되었습니다.",
+        company: {
+          id: 1,
+          name: "새로운 회사명",
+        },
       };
       mockCompanyService.updateCompanyInfo.mockResolvedValue(serviceResponse);
 
