@@ -14,11 +14,18 @@ import { Role } from "@prisma/client";
 
 /**
  * @swagger
- * /products:
+ * tags:
+ *   - name: Product
+ *     description: 상품 관련 API
+ */
+
+/**
+ * @swagger
+ * /product:
  *   post:
  *     summary: 상품 등록
  *     description: "새로운 상품을 등록합니다. 이미지 파일 업로드도 지원합니다."
- *     tags: [Products]
+ *     tags: [Product]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -143,9 +150,11 @@ const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res
  * @swagger
  * /products:
  *   get:
- *     summary: 상품 목록 조회
+ *     summary: 상품 조회
  *     description: "상품 목록을 조회합니다. 정렬, 카테고리 필터링, 페이지네이션을 지원합니다."
- *     tags: [Products]
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: sort
@@ -243,9 +252,9 @@ const getProducts: RequestHandler<{}, {}, {}, TGetProductsQueryDto> = async (req
  * @swagger
  * /products/my:
  *   get:
- *     summary: "내가 등록한 상품 목록 조회"
+ *     summary: "내가 등록한 상품 조회"
  *     description: 현재 로그인한 사용자가 등록한 상품 목록을 조회합니다.
- *     tags: [Products]
+ *     tags: [Product]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -373,9 +382,11 @@ const getMyProducts: RequestHandler<{}, {}, {}, TGetMyProductsQueryDto> = async 
  * @swagger
  * /products/{id}:
  *   get:
- *     summary: 상품 상세 정보 조회
+ *     summary: 상품 상세 조회
  *     description: "특정 상품의 상세 정보를 조회합니다."
- *     tags: [Products]
+ *     tags: [Product]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -558,7 +569,7 @@ export const forceUpdateProduct: RequestHandler<TProductIdParamsDto, {}, TUpdate
  *   delete:
  *     summary: 상품 삭제
  *     description: "자신이 등록한 상품을 삭제합니다 (소프트 삭제)."
- *     tags: [Products]
+ *     tags: [Product]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -606,9 +617,9 @@ export const deleteProduct: RequestHandler<{ id: string }> = async (req, res, ne
  * @swagger
  * /admin/products/{id}:
  *   delete:
- *     summary: 관리자 상품 강제 삭제
+ *     summary: 관리자 상품 삭제
  *     description: "관리자가 모든 상품을 강제로 삭제합니다 (소프트 삭제)."
- *     tags: [Products]
+ *     tags: [Product]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -657,9 +668,9 @@ export const forceDeleteProduct: RequestHandler<{ id: string }> = async (req, re
  * @swagger
  * /categories:
  *   get:
- *     summary: 카테고리 트리 조회
+ *     summary: 카테고리 조회
  *     description: "상품 카테고리의 계층 구조를 조회합니다."
- *     tags: [Products]
+ *     tags: [Product]
  *     responses:
  *       200:
  *         description: "카테고리 트리 조회 성공"
