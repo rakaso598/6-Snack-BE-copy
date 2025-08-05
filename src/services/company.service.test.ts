@@ -16,8 +16,10 @@ describe("회사 서비스", () => {
       const userId = "user123";
       const companyData = {
         companyName: "새로운 회사명",
-        newPassword: "newPassword123",
-        newPasswordConfirm: "newPassword123",
+        passwordData: {
+          newPassword: "newPassword123",
+          newPasswordConfirm: "newPassword123",
+        },
       };
       const currentUser = { id: "super-admin-id", role: "SUPER_ADMIN" } as any;
       const mockUpdatedCompany = {
@@ -26,13 +28,13 @@ describe("회사 서비스", () => {
         bizNumber: "123-45-67890",
       };
 
-      mockCompanyRepository.updateCompanyInfo.mockResolvedValue(mockUpdatedCompany as any);
+      mockCompanyRepository.updateCompanyName.mockResolvedValue(mockUpdatedCompany as any);
 
       // Act
-      const result = await companyService.updateCompanyInfo(userId, companyData, currentUser);
+      const result = await companyService.updateCompanyInfo(userId, companyData, currentUser, 1);
 
       // Assert
-      expect(mockCompanyRepository.updateCompanyInfo).toHaveBeenCalledWith(userId, companyData);
+      expect(mockCompanyRepository.updateCompanyName).toHaveBeenCalledWith(1, companyData.companyName);
       expect(result.message).toBe("회사 정보가 성공적으로 수정되었습니다.");
     });
 
@@ -41,15 +43,17 @@ describe("회사 서비스", () => {
       const userId = "user123";
       const companyData = {
         companyName: "새로운 회사명",
-        newPassword: "newPassword123",
-        newPasswordConfirm: "newPassword123",
+        passwordData: {
+          newPassword: "newPassword123",
+          newPasswordConfirm: "newPassword123",
+        },
       };
       const currentUser = { id: "super-admin-id", role: "SUPER_ADMIN" } as any;
 
-      mockCompanyRepository.updateCompanyInfo.mockRejectedValue(new Error("회사 정보 수정 실패"));
+      mockCompanyRepository.updateCompanyName.mockRejectedValue(new Error("회사 정보 수정 실패"));
 
       // Act & Assert
-      await expect(companyService.updateCompanyInfo(userId, companyData, currentUser)).rejects.toThrow(
+      await expect(companyService.updateCompanyInfo(userId, companyData, currentUser, 1)).rejects.toThrow(
         "회사 정보 수정 실패",
       );
     });
