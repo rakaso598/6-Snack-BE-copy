@@ -11,6 +11,8 @@ import autoCreateMonthlyBudget from "./cron/autoCreateMonthlyBudget";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import "./instrument";
+import * as Sentry from "@sentry/node";
 
 const app: Application = express();
 const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -45,6 +47,8 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/", indexRouter);
 
 autoCreateMonthlyBudget.start();
+
+Sentry.setupExpressErrorHandler(app);
 
 app.use(errorHandler);
 

@@ -14,7 +14,7 @@ const confirmPayment: RequestHandler<{}, {}, TConfirmPaymentBodyDto> = async (re
 
   // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용 X
   // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가
-  const widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+  const widgetSecretKey = process.env.SECRET_KEY!;
   const encryptedSecretKey = "Basic " + Buffer.from(widgetSecretKey + ":").toString("base64");
 
   try {

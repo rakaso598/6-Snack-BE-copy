@@ -3,17 +3,17 @@ import swaggerJSDoc from "swagger-jsdoc";
 const swaggerDefinition = {
   openapi: "3.0.0",
   info: {
-    title: "Express TypeScript API",
+    title: "Snack API",
     version: "1.0.0",
-    description: "A sample API for Express with TypeScript and Swagger",
+    description: "원스톱 간식 구매 솔루션 Snack API 문서에 오신 걸 환영합니다.",
   },
   servers: [
     {
-      url: "http://localhost:3000",
+      url: "http://localhost:8080",
       description: "Development server",
     },
     {
-      url: "https://api.yourdomain.com",
+      url: "https://api.5nack.site",
       description: "Production server",
     },
   ],
