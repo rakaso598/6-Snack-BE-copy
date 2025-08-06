@@ -2,7 +2,7 @@ export const orderMockData = [
   // 토쓰(주) (companyId: 1) 주문들
   {
     companyId: 1,
-    userId: "user-1",
+    userId: "user-1", // 최고관리자
     approver: "최고관리자",
     adminMessage: "스낵 주문이 승인되었습니다. 오후 2시에 배송됩니다.",
     requestMessage: "오늘 오후중으로만 승인 부탁드려요",
@@ -13,17 +13,18 @@ export const orderMockData = [
   },
   {
     companyId: 1,
-    userId: "user-2",
-    adminMessage: null,
+    userId: "user-2", // 관리자
+    approver: "관리자",
+    adminMessage: "관리자 주문이 자동 승인되었습니다.",
     requestMessage: "내일 아침 회의 전에 스낵 준비해주세요.",
     totalPrice: 2400, // 새우깡 3개(2400)
-    status: "PENDING",
+    status: "APPROVED",
     createdAt: new Date("2025-07-01"),
     updatedAt: new Date("2025-07-01"),
   },
   {
     companyId: 1,
-    userId: "user-3",
+    userId: "user-3", // 일반 유저
     approver: "관리자",
     adminMessage: "일부 스낵 재고 부족으로 대체 상품으로 변경되었습니다.",
     requestMessage: "팀 회식용 스낵 주문합니다.",
@@ -34,7 +35,7 @@ export const orderMockData = [
   },
   {
     companyId: 1,
-    userId: "user-4",
+    userId: "user-4", // 일반 유저
     approver: "관리자",
     adminMessage: "스낵 주문이 승인되었습니다.",
     requestMessage: "팀 미팅용 스낵입니다.",
@@ -45,7 +46,7 @@ export const orderMockData = [
   },
   {
     companyId: 1,
-    userId: "user-5",
+    userId: "user-5", // 일반 유저
     adminMessage: null,
     requestMessage: "개발팀 야근용 스낵 부탁드립니다.",
     totalPrice: 1800, // 고래밥 2개(1800)
@@ -55,7 +56,7 @@ export const orderMockData = [
   },
   {
     companyId: 1,
-    userId: "user-6",
+    userId: "user-6", // 일반 유저
     approver: "관리자",
     adminMessage: "스낵 주문이 승인되었습니다.",
     requestMessage: "디자인팀 회의용 스낵입니다.",
@@ -67,7 +68,7 @@ export const orderMockData = [
   // 쿠빵(주) (companyId: 2) 주문
   {
     companyId: 2,
-    userId: "user-1-2",
+    userId: "user-1-2", // 최고관리자
     approver: "최고관리자 2",
     adminMessage: "쿠빵(주) 첫 주문이 승인되었습니다.",
     requestMessage: "회사 오픈 기념 스낵입니다.",
