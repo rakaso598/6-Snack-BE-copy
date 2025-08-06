@@ -24,7 +24,7 @@ export const monthlyBudgetMockData = [
   },
   {
     companyId: 1,
-    currentMonthExpense: 4500, // user-1의 6월 APPROVED 주문 (4500 + 배송비 0 = 4500)
+    currentMonthExpense: 4500, // user-1의 6월 APPROVED 주문 (4500)
     currentMonthBudget: 2000000,
     monthlyBudget: 2000000,
     year: "2025",
@@ -35,7 +35,7 @@ export const monthlyBudgetMockData = [
   },
   {
     companyId: 1,
-    currentMonthExpense: 10500, // 토쓰(주) 7월 APPROVED 주문들: user-3(4500) + user-4(3200) + user-6(2800) + 배송비 3000
+    currentMonthExpense: 12900, // 토쓰(주) 7월 APPROVED 주문들: user-1(4500) + user-2(2400) + user-3(4500) + user-4(3200) + user-6(2800)
     currentMonthBudget: 3500000,
     monthlyBudget: 2000000,
     year: "2025",
@@ -91,7 +91,7 @@ export const monthlyBudgetMockData = [
   },
   {
     companyId: 2,
-    currentMonthExpense: 8500, // 쿠빵(주) 7월 APPROVED 주문: user-1-2(5500) + 배송비 3000
+    currentMonthExpense: 5500, // 쿠빵(주) 7월 APPROVED 주문: user-1-2(5500)
     currentMonthBudget: 1000000,
     monthlyBudget: 1000000,
     year: "2025",

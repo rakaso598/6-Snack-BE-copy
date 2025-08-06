@@ -19,43 +19,47 @@ async function main() {
   // 전체 데이터 삭제 (외래키 제약조건을 고려한 순서)
   console.log("🗑️ Deleting existing data...");
 
-  // 1. Receipt 삭제 (의존성 없음)
+  // 1. Receipt 삭제 (Order에 의존)
   console.log("🗑️ Deleting receipts...");
   await prisma.receipt.deleteMany();
 
-  // 2. Order 삭제 (User에 의존)
+  // 2. Payment 삭제 (Order에 의존)
+  console.log("🗑️ Deleting payments...");
+  await prisma.payment.deleteMany();
+
+  // 3. Order 삭제 (User, Company에 의존)
   console.log("🗑️ Deleting orders...");
   await prisma.order.deleteMany();
 
-  // 3. Favorite 삭제 (User, Product에 의존)
+  // 4. Favorite 삭제 (User, Product에 의존)
   console.log("🗑️ Deleting favorites...");
   await prisma.favorite.deleteMany();
 
-  // 4. Invite 삭제 (User, Company에 의존)
+  // 5. Invite 삭제 (User, Company에 의존)
   console.log("🗑️ Deleting invites...");
   await prisma.invite.deleteMany();
 
-  // 5. CartItem 삭제 (User, Product에 의존)
+  // 6. CartItem 삭제 (User, Product에 의존)
   console.log("🗑️ Deleting cart items...");
   await prisma.cartItem.deleteMany();
 
-  // 6. Product 삭제 (User, Category에 의존)
+  // 7. Product 삭제 (User, Category에 의존)
   console.log("🗑️ Deleting products...");
   await prisma.product.deleteMany();
 
-  // 7. User 삭제 (Company에 의존)
+  // 8. User 삭제 (Company에 의존)
   console.log("🗑️ Deleting users...");
   await prisma.user.deleteMany();
 
-  // 8. MonthlyBudget 삭제 (Company에 의존)
+  // 9. MonthlyBudget 삭제 (Company에 의존)
   console.log("🗑️ Deleting monthly budgets...");
   await prisma.monthlyBudget.deleteMany();
 
-  // 9. Category 삭제 (자체 참조)
+  // 10. Category 삭제 (자체 참조)
   console.log("🗑️ Deleting categories...");
   await prisma.category.deleteMany();
 
-  // 10. Company 삭제 (의존성 없음)
+  // 11. Company 삭제 (의존성 없음)
   console.log("🗑️ Deleting companies...");
   await prisma.company.deleteMany();
 
@@ -68,6 +72,7 @@ async function main() {
   await prisma.$executeRaw`ALTER SEQUENCE "Product_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "CartItem_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "Receipt_id_seq" RESTART WITH 1;`;
+  await prisma.$executeRaw`ALTER SEQUENCE "Payment_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "Favorite_id_seq" RESTART WITH 1;`;
   await prisma.$executeRaw`ALTER SEQUENCE "MonthlyBudget_id_seq" RESTART WITH 1;`;
 
