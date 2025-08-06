@@ -3,6 +3,7 @@ import budgetRepository from "../repositories/budget.repository";
 import { NotFoundError } from "../types/error";
 import { TUpdateMonthlyBudgetBody } from "../types/budget.type";
 import getDateForBudget from "../utils/getDateForBudget";
+import prisma from "../config/prisma";
 
 // 예산 및 지출 현황 조회(관리자, 최고 관리자)
 const getMonthlyBudget = async (companyId: MonthlyBudget["companyId"]) => {
@@ -36,13 +37,19 @@ const updateMonthlyBudget = async (companyId: MonthlyBudget["companyId"], body: 
 
   const monthlyBudget = await budgetRepository.getMonthlyBudget({ companyId, year, month });
 
-  if (!monthlyBudget) {
-    throw new NotFoundError("예산이 존재하지 않습니다.");
-  }
+  return await prisma.$transaction(async (tx) => {
+    if (!monthlyBudget) {
+      await budgetRepository.createMonthlyBudget({ companyId, year, month }, tx);
 
-  const updatedMonthlyBudget = await budgetRepository.updateMonthlyBudget({ companyId, year, month }, body);
+      const updatedMonthlyBudget = await budgetRepository.updateMonthlyBudget({ companyId, year, month }, body, tx);
 
-  return updatedMonthlyBudget;
+      return updatedMonthlyBudget;
+    }
+
+    const updatedMonthlyBudget = await budgetRepository.updateMonthlyBudget({ companyId, year, month }, body, tx);
+
+    return updatedMonthlyBudget;
+  });
 };
 
 export default {
