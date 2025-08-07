@@ -13,8 +13,8 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "productId": 5,
-  "quantity": 2
+  "productId": 2,
+  "quantity": 6
 }
 
 ###
@@ -22,16 +22,15 @@ Authorization: Bearer {{token}}
 ### 3. 장바구니 항목 일괄 삭제
 DELETE {{BASE_URL}}/cart
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
-  "itemIds": [1, 2, 3]
+  "itemIds": [2]
 }
 
 ###
 
 ### 4. 장바구니 개별 항목 삭제
-DELETE {{BASE_URL}}/cart/1
+DELETE {{BASE_URL}}/cart/2
 Authorization: Bearer {{token}}
 
 ###

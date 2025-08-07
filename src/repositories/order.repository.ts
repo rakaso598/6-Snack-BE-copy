@@ -13,6 +13,7 @@ const STATUS_OPTIONS: TGetOrderStatus = {
   approved: "APPROVED",
 };
 
+// 주문 목록 조회
 const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersRepositoryQuery, companyId: Company["id"]) => {
   return await prisma.order.findMany({
     where: { status: STATUS_OPTIONS[status], companyId },
@@ -26,12 +27,14 @@ const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersRepositor
   });
 };
 
+// 주문 목록 총 갯수 조회
 const getOrdersTotalCount = async ({ status }: Pick<TGetOrdersQuery, "status">, companyId: Company["id"]) => {
   return await prisma.order.count({
     where: { status: STATUS_OPTIONS[status], companyId },
   });
 };
 
+// 주문 조회(대기 or 승인)
 const getOrderByIdAndStatus = async (id: Order["id"], status: "pending" | "approved", companyId: Company["id"]) => {
   const statusOptions: TGetOrderStatus = {
     pending: "PENDING",
@@ -47,11 +50,21 @@ const getOrderByIdAndStatus = async (id: Order["id"], status: "pending" | "appro
   });
 };
 
+// 주문 조회(단건)
 const getOrderById = async (id: Order["id"]) => {
   return await prisma.order.findUnique({
     where: { id },
     include: {
       user: { omit: { hashedRefreshToken: true, password: true } },
+      receipts: true,
+    },
+  });
+};
+
+const getOrderWithCartItemIdsById = async (id: Order["id"]) => {
+  return await prisma.order.findUnique({
+    where: { id },
+    include: {
       receipts: true,
     },
   });
@@ -68,6 +81,20 @@ const updateOrder = async (
   return await client.order.update({
     where: { id },
     data: { approver, adminMessage, status },
+  });
+};
+
+const deleteReceiptAndOrder = async (orderId: Order["id"], tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+
+  // 1. receipt 삭제
+  await client.receipt.deleteMany({
+    where: { orderId },
+  });
+
+  // 2. order 삭제
+  await client.order.delete({
+    where: { id: orderId },
   });
 };
 
@@ -222,7 +249,9 @@ export default {
   getOrdersTotalCount,
   getOrderByIdAndStatus,
   getOrderById,
+  getOrderWithCartItemIdsById,
   updateOrder,
+  deleteReceiptAndOrder,
   // OrderRequest 관련 기능들
   createOrder,
   getOrdersByUserId,
