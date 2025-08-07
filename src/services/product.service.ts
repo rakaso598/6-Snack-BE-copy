@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import prisma from "../config/prisma";
 import productRepository from "../repositories/product.repository";
 import { AuthenticationError, NotFoundError, ServerError, ValidationError } from "../types/error";
 import {
@@ -117,7 +118,37 @@ const updateProduct = async (
 };
 
 const deleteProduct = async (id: number, tx?: Prisma.TransactionClient) => {
-  return await productRepository.softDeleteById(id, tx);
+  if (!tx) {
+    return await prisma.$transaction(async (transactionClient) => {
+      return await deleteProductWithRelatedData(id, transactionClient);
+    });
+  }
+
+  return await deleteProductWithRelatedData(id, tx);
+};
+
+// 상품 삭제와 관련 데이터 처리
+const deleteProductWithRelatedData = async (productId: number, tx: Prisma.TransactionClient) => {
+  // 1. 상품 소프트 딜리트
+  const deletedProduct = await productRepository.softDeleteById(productId, tx);
+
+  // 2. 해당 상품의 모든 카트 아이템 소프트 딜리트
+  await tx.cartItem.updateMany({
+    where: {
+      productId,
+      deletedAt: null,
+    },
+    data: {
+      deletedAt: new Date(),
+    },
+  });
+
+  // 3. 해당 상품의 모든 찜하기 하드 딜리트
+  await tx.favorite.deleteMany({
+    where: { productId },
+  });
+
+  return deletedProduct;
 };
 
 // 카테고리
