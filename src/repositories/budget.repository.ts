@@ -17,6 +17,24 @@ const getTotalExpense = async ({ companyId, year }: TTotalExpense) => {
   });
 };
 
+const createMonthlyBudget = async (
+  data: { companyId: number; year: string; month: string },
+  tx?: Prisma.TransactionClient,
+) => {
+  const client = tx || prisma;
+
+  return client.monthlyBudget.create({
+    data: {
+      companyId: data.companyId,
+      year: data.year,
+      month: data.month,
+      currentMonthExpense: 0,
+      currentMonthBudget: 0,
+      monthlyBudget: 0,
+    },
+  });
+};
+
 const updateMonthlyBudget = async (
   { companyId, year, month }: TMonthlyBudget,
   body: TUpdateMonthlyBudgetBody,
@@ -47,6 +65,7 @@ const updateCurrentMonthExpense = async (
 export default {
   getMonthlyBudget,
   getTotalExpense,
+  createMonthlyBudget,
   updateMonthlyBudget,
   updateCurrentMonthExpense,
 };
