@@ -118,7 +118,6 @@ const updateProduct = async (
 };
 
 const deleteProduct = async (id: number, tx?: Prisma.TransactionClient) => {
-  // 트랜잭션이 없으면 새로 생성
   if (!tx) {
     return await prisma.$transaction(async (transactionClient) => {
       return await deleteProductWithRelatedData(id, transactionClient);
@@ -137,7 +136,7 @@ const deleteProductWithRelatedData = async (productId: number, tx: Prisma.Transa
   await tx.cartItem.updateMany({
     where: {
       productId,
-      deletedAt: null, // 아직 삭제되지 않은 카트 아이템만
+      deletedAt: null,
     },
     data: {
       deletedAt: new Date(),
