@@ -7,7 +7,7 @@ Content-Type: application/json
 Cookie: accessToken={{accessToken}}
 
 {
-  "cartItemIds": [1,2],
+  "cartItemIds": [2],
   "adminMessage": "관리자에게 남길 메시지",
   "requestMessage": "요청 이요"
 }
@@ -39,7 +39,7 @@ Cookie: accessToken={{accessToken}}
 }
 
 ### 관리자 - 구매내역 조회 (대기)
-GET {{BASE_URL}}/admin/orders?status=pending&page=1&limit=50&orderBy=priceLow
+GET {{BASE_URL}}/admin/orders?status=pending&page=2&limit=3&orderBy=priceLow
 Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 조회 (승인)
