@@ -136,12 +136,13 @@ const createOrder = async (orderData: {
   }
 
   // 트랜잭션으로 주문 생성
-  const result = await prisma.$transaction(async (tx) => {
-    const order = await orderRepository.createOrder(orderData, tx);
-    return order;
+  const order = await prisma.$transaction(async (tx) => {
+    return await orderRepository.createOrder(orderData, tx);
   });
 
-  return result;
+  const formattedOrder = getOrder(order.id, "pending", orderData.companyId);
+
+  return formattedOrder;
 };
 
 const getOrderById = async (orderId: string, userId: string) => {

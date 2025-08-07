@@ -542,10 +542,7 @@ const createOrder: RequestHandler<
 
     const result = await orderService.createOrder(authenticatedOrderData);
 
-    res.status(201).json({
-      message: "구매 요청이 성공적으로 생성되었습니다.",
-      data: result,
-    });
+    res.status(201).json({ result });
   } catch (error) {
     next(error);
   }

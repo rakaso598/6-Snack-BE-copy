@@ -2,6 +2,8 @@ import axios from "axios";
 import prisma from "../config/prisma";
 import { RequestHandler } from "express";
 import paymentService from "../services/payment.service";
+import orderService from "../services/order.service";
+import { AuthenticationError } from "../types/error";
 
 type TConfirmPaymentBodyDto = {
   paymentKey: string;
@@ -11,6 +13,11 @@ type TConfirmPaymentBodyDto = {
 
 const confirmPayment: RequestHandler<{}, {}, TConfirmPaymentBodyDto> = async (req, res, next) => {
   const { paymentKey, orderId, amount } = req.body;
+  const user = req.user;
+
+  if (!user) throw new AuthenticationError("유효하지 않은 유저입니다.");
+
+  const { name: approver, companyId } = user;
 
   // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용 X
   // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가
@@ -32,11 +39,14 @@ const confirmPayment: RequestHandler<{}, {}, TConfirmPaymentBodyDto> = async (re
 
     await prisma.$transaction(async (tx) => {
       const { orderName, method, requestedAt, approvedAt, totalAmount, suppliedAmount, vat } = response.data;
-      // 결제 조회, 결제 취소에 사용될 paymentKey, orderId 저장
+      // 1. 결제 조회, 결제 취소에 사용될 paymentKey, orderId 저장
       await paymentService.createPayment(
         { orderId, paymentKey, orderName, method, requestedAt, approvedAt, totalAmount, suppliedAmount, vat },
         tx,
       );
+
+      // 2. Order 상태 업데이트 및 예산 차감
+      await orderService.updateOrder(orderId, companyId, { approver, adminMessage: "즉시 구매", status: "APPROVED" });
     });
 
     res.status(response.status).json(response.data);
