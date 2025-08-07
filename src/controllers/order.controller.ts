@@ -540,9 +540,9 @@ const createOrder: RequestHandler<
       companyId: req.user.companyId,
     };
 
-    const result = await orderService.createOrder(authenticatedOrderData);
+    const order = await orderService.createOrder(authenticatedOrderData);
 
-    res.status(201).json({ result });
+    res.status(201).json(order);
   } catch (error) {
     next(error);
   }
