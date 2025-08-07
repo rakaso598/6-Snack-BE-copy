@@ -20,7 +20,7 @@ const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersRepositor
     take: limit,
     orderBy: SORT_OPTIONS[orderBy] || SORT_OPTIONS["latest"],
     include: {
-      user: true,
+      user: { omit: { hashedRefreshToken: true, password: true } },
       receipts: true,
     },
   });
@@ -41,7 +41,7 @@ const getOrderByIdAndStatus = async (id: Order["id"], status: "pending" | "appro
   return await prisma.order.findFirst({
     where: { id, status: statusOptions[status], companyId },
     include: {
-      user: true,
+      user: { omit: { hashedRefreshToken: true, password: true } },
       receipts: true,
     },
   });
@@ -51,7 +51,7 @@ const getOrderById = async (id: Order["id"]) => {
   return await prisma.order.findUnique({
     where: { id },
     include: {
-      user: true,
+      user: { omit: { hashedRefreshToken: true, password: true } },
       receipts: true,
     },
   });
