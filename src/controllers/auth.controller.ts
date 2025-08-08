@@ -206,6 +206,7 @@ export class AuthController {
 
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
+        domain: ".5nack.site",
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         expires: accessTokenExpires,
@@ -214,6 +215,7 @@ export class AuthController {
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
+        domain: ".5nack.site",
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         expires: refreshTokenExpires,
