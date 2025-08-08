@@ -3,7 +3,9 @@ import prisma from "../config/prisma";
 import { RequestHandler } from "express";
 import paymentService from "../services/payment.service";
 import orderService from "../services/order.service";
-import { AuthenticationError } from "../types/error";
+import { AuthenticationError, NotFoundError } from "../types/error";
+import orderRepository from "../repositories/order.repository";
+import cartRepository from "../repositories/cart.repository";
 
 type TConfirmPaymentBodyDto = {
   paymentKey: string;
@@ -51,10 +53,26 @@ const confirmPayment: RequestHandler<{}, {}, TConfirmPaymentBodyDto> = async (re
 
     res.status(response.status).json(response.data);
   } catch (error) {
+    const userId = user.id;
+    const order = await orderRepository.getOrderWithCartItemIdsById(orderId);
+
+    if (!order) throw new NotFoundError("주문 정보를 찾을 수 없습니다.");
+
+    // cartItem 복구하기 위한 productIds 추출
+    const productIds = order.receipts.map((receipt) => receipt.productId);
+
+    await prisma.$transaction(async (tx) => {
+      // 1. CartItem 복구
+      await cartRepository.revertCartItem(userId, productIds, tx);
+
+      // 2. Receipt + Order 삭제
+      await orderRepository.deleteReceiptAndOrder(orderId, tx);
+    });
+
     if (axios.isAxiosError(error) && error.response) {
       res.status(error.response.status).json(error.response.data);
     } else {
-      res.status(500).json({ message: "Internal Server Error" });
+      res.status(500).json({ message: "결제 실패" });
     }
   }
 };

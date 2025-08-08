@@ -1,3 +1,4 @@
+import { Prisma, Product, User } from "@prisma/client";
 import prisma from "../lib/prisma";
 
 const getCartItemsByUserId = async (userId: string) => {
@@ -126,6 +127,19 @@ const updateCartItemQuantity = async (userId: string, itemId: number, quantity: 
   });
 };
 
+const revertCartItem = async (userId: User["id"], productIds: Product["id"][], tx?: Prisma.TransactionClient) => {
+  const client = tx || prisma;
+
+  return await Promise.all(
+    productIds.map(async (productId) => {
+      return await client.cartItem.updateMany({
+        where: { userId, productId },
+        data: { deletedAt: null },
+      });
+    }),
+  );
+};
+
 export default {
   getCartItemsByUserId,
   findCartItemById,
@@ -135,4 +149,5 @@ export default {
   updateCartItemChecked,
   updateAllCartItemsChecked,
   updateCartItemQuantity,
+  revertCartItem,
 };
