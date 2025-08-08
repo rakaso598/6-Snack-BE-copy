@@ -29,7 +29,7 @@ const confirmPayment: RequestHandler<{}, {}, TConfirmPaymentBodyDto> = async (re
   try {
     // 결제 승인 시 결제수단에서 금액 차감
     const response = await axios.post(
-      "https://api.tosspayments.com/v1/payments/confirmed",
+      "https://api.tosspayments.com/v1/payments/confirm",
       { orderId, amount, paymentKey },
       {
         headers: {
