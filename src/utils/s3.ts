@@ -21,5 +21,13 @@ export const uploadImageToS3 = async (file: Express.Multer.File) => {
 
   await s3.send(command);
 
-  return `https://${bucketName}.s3.amazonaws.com/${fileKey}`;
+  return getCloudFrontUrl(fileKey);
+};
+
+export const getCloudFrontUrl = (s3Key: string) => {
+  const cloudFrontDomain = process.env.CLOUDFRONT_DOMAIN;
+  if (!cloudFrontDomain) {
+    throw new Error("CLOUDFRONT_DOMAIN is not set");
+  }
+  return `https://${cloudFrontDomain}/${s3Key}`;
 };
