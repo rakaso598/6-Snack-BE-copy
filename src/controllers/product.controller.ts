@@ -41,7 +41,7 @@ import { Role } from "@prisma/client";
  *             properties:
  *               name:
  *                 type: string
- *                 description: "상품명 (2-20자)"
+ *                 description: "상품명 (1-15자)"
  *                 example: "테스트 상품"
  *               price:
  *                 type: string

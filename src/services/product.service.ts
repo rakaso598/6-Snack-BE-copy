@@ -19,8 +19,8 @@ const createProduct = async (input: TCreateProductParams, tx?: Prisma.Transactio
     throw new AuthenticationError("로그인 정보가 필요합니다.");
   }
 
-  if (!name || name.length < 2) {
-    errors["name"] = "상품 이름은 필수 항목이며, 최소 2자 이상이어야 합니다.";
+  if (!name || name.length < 1) {
+    errors["name"] = "상품 이름은 필수 항목이며, 최소 1자 이상이어야 합니다.";
   }
 
   if (isNaN(price) || price <= 0) {
