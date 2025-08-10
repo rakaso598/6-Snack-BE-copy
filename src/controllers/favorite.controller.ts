@@ -302,9 +302,10 @@ const createFavorite: RequestHandler<TFavoriteParamsDto> = async (req, res, next
 
 const deleteFavorite: RequestHandler<TFavoriteParamsDto> = async (req, res, next) => {
   const user = req.user;
-  const productId = parseNumberOrThrow(req.params.productId, "productId");
 
   if (!user) throw new AuthenticationError("유저 정보가 존재하지 않습니다.");
+
+  const productId = parseNumberOrThrow(req.params.productId, "productId");
 
   await favoriteService.deleteFavorite(user.id, productId);
 
