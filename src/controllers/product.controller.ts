@@ -1,7 +1,14 @@
 import { RequestHandler } from "express";
 import productService from "../services/product.service";
-import { AppError, AuthenticationError, ForbiddenError, NotFoundError, ServerError } from "../types/error";
-import { uploadImageToS3 } from "../utils/s3";
+import {
+  AppError,
+  AuthenticationError,
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+  ServerError,
+} from "../types/error";
+import { getCloudFrontUrl, uploadImageToS3 } from "../utils/s3";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 import {
   TCreateProductDto,
@@ -111,12 +118,20 @@ const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res
     const categoryIdNum = parseNumberOrThrow(categoryId, "categoryId");
 
     if (!creatorId) {
-      throw new AuthenticationError("로그인이 필요합니다.");
+      throw new AuthenticationError("사용자 인증이 필요합니다. 다시 로그인해주세요.");
     }
 
     let imageUrl = "";
     if (req.file) {
-      imageUrl = await uploadImageToS3(req.file);
+      try {
+        const s3Key = await uploadImageToS3(req.file);
+        imageUrl = getCloudFrontUrl(s3Key);
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new BadRequestError(error.message);
+        }
+        throw new BadRequestError('이미지 업로드에 실패했습니다.');
+      }
     }
 
     const input = {
@@ -131,17 +146,15 @@ const createProduct: RequestHandler<{}, {}, TCreateProductDto> = async (req, res
     if (product) {
       res.status(201).location(`/products/${product.id}`).json(product);
     } else {
-      throw new ServerError("상품 생성에 실패했습니다.");
+      throw new ServerError("상품 등록 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
   } catch (error) {
     if (error instanceof AppError) {
       res.status(error.code || 500).json({ message: error.message, data: error.data });
     } else if (error instanceof Error) {
-      console.error("createProduct error:", error.message, error.stack);
       res.status(500).json({ message: error.message });
     } else {
-      console.error("Unknown createProduct error:", error);
-      res.status(500).json({ message: "서버 에러 발생" });
+      res.status(500).json({ message: "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요." });
     }
   }
 };
