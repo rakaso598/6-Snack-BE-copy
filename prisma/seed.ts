@@ -183,6 +183,8 @@ async function main() {
       ...order,
       companyId: order.companyId === 1 ? firstCompanyId : secondCompanyId,
       status: order.status as any,
+      deliveryFee: order.deliveryFee,
+      productsPriceTotal: order.productsPriceTotal,
     })),
     skipDuplicates: true,
   });
@@ -215,7 +217,7 @@ async function main() {
       productId: productIdMap.get(6),
       orderId: orderIdMap.get(1),
       productName: "롯데 칸쵸",
-      price: 1500,
+      price: 1000,
       imageUrl: "https://team3-snack-s3.s3.amazonaws.com/products/lotte-kancho.png",
       quantity: 1,
       createdAt: new Date("2025-07-15T10:30:00Z"),
@@ -288,7 +290,7 @@ async function main() {
     createdAt: new Date("2025-07-20T13:10:00Z"),
   });
 
-  // Order 7: 초코파이 3개 + 칸쵸 1개
+  // Order 7: 초코파이 3개 + 칸쵸 1개 (user-7 주문)
   receiptDataToInsert.push(
     {
       productId: productIdMap.get(1),

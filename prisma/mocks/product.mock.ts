@@ -64,7 +64,7 @@ export const productMockData = [
     categoryId: 5, // 초콜릿류 (5번째)
     creatorId: "user-1",
     name: "롯데 칸쵸",
-    price: 1500,
+    price: 1000,
     imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/lotte-kancho.png",
     cumulativeSales: 192,
     linkUrl: "https://example.com/lotte-kancho",
@@ -112,7 +112,7 @@ export const productMockData = [
     categoryId: 2, // 과자 (2번째)
     creatorId: "user-1",
     name: "오리온 고래밥",
-    price: 1500,
+    price: 900,
     imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/orion-goraebap.png",
     cumulativeSales: 140,
     linkUrl: "https://example.com/orion-goraebap",

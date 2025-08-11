@@ -135,15 +135,6 @@ const findUserWithCompanyById = async (id: string) => {
   });
 };
 
-// userId로 삭제되지 않은 cartItem 개수 조회
-const getCartItemCountByUserId = async (userId: string) => {
-  return await prisma.cartItem.count({
-    where: {
-      userId,
-      deletedAt: null,
-    },
-  });
-};
 
 export default {
   findActiveUserById,
@@ -153,5 +144,4 @@ export default {
   findUsersByCompanyId,
   hasPreviousPage,
   findUserWithCompanyById, // 추가
-  getCartItemCountByUserId, // 추가
 };
