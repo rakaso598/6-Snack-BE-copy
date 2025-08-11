@@ -7,9 +7,9 @@
     "start": "node --enable-source-maps dist/app.js",
     "dev": "ts-node-dev --respawn src/app.ts",
     "build": "tsc",
-    "test": "DATABASE_URL=postgresql://postgres:password@localhost:5432/testdb jest",
-    "test:unit": "DATABASE_URL=postgresql://postgres:password@localhost:5432/testdb jest --testPathIgnorePatterns=src/integration-test",
-    "test:integration": "DATABASE_URL=postgresql://postgres:password@localhost:5432/testdb jest src/integration-test",
+    "test": "DATABASE_URL=postgresql://postgres:password@localhost:5433/testdb jest",
+    "test:unit": "DATABASE_URL=postgresql://postgres:password@localhost:5433/testdb jest --testPathIgnorePatterns=src/integration-test",
+    "test:integration": "DATABASE_URL=postgresql://postgres:password@localhost:5433/testdb jest src/integration-test",
     "test:coverage": "jest --coverage",
     "ssh": "dotenv -- bash -c 'ssh -i \"$SSH_KEY_PATH\" -L 5432:$DB_HOST:5432 $EC2_USER@$EC2_HOST'",
     "cron": "node dist/cron/autoCreateMonthlyBudget.js"
