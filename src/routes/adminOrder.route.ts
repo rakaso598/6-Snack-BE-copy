@@ -21,7 +21,7 @@ adminOrderRouter.get(
   "/:orderId",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  validateGetOrderQuery,
+  // validateGetOrderQuery,
   orderController.getOrder,
 );
 

@@ -1,8 +1,14 @@
 import { RequestHandler } from "express";
 import orderService from "../services/order.service";
-import { TGetOrderParamsDto, TGetOrdersQueryDto, TUpdateStatusOrderBodyDto } from "../dtos/order.dto";
+import {
+  TGetOrderParamsDto,
+  TGetOrderQueryDto,
+  TGetOrdersQueryDto,
+  TUpdateStatusOrderBodyDto,
+} from "../dtos/order.dto";
 import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
-import { AuthenticationError } from "../types/error";
+import { AuthenticationError, NotFoundError } from "../types/error";
+import orderRepository from "../repositories/order.repository";
 
 /**
  * @swagger
@@ -359,12 +365,22 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
  */
 
 // 구매내역 상세 조회(대기 or 승인)
-const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> = async (req, res, next) => {
+const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrderQueryDto> = async (req, res, next) => {
   const orderId = req.params.orderId;
-  const { status } = req.query;
   const user = req.user;
 
   if (!user) throw new AuthenticationError("유효하지 않은 유저입니다.");
+
+  const { status } = req.query;
+
+  if (!status) {
+    const order = await orderRepository.getOrderById(orderId);
+
+    if (!order) throw new NotFoundError("주문 정보를 찾을 수 없습니다.");
+
+    res.status(200).json(order);
+    return;
+  }
 
   const companyId = user.companyId;
 
