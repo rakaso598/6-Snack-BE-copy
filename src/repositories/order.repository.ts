@@ -4,8 +4,8 @@ import { TGetOrdersQuery, TGetOrdersRepositoryQuery, TGetOrderStatus } from "../
 
 const SORT_OPTIONS: Record<"latest" | "priceLow" | "priceHigh", Prisma.OrderOrderByWithRelationInput> = {
   latest: { createdAt: "desc" },
-  priceLow: { totalPrice: "asc" },
-  priceHigh: { totalPrice: "desc" },
+  priceLow: { productsPriceTotal: "asc" },
+  priceHigh: { productsPriceTotal: "desc" },
 };
 
 const STATUS_OPTIONS: TGetOrderStatus = {
@@ -137,7 +137,8 @@ const createOrder = async (
       companyId: orderData.companyId,
       adminMessage: orderData.adminMessage,
       requestMessage: orderData.requestMessage,
-      totalPrice: totalPrice,
+      productsPriceTotal: totalPrice,
+      deliveryFee: 3000,
       status: "PENDING",
     },
   });
