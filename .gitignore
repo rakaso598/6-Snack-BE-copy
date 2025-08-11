@@ -31,3 +31,5 @@ jspm_packages/
 /dist
 /build
 /src/generated/prisma
+
+Convention.md
