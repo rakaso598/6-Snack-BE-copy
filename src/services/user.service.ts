@@ -157,13 +157,11 @@ const getMe = async (userId: string) => {
   if (!user) {
     throw new NotFoundError("사용자 정보를 찾을 수 없습니다. 다시 로그인해 주세요.");
   }
-  const cartItemCount = await userRepository.getCartItemCountByUserId(userId);
   return {
     id: user.id,
     email: user.email,
     name: user.name,
     role: user.role,
-    cartItemCount,
     company: {
       id: user.company.id,
       name: user.company.name,
