@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { AuthController } from "./auth.controller";
-import { AuthService } from "../services/auth.service";
+import authController from "./auth.controller";
+import authService from "../services/auth.service";
 
 // Mock AuthService
 jest.mock("../services/auth.service");
-const mockAuthService = AuthService as jest.Mocked<typeof AuthService>;
+const mockAuthService = authService as jest.Mocked<typeof authService>;
 
 describe("AuthController", () => {
   let mockRequest: Partial<Request>;
@@ -46,7 +46,7 @@ describe("AuthController", () => {
       mockAuthService.signUpSuperAdmin.mockResolvedValue(mockResult as any);
 
       // Act
-      await AuthController.signUpSuperAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.signUpSuperAdmin(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockResponse.status).toHaveBeenCalledWith(201);
@@ -63,7 +63,7 @@ describe("AuthController", () => {
       mockRequest.body = { email: "admin@test.com" }; // Missing other fields
 
       // Act
-      await AuthController.signUpSuperAdmin(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.signUpSuperAdmin(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
@@ -80,7 +80,7 @@ describe("AuthController", () => {
       mockAuthService.signUpViaInvite.mockResolvedValue(mockUser as any);
 
       // Act
-      await AuthController.signUpViaInvite(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.signUpViaInvite(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockResponse.status).toHaveBeenCalledWith(201);
@@ -96,7 +96,7 @@ describe("AuthController", () => {
       mockRequest.body = { password: "password123", confirmPassword: "differentPassword" };
 
       // Act
-      await AuthController.signUpViaInvite(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.signUpViaInvite(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
@@ -116,7 +116,7 @@ describe("AuthController", () => {
       mockAuthService.login.mockResolvedValue(mockResult as any);
 
       // Act
-      await AuthController.login(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.login(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockResponse.status).toHaveBeenCalledWith(200);
@@ -131,7 +131,7 @@ describe("AuthController", () => {
       mockRequest.body = { email: "user@test.com" }; // Missing password
 
       // Act
-      await AuthController.login(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.login(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
@@ -142,11 +142,11 @@ describe("AuthController", () => {
     it("should logout successfully", async () => {
       // Arrange
       mockRequest.user = { id: "user123", email: "user@test.com" } as any;
-      
+
       mockAuthService.logout.mockResolvedValue(undefined);
 
       // Act
-      await AuthController.logout(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.logout(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockAuthService.logout).toHaveBeenCalledWith("user123");
@@ -161,7 +161,7 @@ describe("AuthController", () => {
       mockRequest.user = undefined;
 
       // Act
-      await AuthController.logout(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.logout(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
@@ -172,17 +172,17 @@ describe("AuthController", () => {
     it("should refresh token successfully", async () => {
       // Arrange
       mockRequest.cookies = { refreshToken: "valid-refresh-token" };
-      
+
       const mockResult = {
         newAccessToken: "new-access-token",
         newRefreshToken: "new-refresh-token",
         user: { email: "user@test.com" }
       };
-      
+
       mockAuthService.refreshAccessToken.mockResolvedValue(mockResult as any);
 
       // Act
-      await AuthController.refreshToken(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.refreshToken(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockAuthService.refreshAccessToken).toHaveBeenCalledWith("valid-refresh-token");
@@ -197,7 +197,7 @@ describe("AuthController", () => {
       mockRequest.cookies = {};
 
       // Act
-      await AuthController.refreshToken(mockRequest as Request, mockResponse as Response, mockNext);
+      await authController.refreshToken(mockRequest as Request, mockResponse as Response, mockNext);
 
       // Assert
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));

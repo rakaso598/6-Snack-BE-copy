@@ -1,4 +1,4 @@
-import { AuthService } from "./auth.service";
+import authService from "./auth.service";
 import authRepository from "../repositories/auth.repository";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -31,17 +31,17 @@ describe("AuthService", () => {
       mockAuthRepository.findUserByEmailWithCompany.mockResolvedValue(null);
       mockAuthRepository.findCompanyByBizNumber.mockResolvedValue(null);
       (mockBcrypt.hash as any).mockResolvedValue("hashedPassword");
-      
+
       const mockResult = {
         user: { id: "1", email: "admin@test.com", role: "SUPER_ADMIN" },
         company: { id: 1, name: "Test Company" },
         monthlyBudget: { id: 1, year: 2025, month: 8 }
       };
-      
+
       mockAuthRepository.runInTransaction.mockResolvedValue(mockResult as any);
 
       // Act
-      const result = await AuthService.signUpSuperAdmin(signUpData);
+      const result = await authService.signUpSuperAdmin(signUpData);
 
       // Assert
       expect(mockAuthRepository.findUserByEmailWithCompany).toHaveBeenCalledWith("admin@test.com");
@@ -63,7 +63,7 @@ describe("AuthService", () => {
       mockAuthRepository.findUserByEmailWithCompany.mockResolvedValue({ id: "1" } as any);
 
       // Act & Assert
-      await expect(AuthService.signUpSuperAdmin(signUpData)).rejects.toThrow("이미 등록된 이메일입니다.");
+      await expect(authService.signUpSuperAdmin(signUpData)).rejects.toThrow("이미 등록된 이메일입니다.");
     });
   });
 
@@ -72,7 +72,7 @@ describe("AuthService", () => {
       // Arrange
       const inviteId = "invite123";
       const password = "password123";
-      
+
       const mockInvite = {
         id: "invite123",
         email: "user@test.com",
@@ -80,7 +80,7 @@ describe("AuthService", () => {
         isUsed: false,
         expiresAt: new Date(Date.now() + 86400000) // 1 day from now
       };
-      
+
       const mockUser = { id: "1", email: "user@test.com", name: "User" };
 
       mockAuthRepository.findInviteById.mockResolvedValue(mockInvite as any);
@@ -89,7 +89,7 @@ describe("AuthService", () => {
       mockAuthRepository.runInTransaction.mockResolvedValue(mockUser as any);
 
       // Act
-      const result = await AuthService.signUpViaInvite(inviteId, password);
+      const result = await authService.signUpViaInvite(inviteId, password);
 
       // Assert
       expect(mockAuthRepository.findInviteById).toHaveBeenCalledWith("invite123");
@@ -102,7 +102,7 @@ describe("AuthService", () => {
       mockAuthRepository.findInviteById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(AuthService.signUpViaInvite("invalid", "password")).rejects.toThrow("유효하지 않은 초대 링크입니다.");
+      await expect(authService.signUpViaInvite("invalid", "password")).rejects.toThrow("유효하지 않은 초대 링크입니다.");
     });
   });
 
@@ -113,7 +113,7 @@ describe("AuthService", () => {
       mockAuthRepository.updateUserRefreshToken.mockResolvedValue(undefined as any);
 
       // Act
-      await AuthService.logout(userId);
+      await authService.logout(userId);
 
       // Assert
       expect(mockAuthRepository.updateUserRefreshToken).toHaveBeenCalledWith("user123", null);
@@ -138,7 +138,7 @@ describe("AuthService", () => {
       mockAuthRepository.updateUserRefreshToken.mockResolvedValue(undefined as any);
 
       // Act
-      const result = await AuthService.refreshAccessToken(refreshToken);
+      const result = await authService.refreshAccessToken(refreshToken);
 
       // Assert
       expect(result).toEqual({
@@ -155,7 +155,7 @@ describe("AuthService", () => {
       mockAuthRepository.findUserById.mockResolvedValue(null);
 
       // Act & Assert
-      await expect(AuthService.refreshAccessToken("invalid-token")).rejects.toThrow("유효하지 않은 리프레시 토큰입니다.");
+      await expect(authService.refreshAccessToken("invalid-token")).rejects.toThrow("유효하지 않은 리프레시 토큰입니다.");
     });
   });
 });
