@@ -35,7 +35,7 @@ export const monthlyBudgetMockData = [
   },
   {
     companyId: 1,
-    currentMonthExpense: 12900, // 토쓰(주) 7월 APPROVED 주문들: user-1(4500) + user-2(2400) + user-3(4500) + user-4(3200) + user-6(2800)
+    currentMonthExpense: 22900, // 토쓰(주) 7월 APPROVED 주문들: user-1(4500) + user-2(2400) + user-3(4500) + user-4(3200) + user-6(2800) + user-7(5500)
     currentMonthBudget: 3500000,
     monthlyBudget: 2000000,
     year: "2025",
