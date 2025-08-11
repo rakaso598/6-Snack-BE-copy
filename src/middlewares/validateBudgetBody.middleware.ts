@@ -5,7 +5,7 @@ import { ValidationError } from "../types/error";
 const validateBudgetBody: RequestHandler<{}, {}, TUpdateMonthlyBudgetBody> = (req, res, next) => {
   const { currentMonthBudget, monthlyBudget } = req.body;
 
-  if (typeof currentMonthBudget === "string" || typeof monthlyBudget === "string") {
+  if (!Number.isFinite(currentMonthBudget) || !Number.isFinite(monthlyBudget)) {
     throw new ValidationError("이번 달 예산 또는 매달 예산에는 숫자만 입력해주세요.");
   }
 

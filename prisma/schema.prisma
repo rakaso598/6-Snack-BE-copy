@@ -118,16 +118,17 @@ model Receipt {
 }
 
 model Order {
-  id             String      @id @default(uuid())
-  companyId      Int
-  userId         String
-  approver       String?
-  adminMessage   String?
-  requestMessage String?
-  totalPrice     Int
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  status         OrderStatus
+  id                 String      @id @default(uuid())
+  companyId          Int
+  userId             String
+  approver           String?
+  adminMessage       String?
+  requestMessage     String?
+  deliveryFee        Int
+  productsPriceTotal Int
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  status             OrderStatus
 
   receipts Receipt[]
   payment  Payment[]
@@ -187,4 +188,5 @@ enum OrderStatus {
   APPROVED
   REJECTED
   CANCELED
+  INSTANT_APPROVED
 }
