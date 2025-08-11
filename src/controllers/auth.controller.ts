@@ -3,6 +3,84 @@ import { Role } from "@prisma/client";
 import authService from "../services/auth.service";
 import { BadRequestError, ValidationError } from "../types/error";
 
+/**
+ * @swagger
+ * tags:
+ *   - name: Auth
+ *     description: 인증 및 권한 관련 엔드포인트
+ */
+
+/**
+ * @swagger
+ * /auth/signup:
+ *   post:
+ *     summary: (최고관리자) 회원가입 및 회사/예산 초기화
+ *     description: 새로운 회사를 생성하고 해당 회사의 SUPER_ADMIN 사용자를 생성합니다.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, name, password, confirmPassword, companyName, bizNumber]
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: admin@example.com
+ *               name:
+ *                 type: string
+ *                 example: 김관리
+ *               password:
+ *                 type: string
+ *                 example: StrongP@ssw0rd!
+ *               confirmPassword:
+ *                 type: string
+ *                 description: passwordConfirm 도 허용 (둘 중 하나)
+ *                 example: StrongP@ssw0rd!
+ *               companyName:
+ *                 type: string
+ *                 example: 오오스낵 주식회사
+ *               bizNumber:
+ *                 type: string
+ *                 description: 사업자등록번호 (고유)
+ *                 example: 123-45-67890
+ *     responses:
+ *       201:
+ *         description: 회원가입 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id: { type: string }
+ *                     email: { type: string }
+ *                     role: { type: string, enum: [SUPER_ADMIN] }
+ *                 company:
+ *                   type: object
+ *                   properties:
+ *                     id: { type: string }
+ *                     name: { type: string }
+ *                 monthlyBudget:
+ *                   type: object
+ *                   properties:
+ *                     id: { type: string }
+ *                     year: { type: integer }
+ *                     month: { type: integer }
+ *                     currentMonthExpense: { type: number }
+ *                     currentMonthBudget: { type: number }
+ *                     monthlyBudget: { type: number }
+ *       400:
+ *         description: 필수 입력 누락 또는 유효성 실패
+ *       409:
+ *         description: 이메일 또는 사업자등록번호 중복
+ */
 const signUpSuperAdmin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, name, password, confirmPassword, passwordConfirm, role, companyName, bizNumber } = req.body;
@@ -53,6 +131,46 @@ const signUpSuperAdmin = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
+/**
+ * @swagger
+ * /auth/signup/{inviteId}:
+ *   post:
+ *     summary: 초대 링크를 통한 회원가입
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: path
+ *         name: inviteId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 초대 고유 ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [password, confirmPassword]
+ *             properties:
+ *               password:
+ *                 type: string
+ *                 example: StrongP@ssw0rd!
+ *               confirmPassword:
+ *                 type: string
+ *                 description: passwordConfirm 도 허용
+ *                 example: StrongP@ssw0rd!
+ *     responses:
+ *       201:
+ *         description: 회원가입 완료
+ *       400:
+ *         description: 필수 입력 누락 / 비밀번호 불일치
+ *       404:
+ *         description: 초대가 존재하지 않음
+ *       410:
+ *         description: 초대 만료됨
+ *       409:
+ *         description: 이미 사용된 초대 또는 이메일 중복
+ */
 const signUpViaInvite = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { inviteId } = req.params;
@@ -81,6 +199,53 @@ const signUpViaInvite = async (req: Request, res: Response, next: NextFunction) 
   }
 };
 
+/**
+ * @swagger
+ * /auth/login:
+ *   post:
+ *     summary: 이메일/비밀번호 로그인
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string, format: email, example: user@example.com }
+ *               password: { type: string, example: StrongP@ssw0rd! }
+ *     responses:
+ *       200:
+ *         description: 로그인 성공 (JWT 쿠키 발급)
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *             description: accessToken(15분), refreshToken(7일) httpOnly 쿠키
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string }
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id: { type: string }
+ *                     email: { type: string }
+ *                     name: { type: string }
+ *                     role: { type: string }
+ *                     company:
+ *                       type: object
+ *                       properties:
+ *                         id: { type: string }
+ *                         name: { type: string }
+ *       400:
+ *         description: 필수 입력 누락
+ *       401:
+ *         description: 인증 실패 (이메일/비밀번호 불일치)
+ */
 const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
@@ -128,6 +293,32 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+/**
+ * @swagger
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Refresh Token을 이용해 Access Token 재발급
+ *     tags: [Auth]
+ *     description: refreshToken httpOnly 쿠키가 유효하면 새 accessToken 및 refreshToken을 재발급합니다.
+ *     responses:
+ *       200:
+ *         description: 토큰 재발급 성공 (쿠키로 전달)
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *             description: 새 accessToken / refreshToken 쿠키
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string, example: "새로운 Access Token이 발급되었습니다." }
+ *       400:
+ *         description: refreshToken 없음
+ *       401:
+ *         description: refreshToken 유효하지 않음
+ */
 const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const refreshToken = req.cookies.refreshToken;
@@ -159,6 +350,26 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction) => 
   }
 };
 
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: 로그아웃 (쿠키 제거)
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 로그아웃 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string, example: "성공적으로 로그아웃되었습니다." }
+ *       401:
+ *         description: 인증 실패
+ */
 const logout = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!req.user) {

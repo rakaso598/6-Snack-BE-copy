@@ -4,38 +4,55 @@ import { RequestHandler } from "express";
 
 /**
  * @swagger
+ * tags:
+ *   - name: SuperAdmin
+ *     description: 최고관리자 전용 엔드포인트
+ *   - name: User
+ *     description: 일반 사용자 관련 엔드포인트
+ */
+
+/**
+ * @swagger
  * /super-admin/users/invite:
  *   post:
- *     summary: (최고관리자) 유저 초대
+ *     summary: (최고관리자) 유저 초대 생성
+ *     description: SUPER_ADMIN 이 같은 회사에 새로운 사용자를 초대합니다. 초대 이메일이 발송되고 해당 초대 링크로 회원가입을 완료합니다.
  *     tags: [SuperAdmin]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - email
- *               - name
- *               - role
- *               - companyId
- *               - invitedById
+ *             required: [email, name, role, companyId, invitedById]
  *             properties:
  *               email:
  *                 type: string
+ *                 format: email
  *               name:
  *                 type: string
  *               role:
  *                 type: string
+ *                 enum: [USER, ADMIN]
+ *                 description: SUPER_ADMIN 는 초대를 통해 생성할 수 없음
  *               companyId:
  *                 type: string
  *               invitedById:
  *                 type: string
+ *               expiresInDays:
+ *                 type: number
+ *                 default: 7
  *     responses:
  *       201:
  *         description: 초대 성공
  *       400:
  *         description: 잘못된 요청
+ *       401:
+ *         description: 인증 실패
+ *       403:
+ *         description: 권한 없음 (SUPER_ADMIN 필수)
  */
 
 /**
