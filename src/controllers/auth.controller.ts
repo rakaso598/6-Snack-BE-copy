@@ -204,9 +204,13 @@ export class AuthController {
       const accessTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
       const refreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
+      const isProduction = process.env.NODE_ENV === "production";
+      const cookieDomain = isProduction ? ".5nack.site" : undefined;
+
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        domain: cookieDomain,
+        secure: isProduction,
         sameSite: "lax",
         expires: accessTokenExpires,
         path: "/",
@@ -214,7 +218,8 @@ export class AuthController {
 
       res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        domain: cookieDomain,
+        secure: isProduction,
         sameSite: "lax",
         expires: refreshTokenExpires,
         path: "/",
