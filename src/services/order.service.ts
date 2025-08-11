@@ -92,6 +92,7 @@ const updateOrder = async (
   return await prisma.$transaction(async (tx) => {
     // 2. Order 상태 업데이트(승인 or 반려)
     const updatedOrder = await orderRepository.updateOrder(orderId, body, tx);
+    const { deliveryFee, productsPriceTotal } = updatedOrder;
 
     // 2-1. 반려일 때 얼리 리턴
     if (body.status === "REJECTED") return updatedOrder;
@@ -101,10 +102,13 @@ const updateOrder = async (
 
     if (!monthlyBudget) throw new NotFoundError("예산이 존재하지 않습니다.");
 
-    if (monthlyBudget.currentMonthBudget < monthlyBudget.currentMonthExpense + updatedOrder.totalPrice + 3000)
+    const { currentMonthExpense } = monthlyBudget;
+
+    // 에러. 예산 부족할 경우 승인 실패
+    if (monthlyBudget.currentMonthBudget < currentMonthExpense + productsPriceTotal + deliveryFee)
       throw new BadRequestError("예산이 부족합니다.");
 
-    const totalCurrentMonthExpense = monthlyBudget.currentMonthExpense + updatedOrder.totalPrice + 3000;
+    const totalCurrentMonthExpense = currentMonthExpense + productsPriceTotal + deliveryFee;
 
     // 4. 지출액 증가
     await budgetRepository.updateCurrentMonthExpense({ companyId, year, month }, totalCurrentMonthExpense, tx);
