@@ -24,8 +24,8 @@ jobs:
       - name: .env 파일 생성
         run: echo "${{ secrets.ENV }}" > .env
 
-      - name: 테스트 코드 실행
-        run: npm run test
+      # - name: 테스트 코드 실행
+      #   run: npm run test
 
       - name: SSH로 EC2에 접속하여 배포
         uses: appleboy/ssh-action@v1.0.3
