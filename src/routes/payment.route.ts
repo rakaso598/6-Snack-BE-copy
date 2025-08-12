@@ -8,16 +8,16 @@ const paymentRouter = Router();
 
 paymentRouter.post(
   "/confirm",
-  invalidateCache(),
   authenticateToken,
+  invalidateCache(),
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
   paymentController.confirmPayment,
 );
 
 paymentRouter.delete(
   "/cancel",
-  invalidateCache(),
   authenticateToken,
+  invalidateCache(),
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
   paymentController.cancelPayment,
 );
