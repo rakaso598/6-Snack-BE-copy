@@ -328,16 +328,20 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction) => 
     const { newAccessToken, newRefreshToken, user } = await authService.refreshAccessToken(refreshToken);
     const newAccessTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
     const newRefreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieDomain = isProduction ? ".5nack.site" : undefined;
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      domain: cookieDomain,
+      secure: isProduction,
       sameSite: "lax",
       expires: newAccessTokenExpires,
       path: "/",
     });
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      domain: cookieDomain,
+      secure: isProduction,
       sameSite: "lax",
       expires: newRefreshTokenExpires,
       path: "/",
@@ -376,15 +380,19 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
       throw new BadRequestError("인증되지 않은 사용자입니다.");
     }
     await authService.logout(req.user.id);
+    const isProduction = process.env.NODE_ENV === "production";
+    const cookieDomain = isProduction ? ".5nack.site" : undefined;
     res.clearCookie("accessToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      domain: cookieDomain,
+      secure: isProduction,
       sameSite: "lax",
       path: "/",
     });
     res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      domain: cookieDomain,
+      secure: isProduction,
       sameSite: "lax",
       path: "/",
     });
