@@ -1,11 +1,12 @@
 import { Company, Order } from "@prisma/client";
 import orderRepository from "../repositories/order.repository";
-import { NotFoundError, ValidationError, ForbiddenError, BadRequestError } from "../types/error";
+import { NotFoundError, ValidationError, ForbiddenError, BadRequestError, AuthenticationError } from "../types/error";
 import { TGetOrdersQuery, TOrderWithBudget } from "../types/order.types";
 import budgetRepository from "../repositories/budget.repository";
 import getDateForBudget from "../utils/getDateForBudget";
 import prisma from "../config/prisma";
 import productRepository from "../repositories/product.repository";
+import userRepository from "../repositories/user.repository";
 
 // 구매내역 조회(대기 or 승인)
 const getOrders = async ({ page, limit, orderBy, status }: TGetOrdersQuery, companyId: number) => {
@@ -144,7 +145,12 @@ const createOrder = async (orderData: {
     return await orderRepository.createOrder(orderData, tx);
   });
 
-  const formattedOrder = getOrder(order.id, "pending", orderData.companyId);
+  // 유저 역할 확인
+  const user = await userRepository.findActiveUserById(orderData.userId);
+
+  if (!user) throw new AuthenticationError("로그인이 필요합니다.");
+
+  const formattedOrder = getOrder(order.id, user.role === "USER" ? "pending" : "approved", orderData.companyId);
 
   return formattedOrder;
 };

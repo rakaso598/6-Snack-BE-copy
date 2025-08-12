@@ -1,6 +1,7 @@
 import { Company, Order, Prisma } from "@prisma/client";
 import prisma from "../config/prisma";
 import { TGetOrdersQuery, TGetOrdersRepositoryQuery, TGetOrderStatus } from "../types/order.types";
+import { AuthenticationError } from "../types/error";
 
 const SORT_OPTIONS: Record<"latest" | "priceLow" | "priceHigh", Prisma.OrderOrderByWithRelationInput> = {
   latest: { createdAt: "desc" },
@@ -10,13 +11,20 @@ const SORT_OPTIONS: Record<"latest" | "priceLow" | "priceHigh", Prisma.OrderOrde
 
 const STATUS_OPTIONS: TGetOrderStatus = {
   pending: "PENDING",
-  approved: "APPROVED",
+  approved: ["APPROVED", "INSTANT_APPROVED"],
+};
+
+const getStatusCondition = (status: keyof TGetOrderStatus) => {
+  const statusValue = STATUS_OPTIONS[status];
+  return Array.isArray(statusValue) ? { status: { in: statusValue } } : { status: statusValue };
 };
 
 // 주문 목록 조회
 const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersRepositoryQuery, companyId: Company["id"]) => {
+  const statusOptions = getStatusCondition(status);
+
   return await prisma.order.findMany({
-    where: { status: STATUS_OPTIONS[status], companyId },
+    where: { ...statusOptions, companyId },
     skip: offset,
     take: limit,
     orderBy: SORT_OPTIONS[orderBy] || SORT_OPTIONS["latest"],
@@ -29,20 +37,19 @@ const getOrders = async ({ offset, limit, orderBy, status }: TGetOrdersRepositor
 
 // 주문 목록 총 갯수 조회
 const getOrdersTotalCount = async ({ status }: Pick<TGetOrdersQuery, "status">, companyId: Company["id"]) => {
+  const statusOptions = getStatusCondition(status);
+
   return await prisma.order.count({
-    where: { status: STATUS_OPTIONS[status], companyId },
+    where: { ...statusOptions, companyId },
   });
 };
 
 // 주문 조회(대기 or 승인)
 const getOrderByIdAndStatus = async (id: Order["id"], status: "pending" | "approved", companyId: Company["id"]) => {
-  const statusOptions: TGetOrderStatus = {
-    pending: "PENDING",
-    approved: "APPROVED",
-  };
+  const statusOptions = getStatusCondition(status);
 
   return await prisma.order.findFirst({
-    where: { id, status: statusOptions[status], companyId },
+    where: { id, ...statusOptions, companyId },
     include: {
       user: { omit: { hashedRefreshToken: true, password: true } },
       receipts: true,
@@ -81,6 +88,13 @@ const updateOrder = async (
   return await client.order.update({
     where: { id },
     data: { approver, adminMessage, status },
+  });
+};
+
+const revertOrder = async (id: Order["id"]) => {
+  return await prisma.order.update({
+    where: { id },
+    data: { adminMessage: null, status: "PENDING", approver: null },
   });
 };
 
@@ -130,6 +144,14 @@ const createOrder = async (
     return sum + cartItem.product.price * cartItem.quantity;
   }, 0);
 
+  // 2-1. 유저 역할 확인
+  const user = await client.user.findUnique({
+    where: { id: orderData.userId },
+    select: { role: true },
+  });
+
+  if (!user) throw new AuthenticationError("로그인이 필요합니다.");
+
   // 3. 주문 생성
   const order = await client.order.create({
     data: {
@@ -139,7 +161,7 @@ const createOrder = async (
       requestMessage: orderData.requestMessage,
       productsPriceTotal: totalPrice,
       deliveryFee: 3000,
-      status: "PENDING",
+      status: user.role === "USER" ? "PENDING" : "INSTANT_APPROVED",
     },
   });
 
@@ -252,6 +274,7 @@ export default {
   getOrderById,
   getOrderWithCartItemIdsById,
   updateOrder,
+  revertOrder,
   deleteReceiptAndOrder,
   // OrderRequest 관련 기능들
   createOrder,

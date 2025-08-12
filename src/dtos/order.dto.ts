@@ -5,6 +5,13 @@ export type TGetOrdersQueryDto = {
   status: "pending" | "approved";
 };
 
+export type TGetOrderQueryDto = {
+  page: string;
+  limit: string;
+  orderBy: "latest" | "priceLow" | "priceHigh";
+  status?: "pending" | "approved";
+};
+
 export type TGetOrderParamsDto = {
   orderId: string;
 };
