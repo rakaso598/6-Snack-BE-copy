@@ -13,8 +13,9 @@ const superAdminRouter = Router();
 superAdminRouter.delete(
   "/users/:userId",
   authenticateToken,
-  invalidateCache(),
+
   authorizeRoles("SUPER_ADMIN"),
+  invalidateCache(),
   userController.deleteUser,
 );
 
@@ -22,8 +23,9 @@ superAdminRouter.delete(
 superAdminRouter.patch(
   "/users/:userId/role",
   authenticateToken,
-  invalidateCache(),
+
   authorizeRoles("SUPER_ADMIN"),
+  invalidateCache(),
   userController.updateRole,
 );
 
@@ -31,8 +33,9 @@ superAdminRouter.patch(
 superAdminRouter.patch(
   "/users/:userId/company",
   authenticateToken,
-  invalidateCache(),
+
   authorizeRoles("SUPER_ADMIN"),
+  invalidateCache(),
   companyController.updateCompanyInfo,
 );
 
@@ -40,8 +43,9 @@ superAdminRouter.patch(
 superAdminRouter.get(
   "/users",
   authenticateToken,
-  cacheMiddleware(),
+
   authorizeRoles("SUPER_ADMIN"),
+  cacheMiddleware(),
   userController.getUsersByCompany,
 );
 
@@ -49,8 +53,9 @@ superAdminRouter.get(
 superAdminRouter.patch(
   "/:companyId/budgets",
   authenticateToken,
-  invalidateCache(),
+
   authorizeRoles("SUPER_ADMIN"),
+  invalidateCache(),
   validateBudgetBody,
   budgetController.updateMonthlyBudget,
 );
