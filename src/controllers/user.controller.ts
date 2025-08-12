@@ -5,19 +5,17 @@ import { RequestHandler } from "express";
 /**
  * @swagger
  * tags:
- *   - name: SuperAdmin
- *     description: 최고관리자 전용 엔드포인트
  *   - name: User
- *     description: 일반 사용자 관련 엔드포인트
+ *     description: 유저 API
  */
 
 /**
  * @swagger
  * /super-admin/users/invite:
  *   post:
- *     summary: (최고관리자) 유저 초대 생성
+ *     summary: 회원 초대 이메일 생성(최고관리자)
  *     description: SUPER_ADMIN 이 같은 회사에 새로운 사용자를 초대합니다. 초대 이메일이 발송되고 해당 초대 링크로 회원가입을 완료합니다.
- *     tags: [SuperAdmin]
+ *     tags: [Invite]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -59,7 +57,7 @@ import { RequestHandler } from "express";
  * @swagger
  * /users/{userId}:
  *   get:
- *     summary: 유저 정보 조회
+ *     summary: 유저 조회
  *     tags: [User]
  *     parameters:
  *       - in: path
@@ -117,7 +115,7 @@ const getUserInfo: RequestHandler<TUserIdParamsDto> = async (req, res, next) => 
  * @swagger
  * /super-admin/users/{userId}:
  *   delete:
- *     summary: (최고관리자) 유저 삭제
+ *     summary: 유저 삭제(최고관리자)
  *     tags: [User]
  *     parameters:
  *       - in: path
@@ -165,7 +163,7 @@ const deleteUser: RequestHandler<TUserIdParamsDto> = async (req, res, next) => {
  * @swagger
  * /super-admin/users/{userId}/role:
  *   patch:
- *     summary: (최고관리자) 유저 권한 수정
+ *     summary:  유저 권한 수정(최고관리자) 
  *     tags: [User]
  *     parameters:
  *       - in: path
@@ -230,7 +228,7 @@ const updateRole: RequestHandler<TUserIdParamsDto, any, TUpdateRoleDto> = async 
  * @swagger
  * /users/{userId}/password:
  *   patch:
- *     summary: 유저 비밀번호 수정
+ *     summary: 비밀번호 변경
  *     tags: [User]
  *     parameters:
  *       - in: path
@@ -290,7 +288,7 @@ const updatePassword: RequestHandler<TUserIdParamsDto, any, TUpdatePasswordDto> 
  * @swagger
  * /super-admin/users:
  *   get:
- *     summary: (최고관리자) 회사 유저 목록 조회
+ *     summary: 유저 목록 조회(최고관리자)
  *     tags: [User]
  *     parameters:
  *       - in: query

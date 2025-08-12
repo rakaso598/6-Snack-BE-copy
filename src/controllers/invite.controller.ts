@@ -7,14 +7,14 @@ import inviteService from "../services/invite.service";
  * @swagger
  * tags:
  *   - name: Invite
- *     description: 사용자 초대 관련 엔드포인트
+ *     description: 회원 초대 API
  */
 
 /**
  * @swagger
  * /invite:
  *   post:
- *     summary: 초대 링크 생성 및 이메일 발송
+ *     summary: 회원 초대 이메일 발송
  *     description: SUPER_ADMIN이 회사에 새 사용자를 초대하고 지정된 역할(SUPER_ADMIN 제외)을 부여합니다. 초대 이메일이 자동으로 발송됩니다.
  *     tags: [Invite]
  *     security:

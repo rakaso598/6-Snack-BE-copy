@@ -6,6 +6,13 @@ import { TFavoriteParamsDto, TGetFavoritesQueryDto } from "../dtos/favorite.dto"
 
 /**
  * @swagger
+ * tags:
+ *   - name: Favorite
+ *     description: 찜 API
+ */
+
+/**
+ * @swagger
  * /favorites:
  *   get:
  *     tags:

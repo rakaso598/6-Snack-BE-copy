@@ -23,7 +23,7 @@ import { Role } from "@prisma/client";
  * @swagger
  * tags:
  *   - name: Product
- *     description: 상품 관련 API
+ *     description: 상품 API
  */
 
 /**
@@ -630,7 +630,7 @@ export const deleteProduct: RequestHandler<{ id: string }> = async (req, res, ne
  * @swagger
  * /admin/products/{id}:
  *   delete:
- *     summary: 관리자 상품 삭제
+ *     summary: 상품 삭제(관리자)
  *     description: "관리자가 모든 상품을 강제로 삭제합니다 (소프트 삭제)."
  *     tags: [Product]
  *     security:
@@ -681,7 +681,7 @@ export const forceDeleteProduct: RequestHandler<{ id: string }> = async (req, re
  * @swagger
  * /categories:
  *   get:
- *     summary: 카테고리 조회
+ *     summary: 상품 카테고리 조회
  *     description: "상품 카테고리의 계층 구조를 조회합니다."
  *     tags: [Product]
  *     responses:
