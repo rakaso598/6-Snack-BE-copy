@@ -43,44 +43,44 @@ import { TFavoriteParamsDto, TGetFavoritesQueryDto } from "../dtos/favorite.dto"
  *                     properties:
  *                       id:
  *                         type: integer
- *                         example: 14
+ *                         example: 1
  *                       product:
  *                         type: object
  *                         properties:
  *                           id:
  *                             type: integer
- *                             example: 14
+ *                             example: 3
  *                           categoryId:
  *                             type: integer
  *                             example: 2
  *                           creatorId:
  *                             type: string
- *                             example: "user-1"
+ *                             example: "user-2"
  *                           name:
  *                             type: string
- *                             example: "신당동떡볶이"
+ *                             example: "농심 새우깡"
  *                           price:
  *                             type: integer
- *                             example: 1500
+ *                             example: 800
  *                           imageUrl:
  *                             type: string
  *                             format: uri
- *                             example: "https://team3-snack-s3.s3.amazonaws.com/products/xxx.png"
+ *                             example: "https://d2beg4tvxabcw1.cloudfront.net/products/nongshim-saewookang.png"
  *                           linkUrl:
  *                             type: string
  *                             format: uri
- *                             example: "http://www.codeit.kr"
+ *                             example: "https://example.com/nongshim-saewookang"
  *                           cumulativeSales:
  *                             type: integer
- *                             example: 0
+ *                             example: 200
  *                           createdAt:
  *                             type: string
  *                             format: date-time
- *                             example: "2025-07-31T06:01:24.403Z"
+ *                             example: "2025-01-03T00:00:00.000Z"
  *                           updatedAt:
  *                             type: string
  *                             format: date-time
- *                             example: "2025-07-31T06:01:48.832Z"
+ *                             example: "2025-01-03T00:00:00.000Z"
  *                           deletedAt:
  *                             type: string
  *                             format: date-time
@@ -103,34 +103,34 @@ import { TFavoriteParamsDto, TGetFavoritesQueryDto } from "../dtos/favorite.dto"
  *                             properties:
  *                               id:
  *                                 type: string
- *                                 example: "user-1"
+ *                                 example: "user-2"
  *                               email:
  *                                 type: string
  *                                 format: email
- *                                 example: "super_admin@codeit.com"
+ *                                 example: "admin@codeit.com"
  *                               name:
  *                                 type: string
- *                                 example: "최고관리자"
+ *                                 example: "관리자"
  *                               role:
  *                                 type: string
  *                                 enum: [USER, ADMIN, SUPER_ADMIN]
- *                                 example: "SUPER_ADMIN"
+ *                                 example: "ADMIN"
  *                 meta:
  *                   type: object
  *                   properties:
  *                     totalCount:
  *                       type: integer
- *                       example: 17
+ *                       example: 3
  *                     itemsPerPage:
  *                       type: integer
  *                       example: 6
  *                     totalPages:
  *                       type: integer
- *                       example: 3
+ *                       example: 1
  *                     nextCursor:
  *                       type: integer
  *                       nullable: true
- *                       example: 9
+ *                       example: 7
  *       401:
  *         description: 인증되지 않은 사용자
  *         content:
@@ -193,17 +193,17 @@ const getFavorites: RequestHandler<{}, {}, {}, TGetFavoritesQueryDto> = async (r
  *               properties:
  *                 id:
  *                   type: integer
- *                   example: 32
+ *                   example: 9
  *                 userId:
  *                   type: string
  *                   example: "user-1"
  *                 productId:
  *                   type: integer
- *                   example: 1
+ *                   example: 7
  *                 createdAt:
  *                   type: string
  *                   format: date-time
- *                   example: "2025-08-02T17:56:37.221Z"
+ *                   example: "2025-08-11T16:06:06.441Z"
  *       400:
  *         description: 이미 찜한 상품인 경우
  *         content:

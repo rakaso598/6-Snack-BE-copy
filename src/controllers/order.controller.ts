@@ -61,18 +61,18 @@ import { AuthenticationError } from "../types/error";
  *                     type: object
  *                     properties:
  *                       id:
- *                         type: integer
- *                         example: 50
+ *                         type: string
+ *                         example: "d71e5c0f-1e9a-43ef-b8f8-25f0c30cf815"
  *                       companyId:
  *                         type: integer
  *                         example: 1
  *                       userId:
  *                         type: string
- *                         example: "user-1"
+ *                         example: "user-3"
  *                       approver:
  *                         type: string
  *                         nullable: true
- *                         example: "최고관리자"
+ *                         example: null
  *                       adminMessage:
  *                         type: string
  *                         example: "관리자에게 남길 메시지"
@@ -80,27 +80,30 @@ import { AuthenticationError } from "../types/error";
  *                         type: string
  *                         nullable: true
  *                         example: "요청 이요"
- *                       totalPrice:
+ *                       deliveryFee:
  *                         type: integer
- *                         example: 16500
+ *                         example: 3000
+ *                       productsPriceTotal:
+ *                         type: integer
+ *                         example: 3500
  *                       createdAt:
  *                         type: string
  *                         format: date-time
- *                         example: "2025-08-01T07:02:14.343Z"
+ *                         example: "2025-08-11T14:15:44.644Z"
  *                       updatedAt:
  *                         type: string
  *                         format: date-time
- *                         example: "2025-08-01T07:02:14.343Z"
+ *                         example: "2025-08-11T14:15:44.644Z"
  *                       status:
  *                         type: string
  *                         enum: [PENDING, APPROVED]
  *                         example: "PENDING"
  *                       requester:
  *                         type: string
- *                         example: "최고관리자"
+ *                         example: "유저"
  *                       productName:
  *                         type: string
- *                         example: "오리온 초코파이 외 1건"
+ *                         example: "해태 홈런볼 외 1건"
  *                 meta:
  *                   type: object
  *                   properties:
@@ -192,8 +195,8 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
  *         required: true
  *         description: 조회할 주문 고유 ID
  *         schema:
- *           type: integer
- *           example: 50
+ *           type: string
+ *           example: "d71e5c0f-1e9a-43ef-b8f8-25f0c30cf815"
  *       - in: query
  *         name: status
  *         required: true
@@ -211,79 +214,61 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
  *               type: object
  *               properties:
  *                 id:
- *                   type: integer
- *                   example: 50
+ *                   type: string
+ *                   example: "d71e5c0f-1e9a-43ef-b8f8-25f0c30cf815"
  *                 companyId:
  *                   type: integer
  *                   example: 1
  *                 userId:
  *                   type: string
- *                   example: user-1
+ *                   example: "user-3"
  *                 approver:
  *                   type: string
  *                   nullable: true
  *                   example: null
  *                 adminMessage:
  *                   type: string
- *                   example: 관리자에게 남길 메시지
+ *                   example: "관리자에게 남길 메시지"
  *                 requestMessage:
  *                   type: string
  *                   nullable: true
- *                   example: 요청 이요
- *                 totalPrice:
+ *                   example: "요청 이요"
+ *                 deliveryFee:
  *                   type: integer
- *                   example: 16500
+ *                   example: 3000
+ *                 productsPriceTotal:
+ *                   type: integer
+ *                   example: 3500
  *                 createdAt:
  *                   type: string
  *                   format: date-time
- *                   example: 2025-08-01T07:02:14.343Z
+ *                   example: "2025-08-11T14:15:44.644Z"
  *                 updatedAt:
  *                   type: string
  *                   format: date-time
- *                   example: 2025-08-01T07:02:14.343Z
+ *                   example: "2025-08-11T14:15:44.644Z"
  *                 status:
  *                   type: string
- *                   example: PENDING
+ *                   example: "PENDING"
  *                 user:
  *                   type: object
  *                   properties:
  *                     id:
  *                       type: string
- *                       example: user-1
+ *                       example: "user-3"
  *                     email:
  *                       type: string
  *                       format: email
- *                       example: super_admin@codeit.com
+ *                       example: "user@codeit.com"
  *                     name:
  *                       type: string
- *                       example: 최고관리자
- *                     password:
- *                       type: string
- *                       example: "$2b$10$1Wfev82g49/Y96n1Z00EmOAcvsUsAlvpkV8epDkzP36IzKSdp.V/W"
- *                     companyId:
- *                       type: integer
- *                       example: 1
- *                     createdAt:
- *                       type: string
- *                       format: date-time
- *                       example: 2024-01-01T00:00:00.000Z
- *                     updatedAt:
- *                       type: string
- *                       format: date-time
- *                       example: 2025-08-02T18:08:17.741Z
- *                     deletedAt:
- *                       type: string
- *                       nullable: true
- *                       example: null
- *                     hashedRefreshToken:
- *                       type: string
- *                       example: "$2b$10$Gb9HggcTszQWthR/cjaEXeFP.lKhtp/b98bPXIz3yzhhfK1QOVL66"
+ *                       example: "유저"
  *                     role:
  *                       type: string
- *                       example: SUPER_ADMIN
+ *                       example: "USER"
  *                 requester:
  *                   type: string
- *                   example: 최고관리자
+ *                   example: "유저"
  *                 products:
  *                   type: array
  *                   items:
@@ -291,41 +276,41 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
  *                     properties:
  *                       id:
  *                         type: integer
- *                         example: 116
+ *                         example: 24
  *                       productId:
  *                         type: integer
- *                         example: 1
+ *                         example: 4
  *                       orderId:
- *                         type: integer
- *                         example: 50
+ *                         type: string
+ *                         example: "d71e5c0f-1e9a-43ef-b8f8-25f0c30cf815"
  *                       productName:
  *                         type: string
- *                         example: 오리온 초코파이
+ *                         example: "해태 홈런볼"
  *                       price:
  *                         type: integer
- *                         example: 1500
+ *                         example: 2500
  *                       imageUrl:
  *                         type: string
  *                         format: uri
- *                         example: https://team3-snack-s3.s3.amazonaws.com/products/orion-chocopie.png
+ *                         example: "https://d2beg4tvxabcw1.cloudfront.net/products/haetae-homerunball.png"
  *                       quantity:
  *                         type: integer
- *                         example: 10
+ *                         example: 1
  *                       createdAt:
  *                         type: string
  *                         format: date-time
- *                         example: 2025-08-01T07:02:14.366Z
+ *                         example: "2025-08-11T14:15:44.676Z"
  *                 budget:
  *                   type: object
  *                   properties:
  *                     currentMonthBudget:
  *                       type: integer
  *                       nullable: true
- *                       example: 1000000
+ *                       example: 2000000
  *                     currentMonthExpense:
  *                       type: integer
  *                       nullable: true
- *                       example: 477790
+ *                       example: 77800
  *       400:
  *         description: 요청 쿼리 오류
  *         content:
@@ -388,9 +373,9 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
  *         name: orderId
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
  *         description: 수정할 주문의 고유 ID
- *         example: 11
+ *         example: "d71e5c0f-1e9a-43ef-b8f8-25f0c30cf815"
  *     requestBody:
  *       required: true
  *       content:
@@ -418,14 +403,14 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
  *               type: object
  *               properties:
  *                 id:
- *                   type: integer
- *                   example: 11
+ *                   type: string
+ *                   example: "d71e5c0f-1e9a-43ef-b8f8-25f0c30cf815"
  *                 companyId:
  *                   type: integer
  *                   example: 1
  *                 userId:
  *                   type: string
- *                   example: user-1
+ *                   example: user-3
  *                 approver:
  *                   type: string
  *                   example: 최고관리자
@@ -435,17 +420,20 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
  *                 requestMessage:
  *                   type: string
  *                   example: 요청 이요
- *                 totalPrice:
+ *                 deliveryFee:
  *                   type: integer
- *                   example: 76700
+ *                   example: 3000
+ *                 productsPriceTotal:
+ *                   type: integer
+ *                   example: 3500
  *                 createdAt:
  *                   type: string
  *                   format: date-time
- *                   example: 2025-07-31T04:18:29.869Z
+ *                   example: "2025-08-11T14:15:44.644Z"
  *                 updatedAt:
  *                   type: string
  *                   format: date-time
- *                   example: 2025-08-02T18:08:58.273Z
+ *                   example: "2025-08-11T15:52:44.703Z"
  *                 status:
  *                   type: string
  *                   example: APPROVED
@@ -453,15 +441,12 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
  *         description: 요청값 유효성 검사 실패
  *         content:
  *           application/json:
- *             examples:
- *               missingStatus:
- *                 summary: status 누락
- *                 value:
- *                   message: 상태 값을 입력해주세요.
- *               invalidStatus:
- *                 summary: status 값이 허용되지 않은 경우
- *                 value:
- *                   message: 올바른 상태를 입력해주세요.
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "상태 값을 입력해주세요."
  *       401:
  *         description: 인증되지 않은 사용자
  *         content:
@@ -471,7 +456,7 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 유효하지 않은 유저입니다.
+ *                   example: "유효하지 않은 유저입니다."
  *       403:
  *         description: 권한 없음 (ADMIN 또는 SUPER_ADMIN만 가능)
  *         content:
@@ -481,9 +466,9 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 권한이 없습니다.
+ *                   example: "권한이 없습니다."
  *       404:
- *         description: 주문 또는 예산 정보 없음
+ *         description: 주문 정보 없음
  *         content:
  *           application/json:
  *             schema:
@@ -491,7 +476,7 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 주문을 찾을 수 없습니다.
+ *                   example: "주문을 찾을 수 없습니다."
  *       500:
  *         description: 서버 오류
  *         content:
@@ -501,7 +486,7 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrdersQueryDto> =
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 알 수 없는 서버 오류가 발생했습니다.
+ *                   example: "알 수 없는 서버 오류가 발생했습니다."
  */
 
 // 구매 승인 | 구매 반려
