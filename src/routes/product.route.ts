@@ -7,7 +7,7 @@ import { cacheMiddleware, invalidateCache } from "../middlewares/cacheMiddleware
 const router = Router();
 
 router.get("/category", cacheMiddleware(), productController.getCategoryTree);
-router.post("/", invalidateCache(), authenticateToken, upload.single("image"), productController.createProduct);
+router.post("/", authenticateToken, invalidateCache(), upload.single("image"), productController.createProduct);
 router.get("/:id", authenticateToken, cacheMiddleware(), productController.getProductDetail);
 router.patch("/:id", authenticateToken, invalidateCache(), productController.updateProduct);
 router.delete("/:id", authenticateToken, invalidateCache(), productController.deleteProduct);
