@@ -5,16 +5,24 @@ import userController from "../controllers/user.controller";
 import companyController from "../controllers/company.controller";
 import budgetController from "../controllers/budget.controller";
 import validateBudgetBody from "../middlewares/validateBudgetBody.middleware";
+import { cacheMiddleware, invalidateCache } from "../middlewares/cacheMiddleware";
 
 const superAdminRouter = Router();
 
 // 회원 탈퇴
-superAdminRouter.delete("/users/:userId", authenticateToken, authorizeRoles("SUPER_ADMIN"), userController.deleteUser);
+superAdminRouter.delete(
+  "/users/:userId",
+  authenticateToken,
+  invalidateCache(),
+  authorizeRoles("SUPER_ADMIN"),
+  userController.deleteUser,
+);
 
 // 회원 권한 수정
 superAdminRouter.patch(
   "/users/:userId/role",
   authenticateToken,
+  invalidateCache(),
   authorizeRoles("SUPER_ADMIN"),
   userController.updateRole,
 );
@@ -23,17 +31,25 @@ superAdminRouter.patch(
 superAdminRouter.patch(
   "/users/:userId/company",
   authenticateToken,
+  invalidateCache(),
   authorizeRoles("SUPER_ADMIN"),
   companyController.updateCompanyInfo,
 );
 
 // 최고관리자의 회사 유저목록 조회
-superAdminRouter.get("/users", authenticateToken, authorizeRoles("SUPER_ADMIN"), userController.getUsersByCompany);
+superAdminRouter.get(
+  "/users",
+  authenticateToken,
+  cacheMiddleware(),
+  authorizeRoles("SUPER_ADMIN"),
+  userController.getUsersByCompany,
+);
 
 // 예산 수정(최고 관리자)
 superAdminRouter.patch(
   "/:companyId/budgets",
   authenticateToken,
+  invalidateCache(),
   authorizeRoles("SUPER_ADMIN"),
   validateBudgetBody,
   budgetController.updateMonthlyBudget,
