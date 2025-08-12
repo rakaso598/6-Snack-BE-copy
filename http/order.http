@@ -47,11 +47,11 @@ GET {{BASE_URL}}/admin/orders?status=approved&page=1&limit=4&orderBy=latest
 Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 상세 조회 (대기)
-GET {{BASE_URL}}/admin/orders/88c1da8a-f67f-481b-9645-8bf44d8549ce?status=pending
+GET {{BASE_URL}}/admin/orders/b8c05e8e-f7a9-4f81-86c2-a036fa0d45dd
 Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매내역 상세 조회 (승인)
-GET {{BASE_URL}}/admin/orders/66faf6e9-424d-454f-8e14-f2abc606c08c?status=approved
+GET {{BASE_URL}}/admin/orders/1f4d999f-c902-439f-a60b-fe650eee42ab?
 Cookie: accessToken={{accessToken}}
 
 ### 관리자 - 구매 승인/반려

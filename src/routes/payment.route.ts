@@ -12,4 +12,11 @@ paymentRouter.post(
   paymentController.confirmPayment,
 );
 
+paymentRouter.delete(
+  "/cancel",
+  authenticateToken,
+  authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  paymentController.cancelPayment,
+);
+
 export default paymentRouter;

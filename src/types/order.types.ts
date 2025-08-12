@@ -16,7 +16,7 @@ export type TGetOrdersRepositoryQuery = {
 
 export type TGetOrderStatus = {
   pending: "PENDING";
-  approved: "APPROVED";
+  approved: ["APPROVED", "INSTANT_APPROVED"];
 };
 
 export type TOrderWithBudget = Order & {
