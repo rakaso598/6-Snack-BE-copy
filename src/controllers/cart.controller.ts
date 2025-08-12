@@ -16,14 +16,14 @@ import { AuthenticationError } from "../types/error";
  * @swagger
  * tags:
  *   - name: Cart
- *     description: 장바구니 관련 API
+ *     description: 장바구니 API
  */
 
 /**
  * @swagger
  * /cart:
  *   get:
- *     summary: 내 장바구니 조회
+ *     summary: 장바구니 조회
  *     tags: [Cart]
  *     parameters:
  *       - in: query
@@ -121,7 +121,7 @@ const addToCart: RequestHandler<{}, {}, TAddToCartDto> = async (req, res, next) 
  * @swagger
  * /cart/{item}:
  *   delete:
- *     summary: 단일 장바구니 항목 삭제
+ *     summary: 장바구니 항목 삭제(단일)
  *     tags: [Cart]
  *     parameters:
  *       - in: path
@@ -153,7 +153,7 @@ const deleteSelectedItems: RequestHandler<{}, {}, TDeleteCartItemsDto> = async (
  * @swagger
  * /cart/delete:
  *   post:
- *     summary: 선택한 장바구니 항목 삭제
+ *     summary: 장바구니 항목 삭제(선택)
  *     tags: [Cart]
  *     requestBody:
  *       required: true
@@ -192,7 +192,7 @@ const deleteCartItem: RequestHandler = async (req, res, next) => {
  * @swagger
  * /cart/{item}/check:
  *   patch:
- *     summary: 특정 장바구니 항목 체크/해제
+ *     summary: 장바구니 항목 선택/해제(특정)
  *     tags: [Cart]
  *     parameters:
  *       - in: path
@@ -236,7 +236,7 @@ const toggleCheckItem: RequestHandler<TToggleParamsDto, {}, TToggleCheckDto> = a
  * @swagger
  * /cart/check/all:
  *   patch:
- *     summary: 전체 장바구니 항목 체크/해제
+ *     summary: 장바구니 항목 선택/해제(전체)
  *     tags: [Cart]
  *     requestBody:
  *       required: true
@@ -272,7 +272,7 @@ const toggleAllItems: RequestHandler<{}, {}, TToggleAllCheckDto> = async (req, r
  * @swagger
  * /cart/{item}/quantity:
  *   patch:
- *     summary: 장바구니 항목 수량 수정
+ *     summary: 장바구니 항목 수량 변경
  *     tags: [Cart]
  *     parameters:
  *       - in: path

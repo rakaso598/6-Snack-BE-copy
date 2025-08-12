@@ -10,6 +10,15 @@ import { parseNumberOrThrow } from "../utils/parseNumberOrThrow";
 import { AuthenticationError, NotFoundError } from "../types/error";
 import orderRepository from "../repositories/order.repository";
 
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Order
+ *     description: 구매 API
+ */
+
+
 /**
  * @swagger
  * /admin/orders:
@@ -187,7 +196,7 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
  * @swagger
  * /admin/orders/{orderId}:
  *   get:
- *     summary: 구매내역 상세 조회 (대기 or 승인)
+ *     summary: 구매 내역 상세 조회 (대기 or 승인)
  *     description: |
  *       주문 ID와 상태(pending, approved)를 기준으로 특정 구매 요청 상세 정보를 조회합니다.
  *       ADMIN 또는 SUPER_ADMIN 권한이 필요합니다.
@@ -378,7 +387,7 @@ const getOrder: RequestHandler<TGetOrderParamsDto, {}, {}, TGetOrderQueryDto> = 
  * @swagger
  * /admin/orders/{orderId}:
  *   patch:
- *     summary: 구매 승인 또는 반려
+ *     summary: 구매 승인/반려
  *     description: ADMIN 또는 SUPER_ADMIN 권한을 가진 사용자가 특정 주문을 승인하거나 반려합니다.
  *     tags:
  *       - Order
@@ -528,7 +537,7 @@ const updateOrder: RequestHandler<TGetOrderParamsDto, {}, TUpdateStatusOrderBody
  *   post:
  *     summary: 구매 요청 생성
  *     description: 사용자가 새로운 구매 요청을 생성합니다.
- *     tags: [order]
+ *     tags: [Order]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -641,7 +650,7 @@ const createOrder: RequestHandler<
  *   get:
  *     summary: 구매 요청 상세 조회
  *     description: 특정 구매 요청의 상세 정보를 조회합니다.
- *     tags: [order]
+ *     tags: [Order]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -737,9 +746,9 @@ const getOrderById: RequestHandler<{ orderId: string }> = async (req, res, next)
  * @swagger
  * /orders:
  *   get:
- *     summary: 내 구매 요청 리스트 조회
+ *     summary: 내 구매 요청 조회
  *     description: 현재 로그인한 사용자의 모든 구매 요청 목록을 조회합니다.
- *     tags: [order]
+ *     tags: [Order]
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -809,7 +818,7 @@ const getOrdersByUserId: RequestHandler = async (req, res, next) => {
  *   patch:
  *     summary: 구매 요청 취소
  *     description: 대기 중인 구매 요청을 취소합니다. 이미 승인되거나 반려된 요청은 취소할 수 없습니다.
- *     tags: [order]
+ *     tags: [Order]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -924,7 +933,7 @@ const cancelOrder: RequestHandler<{ orderId: string }, {}, { status: "CANCELED" 
  *   post:
  *     summary: 즉시 구매
  *     description: 장바구니 아이템을 즉시 구매합니다. 승인 과정 없이 바로 구매가 완료됩니다.
- *     tags: [order]
+ *     tags: [Order]
  *     security:
  *       - bearerAuth: []
  *     requestBody:

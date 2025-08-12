@@ -7,13 +7,13 @@ import companyService from "../services/company.service";
  * @swagger
  * tags:
  *   - name: Company
- *     description: 회사 정보 관련 엔드포인트
+ *     description: 회사 정보 API
  */
 /**
  * @swagger
  * /super-admin/users/{userId}/company:
  *   patch:
- *     summary: (최고관리자) 회사 정보 수정
+ *     summary: 회사 정보 수정(최고관리자)
  *     tags: [Company]
  *     parameters:
  *       - in: path
