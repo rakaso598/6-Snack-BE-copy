@@ -11,23 +11,23 @@ const adminRouter = Router();
 adminRouter.use("/orders", adminOrderRouter);
 adminRouter.get(
   "/:companyId/budgets",
-  cacheMiddleware(),
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  cacheMiddleware(),
   budgetController.getMonthlyBudget,
 );
 adminRouter.delete(
   "/products/:id",
-  invalidateCache(),
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  invalidateCache(),
   productController.forceDeleteProduct,
 );
 adminRouter.patch(
   "/products/:id",
-  invalidateCache(),
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
+  invalidateCache(),
   productController.forceUpdateProduct,
 );
 
