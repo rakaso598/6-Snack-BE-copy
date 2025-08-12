@@ -118,7 +118,7 @@ const getUserInfo: RequestHandler<TUserIdParamsDto> = async (req, res, next) => 
  * /super-admin/users/{userId}:
  *   delete:
  *     summary: (최고관리자) 유저 삭제
- *     tags: [SuperAdmin]
+ *     tags: [User]
  *     parameters:
  *       - in: path
  *         name: userId
@@ -166,7 +166,7 @@ const deleteUser: RequestHandler<TUserIdParamsDto> = async (req, res, next) => {
  * /super-admin/users/{userId}/role:
  *   patch:
  *     summary: (최고관리자) 유저 권한 수정
- *     tags: [SuperAdmin]
+ *     tags: [User]
  *     parameters:
  *       - in: path
  *         name: userId
@@ -291,7 +291,7 @@ const updatePassword: RequestHandler<TUserIdParamsDto, any, TUpdatePasswordDto> 
  * /super-admin/users:
  *   get:
  *     summary: (최고관리자) 회사 유저 목록 조회
- *     tags: [SuperAdmin]
+ *     tags: [User]
  *     parameters:
  *       - in: query
  *         name: name

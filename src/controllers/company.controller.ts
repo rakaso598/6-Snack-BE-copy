@@ -5,10 +5,16 @@ import companyService from "../services/company.service";
 
 /**
  * @swagger
+ * tags:
+ *   - name: Company
+ *     description: 회사 정보 관련 엔드포인트
+ */
+/**
+ * @swagger
  * /super-admin/users/{userId}/company:
  *   patch:
  *     summary: (최고관리자) 회사 정보 수정
- *     tags: [SuperAdmin]
+ *     tags: [Company]
  *     parameters:
  *       - in: path
  *         name: userId
