@@ -4,6 +4,6 @@ import authenticateToken from "../middlewares/jwtAuth.middleware";
 import { cacheMiddleware } from '../middlewares/cacheMiddleware';
 
 const router = Router();
-router.get("/products", cacheMiddleware(), authenticateToken, productController.getMyProducts);
+router.get("/products", authenticateToken, cacheMiddleware(), productController.getMyProducts);
 
 export default router;

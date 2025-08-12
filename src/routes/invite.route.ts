@@ -8,9 +8,9 @@ const inviteRouter = Router();
 
 inviteRouter.post(
   "/",
-  invalidateCache(),
   authenticateToken,
   authorizeRoles("SUPER_ADMIN"),
+  invalidateCache(),
   inviteController.createInvite
 );
 
