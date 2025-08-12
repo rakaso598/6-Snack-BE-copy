@@ -1,11 +1,12 @@
 import { Router } from "express";
 import authenticateToken from "../middlewares/jwtAuth.middleware";
 import favoriteController from "../controllers/favorite.controller";
+import { cacheMiddleware, invalidateCache } from "../middlewares/cacheMiddleware";
 
-const favoritRouter = Router();
+const favoriteRouter = Router();
 
-favoritRouter.get("/", authenticateToken, favoriteController.getFavorites);
-favoritRouter.post("/:productId", authenticateToken, favoriteController.createFavorite);
-favoritRouter.delete("/:productId", authenticateToken, favoriteController.deleteFavorite);
+favoriteRouter.get("/", authenticateToken, cacheMiddleware(), favoriteController.getFavorites);
+favoriteRouter.post("/:productId", authenticateToken, invalidateCache(), favoriteController.createFavorite);
+favoriteRouter.delete("/:productId", authenticateToken, invalidateCache(), favoriteController.deleteFavorite);
 
-export default favoritRouter;
+export default favoriteRouter;
