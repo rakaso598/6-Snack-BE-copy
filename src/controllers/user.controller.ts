@@ -57,7 +57,8 @@ import { RequestHandler } from "express";
  * @swagger
  * /users/{userId}:
  *   get:
- *     summary: 유저 조회
+ *     summary: 유저 정보 조회
+ *     description: "자기 자신의 정보만 조회 가능합니다. USER 권한은 기본 정보만, ADMIN/SUPER_ADMIN은 권한 정보도 포함됩니다."
  *     tags: [User]
  *     parameters:
  *       - in: path
@@ -66,6 +67,7 @@ import { RequestHandler } from "express";
  *         schema:
  *           type: string
  *         description: 조회할 유저 ID
+ *         example: "user-1"
  *     security:
  *       - bearerAuth: []
  *     responses:
@@ -74,29 +76,113 @@ import { RequestHandler } from "express";
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "일반 유저 정보 조회 완료"
- *                 user:
+ *               oneOf:
+ *                 - description: "일반 유저 정보 조회 응답"
  *                   type: object
  *                   properties:
- *                     company:
+ *                     message:
+ *                       type: string
+ *                       example: "일반 유저 정보 조회 완료"
+ *                     user:
  *                       type: object
  *                       properties:
+ *                         company:
+ *                           type: object
+ *                           properties:
+ *                             name:
+ *                               type: string
+ *                               example: "코드잇"
  *                         name:
  *                           type: string
- *                     name:
+ *                           example: "홍길동"
+ *                         email:
+ *                           type: string
+ *                           example: "user@codeit.com"
+ *                 - description: "관리자/최고 관리자 정보 조회 응답"
+ *                   type: object
+ *                   properties:
+ *                     message:
  *                       type: string
- *                     email:
- *                       type: string
- *                     role:
- *                       type: string
+ *                       example: "관리자/최고 관리자 정보 조회 완료"
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         company:
+ *                           type: object
+ *                           properties:
+ *                             name:
+ *                               type: string
+ *                               example: "코드잇"
+ *                         name:
+ *                           type: string
+ *                           example: "관리자"
+ *                         email:
+ *                           type: string
+ *                           example: "admin@codeit.com"
+ *                         role:
+ *                           type: string
+ *                           enum: [ADMIN, SUPER_ADMIN]
+ *                           example: "ADMIN"
  *       400:
- *         description: 자기 자신의 정보만 조회 가능
+ *         description: "자기 자신의 정보만 조회 가능"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 path:
+ *                   type: string
+ *                   example: "/users/user-4"
+ *                 method:
+ *                   type: string
+ *                   example: "GET"
+ *                 message:
+ *                   type: string
+ *                   example: "자기 자신의 정보만 조회할 수 있습니다."
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-08-13T01:36:03.564Z"
  *       401:
- *         description: 인증 실패
+ *         description: "인증 실패 (쿠키 없음 또는 토큰 만료)"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 path:
+ *                   type: string
+ *                   example: "/users/user-3"
+ *                 method:
+ *                   type: string
+ *                   example: "GET"
+ *                 message:
+ *                   type: string
+ *                   example: "인증이 필요합니다."
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-08-13T01:36:03.564Z"
+ *       404:
+ *         description: "유저를 찾을 수 없음"
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 path:
+ *                   type: string
+ *                   example: "/users/non-existent-user"
+ *                 method:
+ *                   type: string
+ *                   example: "GET"
+ *                 message:
+ *                   type: string
+ *                   example: "유저가 존재하지 않습니다."
+ *                 date:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-08-13T01:36:03.564Z"
  */
 // 유저 프로필 조회
 const getUserInfo: RequestHandler<TUserIdParamsDto> = async (req, res, next) => {
