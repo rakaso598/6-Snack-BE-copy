@@ -41,7 +41,16 @@ const findManyAll = async (
     skip: cursor ? 1 : 0,
     include: {
       category: true,
-      creator: true,
+      creator: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          companyId: true,
+          deletedAt: true,
+        },
+      },
       favorites: userId
         ? {
             where: { userId },
@@ -76,7 +85,16 @@ const findManyAllPopular = async ({
     },
     include: {
       category: true,
-      creator: true,
+      creator: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          companyId: true,
+          deletedAt: true
+        }
+      },
       favorites: userId
         ? {
             where: { userId },
@@ -124,7 +142,16 @@ const findById = async (
     where: { id, deletedAt: null },
     include: {
       category: true,
-      creator: true,
+      creator: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          companyId: true,
+          deletedAt: true
+        }
+      },
       favorites: userId
         ? {
             where: { userId },
@@ -167,7 +194,16 @@ const findManyCreator = async (
     take,
     include: {
       category: true,
-      creator: true,
+      creator: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          companyId: true,
+          deletedAt: true
+        }
+      },
       favorites: userId
         ? {
             where: { userId },
@@ -207,7 +243,16 @@ const findProductById = async (
           parent: true,
         },
       },
-      creator: true,
+      creator: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          companyId: true,
+          deletedAt: true
+        }
+      },
       favorites: userId
         ? {
             where: { userId },
