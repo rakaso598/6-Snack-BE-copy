@@ -5,7 +5,6 @@ import userController from "../controllers/user.controller";
 import companyController from "../controllers/company.controller";
 import budgetController from "../controllers/budget.controller";
 import validateBudgetBody from "../middlewares/validateBudgetBody.middleware";
-import { cacheMiddleware, invalidateCache } from "../middlewares/cacheMiddleware";
 
 const superAdminRouter = Router();
 
@@ -14,7 +13,6 @@ superAdminRouter.delete(
   "/users/:userId",
   authenticateToken,
   authorizeRoles("SUPER_ADMIN"),
-  invalidateCache("/users"),
   userController.deleteUser,
 );
 
@@ -23,7 +21,6 @@ superAdminRouter.patch(
   "/users/:userId/role",
   authenticateToken,
   authorizeRoles("SUPER_ADMIN"),
-  invalidateCache("/users"),
   userController.updateRole,
 );
 
@@ -32,7 +29,6 @@ superAdminRouter.patch(
   "/users/:userId/company",
   authenticateToken,
   authorizeRoles("SUPER_ADMIN"),
-  invalidateCache("/me"),
   companyController.updateCompanyInfo,
 );
 
@@ -41,7 +37,6 @@ superAdminRouter.get(
   "/users",
   authenticateToken,
   authorizeRoles("SUPER_ADMIN"),
-  cacheMiddleware("/users"),
   userController.getUsersByCompany,
 );
 
@@ -50,7 +45,6 @@ superAdminRouter.patch(
   "/:companyId/budgets",
   authenticateToken,
   authorizeRoles("SUPER_ADMIN"),
-  invalidateCache("/budgets"),
   validateBudgetBody,
   budgetController.updateMonthlyBudget,
 );
