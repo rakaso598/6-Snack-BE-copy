@@ -14,7 +14,7 @@ paymentRouter.post(
   paymentController.confirmPayment,
 );
 
-paymentRouter.delete(
+paymentRouter.patch(
   "/cancel",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
