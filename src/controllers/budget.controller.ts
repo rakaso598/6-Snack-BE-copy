@@ -6,11 +6,18 @@ import { TUpdateMonthlyBudgetBody } from "../types/budget.type";
 
 /**
  * @swagger
+ * tags:
+ *   - name: Budget
+ *     description: 예산 API
+ */
+
+/**
+ * @swagger
  * /admin/{companyId}/budgets:
  *   get:
  *     tags:
  *       - Budget
- *     summary: 예산 및 지출 현황 조회
+ *     summary: 예산 및 지출 조회
  *     description: 특정 회사(companyId)의 월별 예산과 지출 현황을 조회합니다.
  *     security:
  *       - cookieAuth: []

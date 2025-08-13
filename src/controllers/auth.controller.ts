@@ -7,14 +7,14 @@ import { BadRequestError, ValidationError } from "../types/error";
  * @swagger
  * tags:
  *   - name: Auth
- *     description: 인증 및 권한 관련 엔드포인트
+ *     description: 인증/인가 API
  */
 
 /**
  * @swagger
  * /auth/signup:
  *   post:
- *     summary: (최고관리자) 회원가입 및 회사/예산 초기화
+ *     summary: 회원가입(최고관리자)
  *     description: 새로운 회사를 생성하고 해당 회사의 SUPER_ADMIN 사용자를 생성합니다.
  *     tags: [Auth]
  *     requestBody:
@@ -135,7 +135,7 @@ const signUpSuperAdmin = async (req: Request, res: Response, next: NextFunction)
  * @swagger
  * /auth/signup/{inviteId}:
  *   post:
- *     summary: 초대 링크를 통한 회원가입
+ *     summary: 회원가입(초대)
  *     tags: [Auth]
  *     parameters:
  *       - in: path
@@ -203,7 +203,7 @@ const signUpViaInvite = async (req: Request, res: Response, next: NextFunction) 
  * @swagger
  * /auth/login:
  *   post:
- *     summary: 이메일/비밀번호 로그인
+ *     summary: 로그인
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -297,7 +297,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
  * @swagger
  * /auth/refresh-token:
  *   post:
- *     summary: Refresh Token을 이용해 Access Token 재발급
+ *     summary: Access Token 재발급
  *     tags: [Auth]
  *     description: refreshToken httpOnly 쿠키가 유효하면 새 accessToken 및 refreshToken을 재발급합니다.
  *     responses:
@@ -358,7 +358,7 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction) => 
  * @swagger
  * /auth/logout:
  *   post:
- *     summary: 로그아웃 (쿠키 제거)
+ *     summary: 로그아웃
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []

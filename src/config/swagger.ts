@@ -17,16 +17,6 @@ const swaggerDefinition = {
       description: "Production server",
     },
   ],
-  tags: [
-    {
-      name: "order",
-      description: "Order management API"
-    },
-    {
-      name: "invite",
-      description: "User invitation API"
-    }
-  ],
   components: {
     securitySchemes: {
       bearerAuth: {

@@ -11,11 +11,10 @@ type TConfirmPaymentBodyDto = {
   paymentKey: string;
   orderId: string;
   amount: string;
-  adminMessage?: string;
 };
 
 const confirmPayment: RequestHandler<{}, {}, TConfirmPaymentBodyDto> = async (req, res, next) => {
-  const { paymentKey, orderId, amount, adminMessage = "" } = req.body;
+  const { paymentKey, orderId, amount } = req.body;
   const user = req.user;
 
   if (!user) throw new AuthenticationError("유효하지 않은 유저입니다.");
@@ -55,7 +54,7 @@ const confirmPayment: RequestHandler<{}, {}, TConfirmPaymentBodyDto> = async (re
       // 2. Order 상태 업데이트 및 예산 차감
       await orderService.updateOrder(orderId, companyId, {
         approver,
-        adminMessage: order.status === "INSTANT_APPROVED" ? "즉시 구매" : adminMessage,
+        adminMessage: order.status === "INSTANT_APPROVED" ? "즉시 구매" : order.adminMessage,
         status: order.status === "INSTANT_APPROVED" ? "INSTANT_APPROVED" : "APPROVED",
       });
     });
