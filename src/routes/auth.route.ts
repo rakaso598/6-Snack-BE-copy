@@ -1,7 +1,6 @@
 import { Router } from "express";
 import authenticateToken from "../middlewares/jwtAuth.middleware";
 import authController from "../controllers/auth.controller";
-import { invalidateCache } from "../middlewares/cacheMiddleware";
 
 const authRouter = Router();
 
@@ -60,6 +59,6 @@ authRouter.post("/refresh-token", authController.refreshToken);
  * @returns {object} - 성공 메시지
  * @throws {AppError} - 인증되지 않은 사용자이거나 로그아웃 처리 중 오류 발생 시
  */
-authRouter.post("/logout", authenticateToken, invalidateCache("/me"), authController.logout);
+authRouter.post("/logout", authenticateToken, authController.logout);
 
 export default authRouter;

@@ -10,7 +10,6 @@ paymentRouter.post(
   "/confirm",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  invalidateCache(["/products", "/orders", "/cartItems", "/my/orders"]),
   paymentController.confirmPayment,
 );
 
@@ -18,7 +17,6 @@ paymentRouter.patch(
   "/cancel",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  invalidateCache(["/products", "/orders", "/cartItems", "/my/orders"]),
   paymentController.cancelPayment,
 );
 
