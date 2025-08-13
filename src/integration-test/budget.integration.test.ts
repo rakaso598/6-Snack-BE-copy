@@ -15,14 +15,20 @@ describe("Budget API Integration Tests", () => {
 
   beforeAll(async () => {
     await prisma.$connect();
+
+    // --- FIX: Delete dependent records before their parent records ---
     await prisma.receipt.deleteMany();
+    await prisma.payment.deleteMany(); // 'payment' was missing in your original list
     await prisma.order.deleteMany();
     await prisma.favorite.deleteMany();
+    await prisma.invite.deleteMany(); // 'invite' was missing
     await prisma.cartItem.deleteMany();
     await prisma.product.deleteMany();
-    await prisma.user.deleteMany();
-    await prisma.company.deleteMany();
-    await prisma.monthlyBudget.deleteMany();
+    await prisma.monthlyBudget.deleteMany(); // <-- Delete this first
+    await prisma.user.deleteMany(); // <-- Delete this next
+    await prisma.company.deleteMany(); // <-- Delete this last
+    await prisma.category.deleteMany(); // 'category' was missing
+    // -------------------------------------------------------------
 
     // 회사 및 유저 생성
     testCompany = await prisma.company.create({
