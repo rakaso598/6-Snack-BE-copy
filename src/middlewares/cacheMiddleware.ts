@@ -29,7 +29,6 @@ export const cacheMiddleware = (ttl: number = 300) => {
 
       // Redis에서 캐시된 데이터 확인
       const cachedData = await redis.get(cacheKey);
-      console.log("cachedData 여부", !!cachedData);
 
       if (cachedData) {
         // 캐시된 데이터가 있으면 반환
@@ -61,16 +60,31 @@ export const cacheMiddleware = (ttl: number = 300) => {
 export const invalidateCache = (url: string | null = null) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
+      let cacheKey: string;
+
       if (url) {
         // 특정 URL의 캐시만 삭제
-        const cacheKey = `cache:${url}`;
-        await redis.del(cacheKey);
-        console.log(`Invalidated cache for: ${cacheKey}`);
+        cacheKey = `cache:${url}`;
       } else {
         // 현재 요청 URL의 캐시 삭제
-        const cacheKey = `cache:${req.originalUrl}`;
+        cacheKey = `cache:${req.originalUrl}`;
+      }
+
+      // 삭제 전에 해당 키가 실제로 존재하는지 확인
+      const exists = await redis.exists(cacheKey);
+
+      if (exists) {
         await redis.del(cacheKey);
-        console.log(`Invalidated cache for: ${cacheKey}`);
+      }
+
+      // products 관련 모든 캐시 키를 패턴 매칭으로 삭제
+      if (req.originalUrl.includes("/products") || (url && url.includes("/products"))) {
+        const pattern = `cache:/products*`;
+        const productKeys = await redis.keys(pattern);
+
+        if (productKeys.length > 0) {
+          await redis.del(...productKeys);
+        }
       }
 
       next();
