@@ -21,12 +21,6 @@ redis.on("error", (err) => {
   console.error("Redis error:", err);
 });
 
-// function getCacheIndexKey(url: string): string {
-//   const pathOnly = url.split("?")[0]; // '/users/user-1'
-//   const basePath = "/" + pathOnly.split("/")[1]; // '/users'
-//   return `cache_index:${basePath}`;
-// }
-
 // 캐시 미들웨어 함수 (TTL을 매개변수로 받음)
 export const cacheMiddleware = (indexUrl: string, ttl: number = 300) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -37,11 +31,6 @@ export const cacheMiddleware = (indexUrl: string, ttl: number = 300) => {
       // 테스트용 로그 추가
       console.log("🔍 [CACHE] GET 요청 - 캐시 키:", cacheKey);
       console.log("🔍 [CACHE] GET 요청 - 캐시 인덱스 키:", cacheIndexKey);
-      console.log("🔍 [CACHE] 전체 URL:", req.originalUrl);
-      console.log("🔍 [CACHE] 쿼리 파라미터:", req.query);
-
-      // 테스트용 로그 추가
-      console.log("🔍 [CACHE] GET 요청 - 캐시 키:", cacheKey);
       console.log("🔍 [CACHE] 전체 URL:", req.originalUrl);
       console.log("🔍 [CACHE] 쿼리 파라미터:", req.query);
 
