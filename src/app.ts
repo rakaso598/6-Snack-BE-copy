@@ -15,7 +15,6 @@ import "./instrument";
 import * as Sentry from "@sentry/node";
 
 const app: Application = express();
-const port: number = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 app.use(helmet());
 
@@ -52,10 +51,6 @@ Sentry.setupExpressErrorHandler(app);
 
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  console.log(`http://localhost:${port}`);
-  console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
-});
+
 
 export default app;

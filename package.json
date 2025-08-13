@@ -1,11 +1,11 @@
 {
   "name": "express-typescript-backend",
   "version": "1.0.0",
-  "main": "dist/app.js",
+  "main": "dist/server.js",
   "scripts": {
     "seed": "ts-node prisma/seed.ts",
-    "start": "node --enable-source-maps dist/app.js",
-    "dev": "ts-node-dev --respawn src/app.ts",
+    "start": "node --enable-source-maps dist/server.js",
+    "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
     "test": "DATABASE_URL=postgresql://postgres:password@localhost:5433/testdb jest",
     "test:unit": "DATABASE_URL=postgresql://postgres:password@localhost:5433/testdb jest --testPathIgnorePatterns=src/integration-test",
