@@ -253,7 +253,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
       throw new BadRequestError("이메일과 비밀번호를 모두 입력해야 합니다.");
     }
     const { user, accessToken, refreshToken } = await authService.login(email, password);
-    const accessTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
+    const accessTokenExpires = new Date(Date.now() + 60 * 60 * 1000);
     const refreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const isProduction = process.env.NODE_ENV === "production";
     const cookieDomain = isProduction ? ".5nack.site" : undefined;
