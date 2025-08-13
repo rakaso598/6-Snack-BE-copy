@@ -32,7 +32,7 @@ superAdminRouter.patch(
   "/users/:userId/company",
   authenticateToken,
   authorizeRoles("SUPER_ADMIN"),
-  invalidateCache("/users/:userId"),
+  invalidateCache("/me"),
   companyController.updateCompanyInfo,
 );
 

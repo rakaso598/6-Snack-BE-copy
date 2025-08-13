@@ -27,6 +27,13 @@ jobs:
       # - name: 테스트 코드 실행
       #   run: npm run test
 
+      - name: ENV 내용 확인 (디버깅용)
+        env:
+          ENV: ${{ secrets.ENV }}
+        run: |
+          echo "=== ENV 내용 확인 ==="
+          echo "$ENV"
+
       - name: SSH로 EC2에 접속하여 배포
         uses: appleboy/ssh-action@v1.0.3
         env:
@@ -40,7 +47,7 @@ jobs:
           script: |
             cd /home/ec2-user/6-Snack-BE
             rm -rf .env
-            git pull origin main
+            git pull origin dev
             echo "$ENV" > .env
             npm ci
             npm run build
