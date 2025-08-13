@@ -7,12 +7,12 @@ const cartRouter = Router();
 
 cartRouter.use(authenticateToken);
 
-cartRouter.get("/", cacheMiddleware(), cartController.getMyCart);
-cartRouter.post("/", invalidateCache(), cartController.addToCart);
-cartRouter.delete("/", invalidateCache(), cartController.deleteSelectedItems);
-cartRouter.delete("/:item", invalidateCache(), cartController.deleteCartItem);
-cartRouter.patch("/:item/check", invalidateCache(), cartController.toggleCheckItem);
-cartRouter.patch("/check", invalidateCache(), cartController.toggleAllItems);
-cartRouter.patch("/:item/quantity", invalidateCache(), cartController.updateQuantity);
+cartRouter.get("/", cacheMiddleware("/cartItems"), cartController.getMyCart);
+cartRouter.post("/", invalidateCache("/cartItems"), cartController.addToCart);
+cartRouter.delete("/", invalidateCache("/cartItems"), cartController.deleteSelectedItems);
+cartRouter.delete("/:item", invalidateCache("/cartItems"), cartController.deleteCartItem);
+cartRouter.patch("/:item/check", invalidateCache("/cartItems"), cartController.toggleCheckItem);
+cartRouter.patch("/check", invalidateCache("/cartItems"), cartController.toggleAllItems);
+cartRouter.patch("/:item/quantity", invalidateCache("/cartItems"), cartController.updateQuantity);
 
 export default cartRouter;

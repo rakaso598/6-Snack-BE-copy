@@ -4,13 +4,44 @@ import authenticateToken from "../middlewares/jwtAuth.middleware";
 import upload from "../middlewares/upload.middleware";
 import { cacheMiddleware, invalidateCache } from "../middlewares/cacheMiddleware";
 
-const router = Router();
+const productRouter = Router();
 
-router.get("/category", cacheMiddleware(), productController.getCategoryTree);
-router.post("/", authenticateToken, invalidateCache(), upload.single("image"), productController.createProduct);
-router.get("/:id", authenticateToken, cacheMiddleware(), productController.getProductDetail);
-router.patch("/:id", authenticateToken, invalidateCache(), productController.updateProduct);
-router.delete("/:id", authenticateToken, invalidateCache(), productController.deleteProduct);
-router.get("/", authenticateToken, cacheMiddleware(), productController.getProducts);
+productRouter.get("/category", productController.getCategoryTree);
 
-export default router;
+// 상품 등록
+productRouter.post(
+  "/",
+  authenticateToken,
+  invalidateCache(["/products", "/my/products"]),
+  upload.single("image"),
+  productController.createProduct,
+);
+
+// 상품 상세 조회
+productRouter.get(
+  "/:id",
+  authenticateToken,
+  cacheMiddleware("/products/:productId"),
+  productController.getProductDetail,
+);
+
+// 상품 수정
+productRouter.patch(
+  "/:id",
+  authenticateToken,
+  invalidateCache(["/products", "/my/products", "/products/:productId", "/cartItems", "/favorites"]),
+  productController.updateProduct,
+);
+
+// 상품 삭제
+productRouter.delete(
+  "/:id",
+  authenticateToken,
+  invalidateCache(["/products", "/my/products", "/products/:productId", "/cartItems", "/favorites"]),
+  productController.deleteProduct,
+);
+
+// 상품 리스트 조회
+productRouter.get("/", authenticateToken, cacheMiddleware("/products"), productController.getProducts);
+
+export default productRouter;

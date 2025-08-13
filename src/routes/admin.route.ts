@@ -9,25 +9,31 @@ import { cacheMiddleware, invalidateCache } from "../middlewares/cacheMiddleware
 const adminRouter = Router();
 
 adminRouter.use("/orders", adminOrderRouter);
+
+// 예산 조회
 adminRouter.get(
   "/:companyId/budgets",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  cacheMiddleware(),
+  cacheMiddleware("/budgets"),
   budgetController.getMonthlyBudget,
 );
+
+// 상품 삭제
 adminRouter.delete(
   "/products/:id",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  invalidateCache(),
+  invalidateCache(["/products", "/cartItems", "/favorites"]),
   productController.forceDeleteProduct,
 );
+
+// 상품 수정
 adminRouter.patch(
   "/products/:id",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  invalidateCache(),
+  invalidateCache(["/products", "/cartItems", "/favorites"]),
   productController.forceUpdateProduct,
 );
 
