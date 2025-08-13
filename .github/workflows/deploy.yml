@@ -52,5 +52,4 @@ jobs:
             npm ci
             npm run build
             pm2 kill
-            sleep 3
             pm2 start dist/app.js --name "express-server"
