@@ -1,0 +1,65 @@
+@BASE_URL=http://localhost:8080
+@accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZjAzMzJhYS0xNWRlLTRmZTAtYTNhYy1jYTZjMDdmY2NmNmEiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwicm9sZSI6IlNVUEVSX0FETUlOIiwiaWF0IjoxNzUyNTY0NTgzLCJleHAiOjE3NTI1NjU0ODN9.qCyJdrxTlfryd3CGpeJ-HrFIvN8vfDLC3xr827tqZkw; Path=/; Expires=Tue, 15 Jul 2025 07:44:43 GMT; HttpOnly; SameSite=Lax,refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI3ZjAzMzJhYS0xNWRlLTRmZTAtYTNhYy1jYTZjMDdmY2NmNmEiLCJlbWFpbCI6ImFkbWluQGV4YW1wbGUuY29tIiwiaWF0IjoxNzUyNTY0NTgzLCJleHAiOjE3NTMxNjkzODN9.EkZy8Rwuq67aehl6FhiPOhhV0Iu1Z1niIhgqJSGmHE4
+
+### 구매 요청 생성
+POST {{BASE_URL}}/orders
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
+
+{
+  "cartItemIds": [1,2],
+  "adminMessage": "관리자에게 남길 메시지",
+  "requestMessage": "요청 이요"
+}
+
+### 내 구매 요청 리스트 조회
+GET {{BASE_URL}}/orders
+Cookie: accessToken={{accessToken}}
+
+### 구매 요청 상세 조회
+GET {{BASE_URL}}/orders/d785b84c-4e16-4879-bc44-7ff81964be73
+Cookie: accessToken={{accessToken}}
+
+### 구매 요청 취소
+PATCH {{BASE_URL}}/orders/3
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
+
+{
+  "status": "CANCELED"
+}
+
+### 즉시 구매 (어드민 전용)
+POST {{BASE_URL}}/admin/orders/instant
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
+
+{
+  "cartItemIds": [1, 2, 3]
+}
+
+### 관리자 - 구매내역 조회 (대기)
+GET {{BASE_URL}}/admin/orders?status=pending&page=1&limit=4&orderBy=latest
+Cookie: accessToken={{accessToken}}
+
+### 관리자 - 구매내역 조회 (승인)
+GET {{BASE_URL}}/admin/orders?status=approved&page=1&limit=4&orderBy=latest
+Cookie: accessToken={{accessToken}}
+
+### 관리자 - 구매내역 상세 조회 (대기)
+GET {{BASE_URL}}/admin/orders/b8c05e8e-f7a9-4f81-86c2-a036fa0d45dd
+Cookie: accessToken={{accessToken}}
+
+### 관리자 - 구매내역 상세 조회 (승인)
+GET {{BASE_URL}}/admin/orders/1f4d999f-c902-439f-a60b-fe650eee42ab?
+Cookie: accessToken={{accessToken}}
+
+### 관리자 - 구매 승인/반려
+PATCH {{BASE_URL}}/admin/orders/11
+Content-Type: application/json
+Cookie: accessToken={{accessToken}}
+
+{
+  "status": "APPROVED",
+  "adminMessage": "승인되었습니다."
+} 

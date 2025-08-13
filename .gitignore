@@ -1,5 +1,11 @@
 # .gitignore
 
+# cursor files
+.cursor/
+
+# vs code files
+.vscode/
+
 # Log files
 npm-debug.log*
 yarn-debug.log*
@@ -25,3 +31,5 @@ jspm_packages/
 /dist
 /build
 /src/generated/prisma
+
+Convention.md

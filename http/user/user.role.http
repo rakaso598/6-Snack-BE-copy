@@ -1,0 +1,61 @@
+
+
+### ===== UPDATE ROLE TESTS =====
+
+### 8. SUPER_ADMIN이 일반 유저를 ADMIN으로 변경 (성공 케이스)
+PATCH http://localhost:8080/super-admin/users/user-3/role
+Content-Type: application/json
+
+{
+    "role": "ADMIN"
+}
+
+### 9. SUPER_ADMIN이 ADMIN을 일반 유저로 변경 (성공 케이스)
+PATCH http://localhost:8080/super-admin/users/user-3/role
+Content-Type: application/json
+
+{
+    "role": "USER"
+}
+
+### 10. 존재하지 않는 유저 권한 변경 시도 (실패 케이스)
+PATCH http://localhost:8080/super-admin/users/non-existent-user/role
+Content-Type: application/json
+
+{
+    "role": "ADMIN"
+}
+
+### 11. SUPER_ADMIN이 자기 자신 권한 변경 시도 (실패 케이스)
+PATCH http://localhost:8080/super-admin/users/user-1/role
+Content-Type: application/json
+
+{
+    "role": "USER"
+}
+
+### 12. 잘못된 role 값으로 변경 시도 (실패 케이스)
+PATCH http://localhost:8080/super-admin/users/user-3/role
+Content-Type: application/json
+
+{
+    "role": "INVALID_ROLE"
+}
+
+### 13. role 필드 없이 요청 (실패 케이스)
+PATCH http://localhost:8080/super-admin/users/user-3/role
+Content-Type: application/json
+
+{
+    "name": "test"
+}
+
+### 14. 쿠키 없이 권한 변경 시도 (실패 케이스 )
+PATCH http://localhost:8080/super-admin/users/user-3/role
+Content-Type: application/json
+
+{
+    "role": "ADMIN"
+}
+
+# 

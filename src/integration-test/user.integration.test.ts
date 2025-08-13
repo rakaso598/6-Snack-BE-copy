@@ -1,0 +1,199 @@
+import request from "supertest";
+import { PrismaClient } from "@prisma/client";
+import app from "../app";
+import jwt from "jsonwebtoken";
+
+const prisma = new PrismaClient();
+
+describe("User Integration Tests", () => {
+  let testUser: any;
+  let testCompany: any;
+  let adminUser: any;
+  let superAdminUser: any;
+
+
+  const JWT_SECRET = process.env.JWT_SECRET ?? "your_very_strong_jwt_secret_key_please_change_this_in_production";
+
+  function makeAuthCookie(user: { id: string; email: string; role: "USER" | "ADMIN" | "SUPER_ADMIN" }) {
+    const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
+    return [`accessToken=${token}`];
+  }
+
+  beforeAll(async () => {
+    await prisma.$connect();
+
+    // 데이터베이스 초기화
+    await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE`;
+    await prisma.$executeRaw`TRUNCATE TABLE "Company" CASCADE`;
+
+    // 테스트 데이터 생성
+    testCompany = await prisma.company.create({
+      data: { name: "테스트 회사", bizNumber: "1234567890" },
+    });
+
+    testUser = await prisma.user.create({
+      data: {
+        email: "user@example.com",
+        name: "일반 사용자",
+        password: "hashedPassword",
+        companyId: testCompany.id,
+        role: "USER",
+      },
+    });
+
+    adminUser = await prisma.user.create({
+      data: {
+        email: "admin@example.com",
+        name: "관리자",
+        password: "hashedPassword",
+        companyId: testCompany.id,
+        role: "ADMIN",
+      },
+    });
+
+    superAdminUser = await prisma.user.create({
+      data: {
+        email: "superadmin@example.com",
+        name: "최고 관리자",
+        password: "hashedPassword",
+        companyId: testCompany.id,
+        role: "SUPER_ADMIN",
+      },
+    });
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  describe("GET /users/me", () => {
+    test("현재 로그인된 사용자 정보를 정상적으로 조회한다", async () => {
+      const response = await request(app).get("/users/me").set("Cookie", makeAuthCookie(testUser)).expect(200);
+
+      expect(response.body).toHaveProperty("user");
+      expect(response.body.user).toHaveProperty("id", testUser.id);
+      expect(response.body.user).toHaveProperty("email", testUser.email);
+      expect(response.body.user).toHaveProperty("name", testUser.name);
+    });
+
+    test("쿠키 없이 요청 시 401을 반환한다", async () => {
+      await request(app).get("/users/me").expect(401);
+    });
+  });
+
+  describe("GET /users/:userId", () => {
+    test("USER 권한으로 자기 자신 정보 조회 성공", async () => {
+      const response = await request(app)
+        .get(`/users/${testUser.id}`)
+        .set("Cookie", makeAuthCookie(testUser))
+        .expect(200);
+
+      expect(response.body).toHaveProperty("message", "일반 유저 정보 조회 완료");
+      expect(response.body).toHaveProperty("user");
+      expect(response.body.user).toHaveProperty("company");
+      expect(response.body.user).toHaveProperty("name");
+      expect(response.body.user).toHaveProperty("email");
+      expect(response.body.user).not.toHaveProperty("role");
+    });
+
+    test("ADMIN 권한으로 자기 자신 정보 조회 성공", async () => {
+      const response = await request(app)
+        .get(`/users/${adminUser.id}`)
+        .set("Cookie", makeAuthCookie(adminUser))
+        .expect(200);
+
+      expect(response.body).toHaveProperty("message", "관리자/최고 관리자 정보 조회 완료");
+      expect(response.body.user).toHaveProperty("role", "ADMIN");
+    });
+
+    test("SUPER_ADMIN 권한으로 자기 자신 정보 조회 성공", async () => {
+      const response = await request(app)
+        .get(`/users/${superAdminUser.id}`)
+        .set("Cookie", makeAuthCookie(superAdminUser))
+        .expect(200);
+
+      expect(response.body).toHaveProperty("message", "관리자/최고 관리자 정보 조회 완료");
+      expect(response.body.user).toHaveProperty("role", "SUPER_ADMIN");
+    });
+
+    test("다른 유저의 정보 조회 시도 시 400 에러", async () => {
+      const response = await request(app)
+        .get(`/users/${adminUser.id}`)
+        .set("Cookie", makeAuthCookie(testUser))
+        .expect(400);
+
+      expect(response.body).toHaveProperty("message", "자기 자신의 정보만 조회할 수 있습니다.");
+      expect(response.body).toHaveProperty("path");
+      expect(response.body).toHaveProperty("method", "GET");
+    });
+  });
+
+  describe("PATCH /users/:userId/password", () => {
+    test("자기 자신의 비밀번호를 정상적으로 변경한다", async () => {
+      const passwordData = {
+        newPassword: "newPassword123!",
+        newPasswordConfirm: "newPassword123!",
+      };
+
+      const response = await request(app)
+        .patch(`/users/${testUser.id}/password`)
+        .set("Cookie", makeAuthCookie(testUser))
+        .send(passwordData)
+        .expect(200);
+
+      expect(response.body).toHaveProperty("message", "비밀번호가 성공적으로 변경되었습니다.");
+    });
+
+    test("다른 유저의 비밀번호 변경 시도 시 400 에러", async () => {
+      const passwordData = {
+        newPassword: "newPassword123!",
+        newPasswordConfirm: "newPassword123!",
+      };
+
+      const response = await request(app)
+        .patch(`/users/${adminUser.id}/password`)
+        .set("Cookie", makeAuthCookie(testUser))
+        .send(passwordData)
+        .expect(400);
+
+      expect(response.body).toHaveProperty("message", "자기 자신의 비밀번호만 변경할 수 있습니다.");
+    });
+
+    test("비밀번호와 비밀번호 확인이 일치하지 않을 때 400 에러", async () => {
+      const passwordData = {
+        newPassword: "newPassword123!",
+        newPasswordConfirm: "differentPassword123!",
+      };
+
+      const response = await request(app)
+        .patch(`/users/${testUser.id}/password`)
+        .set("Cookie", makeAuthCookie(testUser))
+        .send(passwordData)
+        .expect(400);
+
+      expect(response.body).toHaveProperty("message", "비밀번호가 일치하지 않습니다.");
+    });
+
+    test("필수 필드가 누락되었을 때 400 에러", async () => {
+      const passwordData = {
+        newPassword: "newPassword123!",
+        // newPasswordConfirm 누락
+      };
+
+      await request(app)
+        .patch(`/users/${testUser.id}/password`)
+        .set("Cookie", makeAuthCookie(testUser))
+        .send(passwordData)
+        .expect(400);
+    });
+
+    test("쿠키 없이 요청 시 401 에러", async () => {
+      const passwordData = {
+        newPassword: "newPassword123!",
+        newPasswordConfirm: "newPassword123!",
+      };
+
+      await request(app).patch(`/users/${testUser.id}/password`).send(passwordData).expect(401);
+    });
+  });
+});

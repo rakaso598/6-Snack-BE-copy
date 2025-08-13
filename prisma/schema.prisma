@@ -8,18 +8,19 @@ datasource db {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  name      String
-  password  String
-  companyId Int
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id                 String    @id @default(uuid())
+  email              String    @unique
+  name               String
+  password           String
+  companyId          Int
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+  hashedRefreshToken String?
 
   role      Role
   cartItems CartItem[]
-  likes     Like[]
+  favorites Favorite[]
   company   Company    @relation(fields: [companyId], references: [id])
   orders    Order[]    @relation("UserOrders")
   invites   Invite[]   @relation("InvitedBy")
@@ -36,41 +37,44 @@ model Company {
   budgets MonthlyBudget[]
   users   User[]
   invites Invite[]
+  Order   Order[]
 }
 
 // 월별 지출&예산
 model MonthlyBudget {
-  id                 Int       @id @default(autoincrement())
-  companyId          Int
-  totalExpense       Int       @default(0) // 총 지출액
-  currentMonthBudget Int       @default(0) // 이번 달 예산
-  monthlyBudget      Int       @default(0) // 매달 고정 예산
-  year               String
-  month              String
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  deletedAt          DateTime?
-  company            Company   @relation(fields: [companyId], references: [id])
+  id                  Int       @id @default(autoincrement())
+  companyId           Int
+  currentMonthExpense Int       @default(0) // 이번 달 총 지출액
+  currentMonthBudget  Int       @default(0) // 이번 달 예산
+  monthlyBudget       Int       @default(0) // 매달 고정 예산
+  year                String
+  month               String
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+  company             Company   @relation(fields: [companyId], references: [id])
 
   @@unique([companyId, year, month])
 }
 
 model Product {
-  id         Int       @id @default(autoincrement())
-  categoryId Int
-  creatorId  String
-  name       String
-  price      Int
-  imageUrl   String
-  linkUrl    String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  deletedAt  DateTime?
+  id              Int       @id @default(autoincrement())
+  categoryId      Int
+  creatorId       String
+  name            String
+  price           Int
+  imageUrl        String
+  linkUrl         String
+  cumulativeSales Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
 
-  cart     CartItem[]
-  likes    Like[]
-  creator  User       @relation("ProductCreator", fields: [creatorId], references: [id])
-  category Category   @relation(fields: [categoryId], references: [id])
+  cart      CartItem[]
+  favorites Favorite[]
+  receipts  Receipt[]
+  creator   User       @relation("ProductCreator", fields: [creatorId], references: [id])
+  category  Category   @relation(fields: [categoryId], references: [id])
 }
 
 model Category {
@@ -90,33 +94,61 @@ model CartItem {
   quantity  Int
   isChecked Boolean   @default(true)
   deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  user        User          @relation(fields: [userId], references: [id])
-  product     Product       @relation(fields: [productId], references: [id])
-  OrderedItem OrderedItem[]
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
+}
+
+model Receipt {
+  id          Int      @id @default(autoincrement())
+  productId   Int
+  orderId     String
+  productName String
+  price       Int
+  imageUrl    String
+  quantity    Int
+  createdAt   DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id])
+  order   Order   @relation(fields: [orderId], references: [id])
 }
 
 model Order {
-  id             Int         @id @default(autoincrement())
-  userId         String
-  adminMessage   String?
-  requestMessage String?
-  totalPrice     Int
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  status         OrderStatus
+  id                 String      @id @default(uuid())
+  companyId          Int
+  userId             String
+  approver           String?
+  adminMessage       String?
+  requestMessage     String?
+  deliveryFee        Int
+  productsPriceTotal Int
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+  status             OrderStatus
 
-  orderedItems OrderedItem[]
-  user         User          @relation("UserOrders", fields: [userId], references: [id])
+  receipts Receipt[]
+  payment  Payment[]
+  user     User      @relation("UserOrders", fields: [userId], references: [id])
+  company  Company   @relation(fields: [companyId], references: [id])
 }
 
-model OrderedItem {
-  id      Int @id @default(autoincrement())
-  orderId Int
-  cartId  Int
+model Payment {
+  id             Int     @id @default(autoincrement())
+  paymentKey     String
+  orderId        String
+  orderName      String
+  method         String?
+  requestedAt    String
+  approvedAt     String?
+  totalAmount    Int
+  suppliedAmount Int
+  vat            Int
 
-  order    Order    @relation(fields: [orderId], references: [id])
-  cartItem CartItem @relation(fields: [cartId], references: [id])
+  order Order @relation(fields: [orderId], references: [id])
 }
 
 model Invite {
@@ -133,13 +165,16 @@ model Invite {
   invitedBy User    @relation("InvitedBy", fields: [invitedById], references: [id])
 }
 
-model Like {
-  id        Int    @id @default(autoincrement())
+model Favorite {
+  id        Int      @id @default(autoincrement())
   userId    String
   productId Int
+  createdAt DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id])
   product Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId])
 }
 
 enum Role {
@@ -153,4 +188,5 @@ enum OrderStatus {
   APPROVED
   REJECTED
   CANCELED
+  INSTANT_APPROVED
 }

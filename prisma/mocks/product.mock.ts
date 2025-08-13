@@ -1,127 +1,159 @@
 export const productMockData = [
   // 스낵류
   {
-    id: 1,
-    categoryId: 2, // 과자
+    categoryId: 4, // 파이 (4번째)
     creatorId: "user-1",
-    name: "오리지널 포카칩",
+    name: "오리온 초코파이",
     price: 1500,
-    imageUrl: "https://example.com/pocachip.jpg",
-    linkUrl: "https://example.com/pocachip",
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/orion-chocopie.png",
+    linkUrl: "https://example.com/orion-chocopie",
+    cumulativeSales: 150,
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
     deletedAt: null,
   },
   {
-    id: 2,
-    categoryId: 2, // 과자
+    categoryId: 8, // 비스켓류 (8번째)
     creatorId: "user-1",
-    name: "새우깡",
+    name: "롯데 마가렛트",
     price: 1200,
-    imageUrl: "https://example.com/saewookang.jpg",
-    linkUrl: "https://example.com/saewookang",
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/lotte-margaret.png",
+    linkUrl: "https://example.com/lotte-margaret",
+    cumulativeSales: 120,
     createdAt: new Date("2025-01-02"),
     updatedAt: new Date("2025-01-02"),
     deletedAt: null,
   },
   {
-    id: 3,
-    categoryId: 5, // 초콜릿류
+    categoryId: 2, // 과자 (2번째)
     creatorId: "user-2",
-    name: "킷캣 미니",
+    name: "농심 새우깡",
     price: 800,
-    imageUrl: "https://example.com/kitkat.jpg",
-    linkUrl: "https://example.com/kitkat",
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/nongshim-saewookang.png",
+    linkUrl: "https://example.com/nongshim-saewookang",
+    cumulativeSales: 200,
     createdAt: new Date("2025-01-03"),
     updatedAt: new Date("2025-01-03"),
     deletedAt: null,
   },
   {
-    id: 4,
-    categoryId: 11, // 견과류
+    categoryId: 2, // 과자 (2번째)
     creatorId: "user-1",
-    name: "아몬드 믹스",
+    name: "해태 홈런볼",
     price: 2500,
-    imageUrl: "https://example.com/almond.jpg",
-    linkUrl: "https://example.com/almond",
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/haetae-homerunball.png",
+    linkUrl: "https://example.com/haetae-homerunball",
+    cumulativeSales: 80,
     createdAt: new Date("2025-01-04"),
     updatedAt: new Date("2025-01-04"),
     deletedAt: null,
   },
   {
-    id: 5,
-    categoryId: 10, // 젤리류
+    categoryId: 2, // 과자 (2번째)
     creatorId: "user-2",
-    name: "하리보 젤리",
+    name: "오리온 포카칩",
     price: 1800,
-    imageUrl: "https://example.com/haribo.jpg",
-    linkUrl: "https://example.com/haribo",
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/orion-pocachip.png",
+    cumulativeSales: 60,
+    linkUrl: "https://example.com/orion-pocachip",
     createdAt: new Date("2025-01-05"),
     updatedAt: new Date("2025-01-05"),
     deletedAt: null,
   },
-
-  // 음료류
   {
-    id: 6,
-    categoryId: 14, // 청량/탄산음료
+    categoryId: 5, // 초콜릿류 (5번째)
     creatorId: "user-1",
-    name: "코카콜라 500ml",
-    price: 1500,
-    imageUrl: "https://example.com/coke.jpg",
-    linkUrl: "https://example.com/coke",
+    name: "롯데 칸쵸",
+    price: 1000,
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/lotte-kancho.png",
+    cumulativeSales: 192,
+    linkUrl: "https://example.com/lotte-kancho",
     createdAt: new Date("2025-01-06"),
     updatedAt: new Date("2025-01-06"),
     deletedAt: null,
   },
   {
-    id: 7,
-    categoryId: 16, // 에너지음료
+    categoryId: 8, // 비스켓류 (8번째)
     creatorId: "user-2",
-    name: "레드불 250ml",
+    name: "크라운 산도",
     price: 2000,
-    imageUrl: "https://example.com/redbull.jpg",
-    linkUrl: "https://example.com/redbull",
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/crown-sando.png",
+    cumulativeSales: 113,
+    linkUrl: "https://example.com/crown-sando",
     createdAt: new Date("2025-01-07"),
     updatedAt: new Date("2025-01-07"),
     deletedAt: null,
   },
   {
-    id: 8,
-    categoryId: 20, // 차류
+    categoryId: 5, // 초콜릿류 (5번째)
     creatorId: "user-1",
-    name: "립톤 아이스티",
+    name: "페레로로쉐",
     price: 1200,
-    imageUrl: "https://example.com/lipton.jpg",
-    linkUrl: "https://example.com/lipton",
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/ferrero-rocher.png",
+    cumulativeSales: 219,
+    linkUrl: "https://example.com/ferrero-rocher",
     createdAt: new Date("2025-01-08"),
     updatedAt: new Date("2025-01-08"),
     deletedAt: null,
   },
-
-  // 간편식
   {
-    id: 9,
-    categoryId: 29, // 컵라면
+    categoryId: 4, // 파이 (4번째)
     creatorId: "user-2",
-    name: "신라면 컵",
-    price: 800,
-    imageUrl: "https://example.com/shinramyun.jpg",
-    linkUrl: "https://example.com/shinramyun",
+    name: "해태 후렌치파이",
+    price: 1800,
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/haetae-frenchpie.png",
+    cumulativeSales: 64,
+    linkUrl: "https://example.com/haetae-frenchpie",
     createdAt: new Date("2025-01-09"),
     updatedAt: new Date("2025-01-09"),
     deletedAt: null,
   },
   {
-    id: 10,
-    categoryId: 28, // 과일
+    categoryId: 2, // 과자 (2번째)
     creatorId: "user-1",
-    name: "바나나 1kg",
-    price: 3000,
-    imageUrl: "https://example.com/banana.jpg",
-    linkUrl: "https://example.com/banana",
+    name: "오리온 고래밥",
+    price: 900,
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/orion-goraebap.png",
+    cumulativeSales: 140,
+    linkUrl: "https://example.com/orion-goraebap",
     createdAt: new Date("2025-01-10"),
     updatedAt: new Date("2025-01-10"),
+    deletedAt: null,
+  },
+  {
+    categoryId: 7, // 껌류 (7번째)
+    creatorId: "user-2",
+    name: "롯데 자일리톨 껌",
+    price: 1200,
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/lotte-xylitol-gum.png",
+    cumulativeSales: 223,
+    linkUrl: "https://example.com/lotte-xylitol-gum",
+    createdAt: new Date("2025-01-11"),
+    updatedAt: new Date("2025-01-11"),
+    deletedAt: null,
+  },
+  {
+    categoryId: 5, // 초콜릿류 (5번째)
+    creatorId: "user-1",
+    name: "크라운 뽀또",
+    price: 1800,
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/crown-ppotto.png",
+    cumulativeSales: 258,
+    linkUrl: "https://example.com/crown-ppotto",
+    createdAt: new Date("2025-01-12"),
+    updatedAt: new Date("2025-01-12"),
+    deletedAt: null,
+  },
+  {
+    categoryId: 9, // 씨리얼바 (9번째)
+    creatorId: "user-2",
+    name: "오리온 닥터유 단백질바",
+    price: 2500,
+    imageUrl: "https://d2beg4tvxabcw1.cloudfront.net/products/orion-doctoryu-proteinbar.png",
+    cumulativeSales: 265,
+    linkUrl: "https://example.com/orion-doctoryu-proteinbar",
+    createdAt: new Date("2025-01-13"),
+    updatedAt: new Date("2025-01-13"),
     deletedAt: null,
   },
 ];
