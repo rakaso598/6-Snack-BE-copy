@@ -12,11 +12,16 @@ const userRouter = Router();
  * @returns {object} - 현재 로그인된 사용자 정보 (ID, 이메일, 이름, 역할, 회사 정보 포함)
  * @throws {AppError} - 사용자 정보를 찾을 수 없거나 인증되지 않은 경우
  */
-userRouter.get("/me", authenticateToken, cacheMiddleware(), userController.getMe);
+userRouter.get("/me", authenticateToken, cacheMiddleware("/me"), userController.getMe);
 
 // 유저 정보 확인
-userRouter.get("/:userId/", authenticateToken, cacheMiddleware(), userController.getUserInfo);
+userRouter.get("/:userId/", authenticateToken, cacheMiddleware("/users/:userId"), userController.getUserInfo);
 
 // 유저 비밀번호 변경
-userRouter.patch("/:userId/password", authenticateToken, invalidateCache(), userController.updatePassword);
+userRouter.patch(
+  "/:userId/password",
+  authenticateToken,
+  invalidateCache("/users/:userId"),
+  userController.updatePassword,
+);
 export default userRouter;

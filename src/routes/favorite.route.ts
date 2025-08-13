@@ -5,8 +5,23 @@ import { cacheMiddleware, invalidateCache } from "../middlewares/cacheMiddleware
 
 const favoriteRouter = Router();
 
-favoriteRouter.get("/", authenticateToken, cacheMiddleware(), favoriteController.getFavorites);
-favoriteRouter.post("/:productId", authenticateToken, invalidateCache(), favoriteController.createFavorite);
-favoriteRouter.delete("/:productId", authenticateToken, invalidateCache(), favoriteController.deleteFavorite);
+// 찜 목록 조회
+favoriteRouter.get("/", authenticateToken, cacheMiddleware("/favorites"), favoriteController.getFavorites);
+
+// 찜하기
+favoriteRouter.post(
+  "/:productId",
+  authenticateToken,
+  invalidateCache(["/favorites", "/products", "/products/:productId"]),
+  favoriteController.createFavorite,
+);
+
+// 찜 해제하기
+favoriteRouter.delete(
+  "/:productId",
+  authenticateToken,
+  invalidateCache(["/favorites", "/products", "/products/:productId"]),
+  favoriteController.deleteFavorite,
+);
 
 export default favoriteRouter;

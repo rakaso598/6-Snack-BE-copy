@@ -14,7 +14,7 @@ adminOrderRouter.get(
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
   validateGetOrderQuery,
-  cacheMiddleware(),
+  cacheMiddleware("/orders"),
   orderController.getOrders,
 );
 
@@ -23,7 +23,7 @@ adminOrderRouter.get(
   "/:orderId",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  cacheMiddleware(),
+  cacheMiddleware("/orders/:orderId"),
   orderController.getOrder,
 );
 
@@ -33,7 +33,7 @@ adminOrderRouter.patch(
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
   validateUpdateStatusOrderBody,
-  invalidateCache(),
+  invalidateCache(["/orders", "/orders/:orderId"]),
   orderController.updateOrder,
 );
 
@@ -42,7 +42,7 @@ adminOrderRouter.post(
   "/instant",
   authenticateToken,
   authorizeRoles("ADMIN", "SUPER_ADMIN"),
-  invalidateCache(),
+  invalidateCache(["/orders", "/orders/:orderId"]),
   orderController.createInstantOrder,
 );
 
