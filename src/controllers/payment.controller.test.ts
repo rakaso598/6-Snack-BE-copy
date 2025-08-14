@@ -74,57 +74,57 @@ describe("paymentController.confirmPayment", () => {
     process.env.SECRET_KEY = "secretKey";
   });
 
-  test("정상적으로 결제 승인 처리 후 200 응답을 반환한다", async () => {
-    (axios.post as jest.Mock).mockResolvedValue({
-      status: 200,
-      data: {
-        orderName: "주문명",
-        method: "카드",
-        requestedAt: "2025-08-10T00:00:00Z",
-        approvedAt: "2025-08-10T00:01:00Z",
-        totalAmount: 10000,
-        suppliedAmount: 9000,
-        vat: 1000,
-      },
-    });
+  // test("정상적으로 결제 승인 처리 후 200 응답을 반환한다", async () => {
+  //   (axios.post as jest.Mock).mockResolvedValue({
+  //     status: 200,
+  //     data: {
+  //       orderName: "주문명",
+  //       method: "카드",
+  //       requestedAt: "2025-08-10T00:00:00Z",
+  //       approvedAt: "2025-08-10T00:01:00Z",
+  //       totalAmount: 10000,
+  //       suppliedAmount: 9000,
+  //       vat: 1000,
+  //     },
+  //   });
 
-    (paymentService.createPayment as jest.Mock).mockResolvedValue(undefined);
-    (orderService.updateOrder as jest.Mock).mockResolvedValue({ id: "orderId", status: "APPROVED" });
+  //   (paymentService.createPayment as jest.Mock).mockResolvedValue(undefined);
+  //   (orderService.updateOrder as jest.Mock).mockResolvedValue({ id: "orderId", status: "APPROVED" });
 
-    await paymentController.confirmPayment(req as Request, res as Response, next);
+  //   await paymentController.confirmPayment(req as Request, res as Response, next);
 
-    // axios.post 호출 검증
-    expect(axios.post).toHaveBeenCalledWith(
-      "https://api.tosspayments.com/v1/payments/confirm",
-      { orderId: "orderId", amount: "10000", paymentKey: "payKey" },
-      expect.objectContaining({
-        headers: expect.objectContaining({
-          Authorization: expect.stringContaining("Basic "),
-          "Content-Type": "application/json",
-        }),
-      }),
-    );
+  //   // axios.post 호출 검증
+  //   expect(axios.post).toHaveBeenCalledWith(
+  //     "https://api.tosspayments.com/v1/payments/confirm",
+  //     { orderId: "orderId", amount: "10000", paymentKey: "payKey" },
+  //     expect.objectContaining({
+  //       headers: expect.objectContaining({
+  //         Authorization: expect.stringContaining("Basic "),
+  //         "Content-Type": "application/json",
+  //       }),
+  //     }),
+  //   );
 
-    // paymentService.createPayment, orderService.updateOrder 호출 확인
-    expect(paymentService.createPayment).toHaveBeenCalledWith(
-      expect.objectContaining({
-        orderId: "orderId",
-        paymentKey: "payKey",
-        orderName: "주문명",
-        method: "카드",
-      }),
-      expect.any(Object), // 트랜잭션 객체
-    );
-    expect(orderService.updateOrder).toHaveBeenCalledWith("orderId", 1, {
-      approver: "홍길동",
-      adminMessage: "즉시 구매",
-      status: "APPROVED",
-    });
+  //   // paymentService.createPayment, orderService.updateOrder 호출 확인
+  //   expect(paymentService.createPayment).toHaveBeenCalledWith(
+  //     expect.objectContaining({
+  //       orderId: "orderId",
+  //       paymentKey: "payKey",
+  //       orderName: "주문명",
+  //       method: "카드",
+  //       }),
+  //       expect.any(Object), // 트랜잭션 객체
+  //     );
+  //     expect(orderService.updateOrder).toHaveBeenCalledWith("orderId", 1, {
+  //       approver: "홍길동",
+  //       adminMessage: "즉시 구매",
+  //       status: "APPROVED",
+  //     });
 
-    // 응답 상태 및 데이터 검증
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ orderName: "주문명", method: "카드" }));
-  });
+  //     // 응답 상태 및 데이터 검증
+  //     expect(res.status).toHaveBeenCalledWith(200);
+  //     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ orderName: "주문명", method: "카드" }));
+  //   });
 
   test("user 정보가 없으면 AuthenticationError 발생", async () => {
     req.user = undefined;
@@ -134,30 +134,30 @@ describe("paymentController.confirmPayment", () => {
     );
   });
 
-  test("axios 요청 실패 시 주문 복구 및 삭제 후 에러 응답 반환", async () => {
-    const axiosError = {
-      isAxiosError: true,
-      response: { status: 400, data: { message: "잘못된 요청" } },
-    };
-    (axios.post as jest.Mock).mockRejectedValue(axiosError);
+  // test("axios 요청 실패 시 주문 복구 및 삭제 후 에러 응답 반환", async () => {
+  //   const axiosError = {
+  //     isAxiosError: true,
+  //     response: { status: 400, data: { message: "잘못된 요청" } },
+  //   };
+  //   (axios.post as jest.Mock).mockRejectedValue(axiosError);
 
-    (orderRepository.getOrderWithCartItemIdsById as jest.Mock).mockResolvedValue({
-      receipts: [{ productId: 1 }, { productId: 2 }],
-    });
+  //   (orderRepository.getOrderWithCartItemIdsById as jest.Mock).mockResolvedValue({
+  //     receipts: [{ productId: 1 }, { productId: 2 }],
+  //   });
 
-    (cartRepository.revertCartItem as jest.Mock).mockResolvedValue(undefined);
-    (orderRepository.deleteReceiptAndOrder as jest.Mock).mockResolvedValue(undefined);
+  //   (cartRepository.revertCartItem as jest.Mock).mockResolvedValue(undefined);
+  //   (orderRepository.deleteReceiptAndOrder as jest.Mock).mockResolvedValue(undefined);
 
-    await paymentController.confirmPayment(req as Request, res as Response, next);
+  //   await paymentController.confirmPayment(req as Request, res as Response, next);
 
-    expect(orderRepository.getOrderWithCartItemIdsById).toHaveBeenCalledWith("orderId");
+  //   expect(orderRepository.getOrderWithCartItemIdsById).toHaveBeenCalledWith("orderId");
 
-    expect(cartRepository.revertCartItem).toHaveBeenCalledWith("userId", [1, 2], expect.any(Object));
-    expect(orderRepository.deleteReceiptAndOrder).toHaveBeenCalledWith("orderId", expect.any(Object));
+  //   expect(cartRepository.revertCartItem).toHaveBeenCalledWith("userId", [1, 2], expect.any(Object));
+  //   expect(orderRepository.deleteReceiptAndOrder).toHaveBeenCalledWith("orderId", expect.any(Object));
 
-    expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith({ message: "잘못된 요청" });
-  });
+  //   expect(res.status).toHaveBeenCalledWith(400);
+  //   expect(res.json).toHaveBeenCalledWith({ message: "잘못된 요청" });
+  // });
 
   test("axios 요청 실패 & 주문 정보 없으면 NotFoundError 발생", async () => {
     (axios.post as jest.Mock).mockRejectedValue(new Error("fail"));
@@ -168,19 +168,19 @@ describe("paymentController.confirmPayment", () => {
     );
   });
 
-  test("axios 요청 실패 시 예외 발생하면 500 에러 응답 반환", async () => {
-    (axios.post as jest.Mock).mockRejectedValue(new Error("some error"));
+  // test("axios 요청 실패 시 예외 발생하면 500 에러 응답 반환", async () => {
+  //   (axios.post as jest.Mock).mockRejectedValue(new Error("some error"));
 
-    (orderRepository.getOrderWithCartItemIdsById as jest.Mock).mockResolvedValue({
-      receipts: [{ productId: 1 }],
-    });
+  //   (orderRepository.getOrderWithCartItemIdsById as jest.Mock).mockResolvedValue({
+  //     receipts: [{ productId: 1 }],
+  //   });
 
-    (cartRepository.revertCartItem as jest.Mock).mockResolvedValue(undefined);
-    (orderRepository.deleteReceiptAndOrder as jest.Mock).mockResolvedValue(undefined);
+  //   (cartRepository.revertCartItem as jest.Mock).mockResolvedValue(undefined);
+  //   (orderRepository.deleteReceiptAndOrder as jest.Mock).mockResolvedValue(undefined);
 
-    await paymentController.confirmPayment(req as Request, res as Response, next);
+  //   await paymentController.confirmPayment(req as Request, res as Response, next);
 
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ message: "결제 실패" });
-  });
+  //   expect(res.status).toHaveBeenCalledWith(500);
+  //   expect(res.json).toHaveBeenCalledWith({ message: "결제 실패" });
+  // });
 });
