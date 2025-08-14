@@ -142,7 +142,6 @@ describe("UserService", () => {
       };
 
       (mockUserRepository as any).findUserWithCompanyById.mockResolvedValue(mockUser);
-      (mockUserRepository as any).getCartItemCountByUserId.mockResolvedValue(0);
 
       // Act
       const result = await userService.getMe(userId);
@@ -150,8 +149,11 @@ describe("UserService", () => {
       // Assert
       expect((mockUserRepository as any).findUserWithCompanyById).toHaveBeenCalledWith("user123");
       expect(result).toEqual({
-        ...mockUser,
-        cartItemCount: 0,
+        id: "user123",
+        email: "user@test.com",
+        name: "Test User",
+        role: "USER",
+        company: { id: 1, name: "Test Company" },
       });
     });
   });
@@ -189,7 +191,7 @@ describe("UserService", () => {
   });
 
   describe("updatePassword", () => {
-    test("유저 비밀번호 수정이 성공적으로 완료", async () => {
+    it("유저 비밀번호 수정이 성공적으로 완료", async () => {
       // Arrange
       const userId = "user123";
       const passwordData = {
@@ -198,13 +200,18 @@ describe("UserService", () => {
       };
       const currentUser = { id: "user123", role: "USER" } as any;
 
-      mockUserRepository.updatePassword.mockResolvedValue(currentUser as any);
+      // bcrypt.hash를 mock으로 대체
+      jest.mock("bcrypt");
+      const bcrypt = require("bcrypt");
+      bcrypt.hash = jest.fn().mockResolvedValue("hashedPassword123");
+
+      (mockUserRepository as any).updatePassword.mockResolvedValue(undefined);
 
       // Act
       const result = await userService.updatePassword(userId, passwordData, currentUser);
 
       // Assert
-      expect(mockUserRepository.updatePassword).toHaveBeenCalledWith("user123", expect.any(String));
+      expect(mockUserRepository.updatePassword).toHaveBeenCalledWith("user123", "hashedPassword123");
       expect(result.message).toBe("비밀번호가 성공적으로 변경되었습니다.");
     });
 
@@ -225,65 +232,74 @@ describe("UserService", () => {
   });
 
   describe("getUsersByCompany", () => {
-    test("회사 유저 목록 조회가 성공적으로 완료", async () => {
+    it("회사 유저 목록 조회가 성공적으로 완료", async () => {
       // Arrange
-      const currentUser = { 
-        id: "super-admin-id", 
+      const currentUser = {
+        id: "super-admin-id",
         role: "SUPER_ADMIN",
-        companyId: 1 
+        companyId: 1,
       } as any;
       const query = { name: "test", cursor: "user123", limit: 5 };
       const mockUsers = [
         { id: "user1", email: "user1@test.com", name: "User1", role: "ADMIN" },
-        { id: "user2", email: "user2@test.com", name: "User2", role: "USER" }
+        { id: "user2", email: "user2@test.com", name: "User2", role: "USER" },
       ];
-      const mockPagination = {
-        hasNext: false,
-        hasPrev: false
-      };
 
       mockUserRepository.findUsersByCompanyId.mockResolvedValue({
         users: mockUsers,
-        pagination: mockPagination
+        hasNext: false,
+        nextCursor: undefined,
       } as any);
+
+      // hasPreviousPage mock 추가
+      (mockUserRepository as any).hasPreviousPage.mockResolvedValue(false);
 
       // Act
       const result = await userService.getUsersByCompany(currentUser, query);
 
       // Assert
       expect(mockUserRepository.findUsersByCompanyId).toHaveBeenCalledWith(1, "test", "user123", 5);
-      expect(result.message).toBe("회사 유저 목록 조회 완료");
+      expect(result.message).toBe('"test" 검색 결과입니다.');
       expect(result.users).toEqual(mockUsers);
-      expect(result.pagination).toEqual(mockPagination);
+      expect(result.pagination).toEqual({
+        hasNext: false,
+        hasPrev: false,
+        nextCursor: undefined,
+        prevCursor: undefined,
+      });
     });
 
-    test("쿼리 파라미터 없이 회사 유저 목록 조회가 성공적으로 완료", async () => {
+    it("쿼리 파라미터 없이 회사 유저 목록 조회가 성공적으로 완료", async () => {
       // Arrange
-      const currentUser = { 
-        id: "super-admin-id", 
+      const currentUser = {
+        id: "super-admin-id",
         role: "SUPER_ADMIN",
-        companyId: 1 
+        companyId: 1,
       } as any;
       const query = {};
-      const mockUsers = [
-        { id: "user1", email: "user1@test.com", name: "User1", role: "ADMIN" }
-      ];
-      const mockPagination = {
-        hasNext: false,
-        hasPrev: false
-      };
+      const mockUsers = [{ id: "user1", email: "user1@test.com", name: "User1", role: "ADMIN" }];
 
       mockUserRepository.findUsersByCompanyId.mockResolvedValue({
         users: mockUsers,
-        pagination: mockPagination
+        hasNext: false,
+        nextCursor: undefined,
       } as any);
+
+      // hasPreviousPage mock 추가
+      (mockUserRepository as any).hasPreviousPage.mockResolvedValue(false);
 
       // Act
       const result = await userService.getUsersByCompany(currentUser, query);
 
       // Assert
       expect(mockUserRepository.findUsersByCompanyId).toHaveBeenCalledWith(1, undefined, undefined, 5);
-      expect(result.message).toBe("회사 유저 목록 조회 완료");
+      expect(result.message).toBe("회사 유저 목록 조회가 완료되었습니다.");
+      expect(result.pagination).toEqual({
+        hasNext: false,
+        hasPrev: false,
+        nextCursor: undefined,
+        prevCursor: undefined,
+      });
     });
   });
 });
