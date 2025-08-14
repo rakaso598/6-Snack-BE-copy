@@ -2,69 +2,44 @@ import request from "supertest";
 import { PrismaClient } from "@prisma/client";
 import app from "../app";
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = process.env.JWT_SECRET ?? "your_very_strong_jwt_secret_key_please_change_this_in_production";
-
-function makeAuthCookie(user: { id: string; email: string; role: "USER" | "ADMIN" | "SUPER_ADMIN" }) {
-  const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
-  return [`accessToken=${token}`];
-}
+import { cleanDatabase, createTestCompany, createTestUser, createTestCategory, disconnectPrisma } from "./test-utils.ts.disabled";
 
 const prisma = new PrismaClient();
 
 describe("Product Integration Tests", () => {
+  let testUser: any;
   let testCompany: any;
   let parentCategory: any;
   let childCategory: any;
   let anotherCategory: any;
-  let testUser: any;
   let otherUser: any;
   let userCookies: string[];
   let otherCookies: string[];
 
+  const JWT_SECRET = process.env.JWT_SECRET ?? "your_very_strong_jwt_secret_key_please_change_this_in_production";
+
+  function makeAuthCookie(user: { id: string; email: string; role: "USER" | "ADMIN" | "SUPER_ADMIN" }) {
+    const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
+    return [`accessToken=${token}`];
+  }
+
   beforeAll(async () => {
     await prisma.$connect();
+  });
 
-    // 데이터베이스 초기화
-    await prisma.$executeRaw`TRUNCATE TABLE "Payment" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Receipt" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Order" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "CartItem" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Favorite" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Product" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Category" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "MonthlyBudget" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Company" CASCADE`;
+  beforeEach(async () => {
+    // 각 테스트 전에 데이터베이스 정리
+    await cleanDatabase();
 
     // 기본 데이터 생성
-    testCompany = await prisma.company.create({
-      data: { name: "테스트 회사", bizNumber: "1234567890" },
-    });
+    testCompany = await createTestCompany();
 
-    parentCategory = await prisma.category.create({ data: { name: "음료" } });
-    childCategory = await prisma.category.create({ data: { name: "콜라", parentId: parentCategory.id } });
-    anotherCategory = await prisma.category.create({ data: { name: "과자" } });
+    parentCategory = await createTestCategory("음료");
+    childCategory = await createTestCategory("콜라", parentCategory.id);
+    anotherCategory = await createTestCategory("과자");
 
-    testUser = await prisma.user.create({
-      data: {
-        email: "user@example.com",
-        name: "사용자",
-        password: "hashedPassword",
-        companyId: testCompany.id,
-        role: "USER",
-      },
-    });
-
-    otherUser = await prisma.user.create({
-      data: {
-        email: "other@example.com",
-        name: "다른사용자",
-        password: "hashedPassword",
-        companyId: testCompany.id,
-        role: "USER",
-      },
-    });
+    testUser = await createTestUser(testCompany.id, "USER");
+    otherUser = await createTestUser(testCompany.id, "USER");
 
     // 쿠키 생성
     userCookies = makeAuthCookie({ id: testUser.id, email: testUser.email, role: "USER" });
@@ -72,13 +47,7 @@ describe("Product Integration Tests", () => {
   });
 
   afterAll(async () => {
-    await prisma.$disconnect();
-  });
-
-  afterEach(async () => {
-    await prisma.cartItem.deleteMany();
-    await prisma.favorite.deleteMany();
-    await prisma.product.deleteMany();
+    await disconnectPrisma();
   });
 
   describe("POST /products", () => {

@@ -24,9 +24,26 @@ jobs:
       - name: .env 파일 생성
         run: |
           echo "${{ secrets.ENV }}" > .env
+      
+      - name: 테스트용 Postgres 컨테이너 실행
+        run: |
+          docker run --name test-postgres \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=password \
+            -e POSTGRES_DB=testdb \
+            -p 5433:5432 \
+            -d postgres:13
 
-      # - name: 테스트 코드 실행
-      #   run: npm run test
+      - name: 테스트용 Prisma Client 생성 및 마이그레이션 (5433 포트로 접근)
+        run: |
+          DATABASE_URL="postgresql://postgres:password@localhost:5433/testdb" npx prisma generate
+          DATABASE_URL="postgresql://postgres:password@localhost:5433/testdb" npx prisma migrate deploy
+
+      - name: 도커 임시 데이터베이스 시딩 (5433 포트로 접근)
+        run: DATABASE_URL="postgresql://postgres:password@localhost:5433/testdb" npx prisma db seed
+
+      - name: 테스트 코드 실행
+        run: npm run test
 
       - name: 빌드
         run: npm run build

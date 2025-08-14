@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import app from '../app';
 import jwt from 'jsonwebtoken';
 import getDateForBudget from '../utils/getDateForBudget';
+import { cleanDatabase, createTestCompany, createTestUser, createTestCategory, createTestProduct, disconnectPrisma } from './test-utils.ts.disabled';
 
 const prisma = new PrismaClient();
 
@@ -17,58 +18,21 @@ describe('Order Integration Tests', () => {
 
   beforeAll(async () => {
     await prisma.$connect();
-    
-    // 데이터베이스 초기화
-    await prisma.$executeRaw`TRUNCATE TABLE "Payment" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Receipt" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Order" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "CartItem" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Favorite" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Product" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Category" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "MonthlyBudget" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Company" CASCADE`;
+  });
+
+  beforeEach(async () => {
+    // 각 테스트 전에 데이터베이스 정리
+    await cleanDatabase();
 
     // 테스트 데이터 생성
-    testCompany = await prisma.company.create({
-      data: { name: '테스트 회사', bizNumber: '1234567890' }
-    });
+    testCompany = await createTestCompany();
 
-    testCategory = await prisma.category.create({
-      data: { name: '테스트 카테고리' }
-    });
+    testCategory = await createTestCategory('테스트 카테고리');
 
-    testUser = await prisma.user.create({
-      data: {
-        email: 'test@example.com',
-        name: '테스트 사용자',
-        password: 'hashedPassword',
-        companyId: testCompany.id,
-        role: 'USER'
-      }
-    });
+    testUser = await createTestUser(testCompany.id, 'USER');
+    const adminUser = await createTestUser(testCompany.id, 'ADMIN');
 
-    const adminUser = await prisma.user.create({
-      data: {
-        email: 'admin@example.com',
-        name: '관리자',
-        password: 'hashedPassword',
-        companyId: testCompany.id,
-        role: 'ADMIN'
-      }
-    });
-
-    testProduct = await prisma.product.create({
-      data: {
-        name: '테스트 상품',
-        price: 10000,
-        imageUrl: 'https://example.com/image.jpg',
-        linkUrl: 'https://example.com/product',
-        categoryId: testCategory.id,
-        creatorId: testUser.id
-      }
-    });
+    testProduct = await createTestProduct(testUser.id, testCategory.id);
 
     testCartItem = await prisma.cartItem.create({
       data: {
@@ -106,7 +70,7 @@ describe('Order Integration Tests', () => {
   });
 
   afterAll(async () => {
-    await prisma.$disconnect();
+    await disconnectPrisma();
   });
 
   afterEach(async () => {
@@ -177,7 +141,7 @@ describe('Order Integration Tests', () => {
       ]);
 
       // receipt 생성
-      await Promise.all(orders.map(order => 
+      await Promise.all(orders.map(order =>
         prisma.receipt.create({
           data: {
             productId: testProduct.id,
