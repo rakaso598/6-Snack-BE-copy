@@ -12,23 +12,24 @@ describe("회사 컨트롤러", () => {
   let mockNext: any;
 
   beforeEach(() => {
-    // 테스트용 요청 객체 생성
+    // 테스트용 요청 객체 생성 - 실제 컨트롤러 구조와 일치
     mockRequest = {
       params: { userId: "user123" },
       body: {
         companyName: "새로운 회사명",
-        newPassword: "newPassword123",
-        newPasswordConfirm: "newPassword123",
+        passwordData: {
+          newPassword: "newPassword123",
+          newPasswordConfirm: "newPassword123",
+        },
       },
       user: {
         id: "super-admin-id",
         email: "superadmin@test.com",
         name: "Super Admin",
         role: "SUPER_ADMIN",
-        companyId: 1,
+        company: { id: 1, name: "Test Company" }, // company.id로 접근
         createdAt: new Date(),
         updatedAt: new Date(),
-        company: { name: "Test Company" },
       },
     };
 
@@ -49,7 +50,7 @@ describe("회사 컨트롤러", () => {
     it("회사 정보 수정이 성공적으로 완료", async () => {
       // Arrange
       const serviceResponse = {
-        message: "회사 정보가 성공적으로 수정되었습니다.",
+        message: "회사 정보가 업데이트 되었습니다",
         company: {
           id: 1,
           name: "새로운 회사명",
@@ -61,7 +62,12 @@ describe("회사 컨트롤러", () => {
       await companyController.updateCompanyInfo(mockRequest, mockResponse, mockNext);
 
       // Assert
-      expect(mockCompanyService.updateCompanyInfo).toHaveBeenCalledWith("user123", mockRequest.body, mockRequest.user);
+      expect(mockCompanyService.updateCompanyInfo).toHaveBeenCalledWith(
+        "user123",
+        mockRequest.body,
+        mockRequest.user,
+        1, // company.id 값
+      );
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(serviceResponse);
     });
@@ -76,6 +82,66 @@ describe("회사 컨트롤러", () => {
 
       // Assert
       expect(mockNext).toHaveBeenCalledWith(error);
+    });
+
+    it("회사명만 업데이트하는 경우", async () => {
+      // Arrange
+      mockRequest.body = { companyName: "새로운 회사명" }; // passwordData 없음
+      const serviceResponse = {
+        message: "회사 정보가 업데이트 되었습니다",
+        company: {
+          id: 1,
+          name: "새로운 회사명",
+        },
+      };
+      mockCompanyService.updateCompanyInfo.mockResolvedValue(serviceResponse);
+
+      // Act
+      await companyController.updateCompanyInfo(mockRequest, mockResponse, mockNext);
+
+      // Assert
+      expect(mockCompanyService.updateCompanyInfo).toHaveBeenCalledWith(
+        "user123",
+        { companyName: "새로운 회사명" },
+        mockRequest.user,
+        1,
+      );
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
+    });
+
+    it("비밀번호만 업데이트하는 경우", async () => {
+      // Arrange
+      mockRequest.body = {
+        passwordData: {
+          newPassword: "newPassword123",
+          newPasswordConfirm: "newPassword123",
+        },
+      }; // companyName 없음
+      const serviceResponse = {
+        message: "회사 정보가 업데이트 되었습니다",
+        company: {
+          id: 1,
+          name: "Test Company",
+        },
+      };
+      mockCompanyService.updateCompanyInfo.mockResolvedValue(serviceResponse);
+
+      // Act
+      await companyController.updateCompanyInfo(mockRequest, mockResponse, mockNext);
+
+      // Assert
+      expect(mockCompanyService.updateCompanyInfo).toHaveBeenCalledWith(
+        "user123",
+        {
+          passwordData: {
+            newPassword: "newPassword123",
+            newPasswordConfirm: "newPassword123",
+          },
+        },
+        mockRequest.user,
+        1,
+      );
+      expect(mockResponse.status).toHaveBeenCalledWith(200);
     });
   });
 });
