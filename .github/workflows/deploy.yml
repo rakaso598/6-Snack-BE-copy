@@ -25,6 +25,15 @@ jobs:
         run: |
           echo "${{ secrets.ENV }}" > .env
 
+      - name: 테스트용 Postgres 컨테이너 실행
+        run: |
+          docker run --name test-postgres \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=password \
+            -e POSTGRES_DB=testdb \
+            -p 5433:5432 \
+            -d postgres:13
+
       - name: 테스트 코드 실행
         run: npm run test
 
@@ -57,3 +66,4 @@ jobs:
             npm ci
             pm2 kill
             pm2 start dist/server.js --name "backend-server"
+
