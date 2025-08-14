@@ -6,6 +6,11 @@ import { AuthenticationError, NotFoundError, ValidationError } from "../types/er
 jest.mock("../repositories/product.repository");
 const mockProductRepository = productRepository as jest.Mocked<typeof productRepository>;
 
+// Mock Prisma
+jest.mock("../config/prisma", () => ({
+  $transaction: jest.fn((callback) => callback({})),
+}));
+
 describe("ProductService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -59,7 +64,7 @@ describe("ProductService", () => {
 
     it("상품명이 너무 짧을 때 ValidationError를 발생시킨다", async () => {
       // Arrange
-      const invalidInput = { ...validInput, name: "A" };
+      const invalidInput = { ...validInput, name: "" };
 
       // Act & Assert
       await expect(productService.createProduct(invalidInput)).rejects.toThrow(ValidationError);
@@ -84,7 +89,7 @@ describe("ProductService", () => {
     it("여러 필드가 유효하지 않을 때 ValidationError를 발생시킨다", async () => {
       // Arrange
       const invalidInput = {
-        name: "A",
+        name: "",
         price: -1000,
         linkUrl: "https://example.com",
         imageUrl: "",
@@ -283,13 +288,23 @@ describe("ProductService", () => {
         deletedAt: new Date(),
       };
 
+      // 트랜잭션 클라이언트 모킹
+      const mockTransactionClient = {
+        cartItem: {
+          updateMany: jest.fn().mockResolvedValue({}),
+        },
+        favorite: {
+          deleteMany: jest.fn().mockResolvedValue({}),
+        },
+      };
+
       mockProductRepository.softDeleteById.mockResolvedValue(mockDeletedProduct as any);
 
       // Act
-      const result = await productService.deleteProduct(1);
+      const result = await productService.deleteProduct(1, mockTransactionClient as any);
 
       // Assert
-      expect(mockProductRepository.softDeleteById).toHaveBeenCalledWith(1, undefined);
+      expect(mockProductRepository.softDeleteById).toHaveBeenCalledWith(1, mockTransactionClient);
       expect(result).toEqual(mockDeletedProduct);
     });
   });
