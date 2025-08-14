@@ -9,6 +9,7 @@ const mockProductService = productService as jest.Mocked<typeof productService>;
 
 jest.mock("../utils/s3");
 const mockUploadImageToS3 = require("../utils/s3").uploadImageToS3;
+const mockGetCloudFrontUrl = require("../utils/s3").getCloudFrontUrl;
 
 describe("ProductController", () => {
   let mockRequest: any;
@@ -51,6 +52,9 @@ describe("ProductController", () => {
     };
     mockNext = jest.fn();
     jest.clearAllMocks();
+
+    // S3 유틸리티 함수 모킹 설정
+    mockGetCloudFrontUrl.mockImplementation((key: string) => `https://cloudfront-domain.com/${key}`);
   });
 
   describe("createProduct", () => {
@@ -102,7 +106,8 @@ describe("ProductController", () => {
       };
       mockRequest.file = { buffer: Buffer.from("test"), originalname: "test.jpg" };
 
-      mockUploadImageToS3.mockResolvedValue("https://s3.amazonaws.com/test-image.jpg");
+      // S3 업로드 모킹 - 실제 키를 반환하도록 설정
+      mockUploadImageToS3.mockResolvedValue("test-image-key.jpg");
 
       const mockProduct = {
         id: 1,
@@ -110,7 +115,7 @@ describe("ProductController", () => {
         price: 10000,
         linkUrl: "https://example.com",
         categoryId: 1,
-        imageUrl: "https://s3.amazonaws.com/test-image.jpg",
+        imageUrl: "https://cloudfront-domain.com/test-image-key.jpg",
         creatorId: "user123",
       };
 
@@ -126,7 +131,7 @@ describe("ProductController", () => {
         price: 10000,
         linkUrl: "https://example.com",
         categoryId: 1,
-        imageUrl: "https://s3.amazonaws.com/test-image.jpg",
+        imageUrl: "https://cloudfront-domain.com/test-image-key.jpg",
         creatorId: "user123",
       });
     });
@@ -147,7 +152,8 @@ describe("ProductController", () => {
       // Assert
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
-        message: "로그인이 필요합니다.",
+        message: "사용자 인증이 필요합니다. 다시 로그인해주세요.",
+        data: undefined,
       });
     });
   });
