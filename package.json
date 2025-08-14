@@ -7,7 +7,7 @@
     "start": "node --enable-source-maps dist/server.js",
     "dev": "ts-node-dev --respawn src/server.ts",
     "build": "tsc",
-    "test": "DATABASE_URL=postgresql://postgres:password@localhost:5433/testdb jest",
+    "test": "DATABASE_URL=postgresql://postgres:password@localhost:5433/testdb jest --forceExit",
     "test:unit": "DATABASE_URL=postgresql://postgres:password@localhost:5433/testdb jest --testPathIgnorePatterns=src/integration-test",
     "test:integration": "DATABASE_URL=postgresql://postgres:password@localhost:5433/testdb jest src/integration-test",
     "test:coverage": "jest --coverage",
