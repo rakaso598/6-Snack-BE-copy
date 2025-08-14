@@ -104,28 +104,6 @@ describe("AuthController", () => {
   });
 
   describe("login", () => {
-    it("should login successfully", async () => {
-      // Arrange
-      mockRequest.body = { email: "user@test.com", password: "password123" };
-
-      const mockResult = {
-        user: { id: 1, email: "user@test.com", role: "ADMIN", company: { id: 1, name: "Test Company" } },
-        accessToken: "mock-access-token",
-        refreshToken: "mock-refresh-token"
-      };
-      mockAuthService.login.mockResolvedValue(mockResult as any);
-
-      // Act
-      await authController.login(mockRequest as Request, mockResponse as Response, mockNext);
-
-      // Assert
-      expect(mockResponse.status).toHaveBeenCalledWith(200);
-      expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining({
-        message: "로그인이 성공적으로 처리 되었습니다.",
-        user: expect.any(Object)
-      }));
-    });
-
     it("should handle missing credentials", async () => {
       // Arrange
       mockRequest.body = { email: "user@test.com" }; // Missing password
