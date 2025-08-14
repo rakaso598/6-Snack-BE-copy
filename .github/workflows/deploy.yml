@@ -24,7 +24,7 @@ jobs:
       - name: .env 파일 생성
         run: |
           echo "${{ secrets.ENV }}" > .env
-
+      
       - name: 테스트용 Postgres 컨테이너 실행
         run: |
           docker run --name test-postgres \
@@ -33,6 +33,19 @@ jobs:
             -e POSTGRES_DB=testdb \
             -p 5433:5432 \
             -d postgres:13
+      
+      - name: 테스트용 Prisma Client 생성
+        # Prisma Client가 최신 스키마를 기반으로 생성되도록 합니다.
+        run: npx prisma generate
+
+      - name: 테스트용 데이터베이스 마이그레이션
+        # `migrate deploy`는 CI/CD 환경에서 사용하기 적합하며,
+        # Prisma schema와 데이터베이스 상태를 동기화합니다.
+        run: npx prisma migrate deploy
+       
+      - name: 도커 임시 데이터베이스 시딩
+        run: npx prisma db seed
+            # 서버를 재시작합니다.
 
       - name: 테스트 코드 실행
         run: npm run test
@@ -66,4 +79,3 @@ jobs:
             npm ci
             pm2 kill
             pm2 start dist/server.js --name "backend-server"
-
