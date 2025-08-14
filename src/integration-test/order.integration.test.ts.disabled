@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import app from '../app';
 import jwt from 'jsonwebtoken';
 import getDateForBudget from '../utils/getDateForBudget';
-import { cleanDatabase, createTestCompany, createTestUser, createTestCategory, createTestProduct, disconnectPrisma } from './test-utils';
+import { cleanDatabase, createTestCompany, createTestUser, createTestCategory, createTestProduct, disconnectPrisma } from './test-utils.ts.disabled';
 
 const prisma = new PrismaClient();
 
@@ -141,7 +141,7 @@ describe('Order Integration Tests', () => {
       ]);
 
       // receipt 생성
-      await Promise.all(orders.map(order => 
+      await Promise.all(orders.map(order =>
         prisma.receipt.create({
           data: {
             productId: testProduct.id,
