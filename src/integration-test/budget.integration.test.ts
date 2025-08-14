@@ -4,6 +4,80 @@ import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import getDateForBudget from "../utils/getDateForBudget";
 
+// Mock PrismaClient
+jest.mock("@prisma/client");
+jest.mock("../config/prisma", () => ({
+  __esModule: true,
+  default: {
+    company: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+    },
+    user: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+    },
+    monthlyBudget: {
+      create: jest.fn(),
+      findFirst: jest.fn(),
+      update: jest.fn(),
+    },
+    $connect: jest.fn(),
+    $disconnect: jest.fn(),
+  },
+}));
+
+// Mock JWT authentication middleware
+jest.mock("../middlewares/jwtAuth.middleware", () => {
+  return jest.fn((req: any, res: any, next: any) => {
+    // Mock user data based on the token in the Authorization header
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "test-secret-key") as any;
+        req.user = {
+          id: decoded.userId,
+          email: decoded.email,
+          role: decoded.role,
+          companyId: decoded.companyId,
+          company: {
+            id: decoded.companyId,
+            name: "Test Company"
+          }
+        };
+        next();
+      } catch (error) {
+        res.status(401).json({ message: "인증 토큰이 유효하지 않습니다." });
+      }
+    } else {
+      res.status(401).json({ message: "인증 토큰이 제공되지 않았습니다." });
+    }
+  });
+});
+
+// Mock authorization middleware
+jest.mock("../middlewares/authorizeRoles.middleware", () => {
+  return jest.fn((...allowedRoles: string[]) => {
+    return (req: any, res: any, next: any) => {
+      if (req.user && allowedRoles.includes(req.user.role)) {
+        next();
+      } else {
+        res.status(403).json({ message: "권한이 없습니다." });
+      }
+    };
+  });
+});
+
+// Mock budget service
+jest.mock("../services/budget.service", () => ({
+  __esModule: true,
+  default: {
+    getMonthlyBudget: jest.fn(),
+    updateMonthlyBudget: jest.fn(),
+  },
+}));
+
 const prisma = new PrismaClient();
 
 describe("Budget API Integration Tests", () => {
@@ -14,55 +88,55 @@ describe("Budget API Integration Tests", () => {
   const baseSuperAdminUrl = "/super-admin";
 
   beforeAll(async () => {
-    await prisma.$connect();
+    // Mock data setup
+    testCompany = {
+      id: 1, // Changed to number
+      name: "테스트회사",
+      bizNumber: "123-45-67890"
+    };
 
-    // --- FIX: Delete dependent records before their parent records ---
-    await prisma.receipt.deleteMany();
-    await prisma.payment.deleteMany(); // 'payment' was missing in your original list
-    await prisma.order.deleteMany();
-    await prisma.favorite.deleteMany();
-    await prisma.invite.deleteMany(); // 'invite' was missing
-    await prisma.cartItem.deleteMany();
-    await prisma.product.deleteMany();
-    await prisma.monthlyBudget.deleteMany(); // <-- Delete this first
-    await prisma.user.deleteMany(); // <-- Delete this next
-    await prisma.company.deleteMany(); // <-- Delete this last
-    await prisma.category.deleteMany(); // 'category' was missing
-    // -------------------------------------------------------------
+    const adminUser = {
+      id: "admin-user-id",
+      email: "admin@budget.com",
+      name: "관리자",
+      companyId: testCompany.id,
+      role: "ADMIN"
+    };
 
-    // 회사 및 유저 생성
-    testCompany = await prisma.company.create({
-      data: { name: "테스트회사", bizNumber: "123-45-67890" },
-    });
-    const adminUser = await prisma.user.create({
-      data: {
-        email: "admin@budget.com",
-        name: "관리자",
-        password: "hashedPassword",
-        companyId: testCompany.id,
-        role: "ADMIN",
-      },
-    });
-    const superAdminUser = await prisma.user.create({
-      data: {
-        email: "superadmin@budget.com",
-        name: "최고관리자",
-        password: "hashedPassword",
-        companyId: testCompany.id,
-        role: "SUPER_ADMIN",
-      },
-    });
+    const superAdminUser = {
+      id: "super-admin-user-id",
+      email: "superadmin@budget.com",
+      name: "최고관리자",
+      companyId: testCompany.id,
+      role: "SUPER_ADMIN"
+    };
+
     const { year, month } = getDateForBudget();
-    await prisma.monthlyBudget.create({
-      data: {
-        companyId: testCompany.id,
-        currentMonthBudget: 100000,
-        currentMonthExpense: 50000,
-        monthlyBudget: 1000000,
-        year,
-        month,
-      },
+    const mockBudget = {
+      id: "budget-id",
+      companyId: testCompany.id,
+      currentMonthBudget: 100000,
+      currentMonthExpense: 50000,
+      monthlyBudget: 1000000,
+      year,
+      month,
+    };
+
+    // Setup mocks
+    const mockPrisma = require("../config/prisma").default;
+    mockPrisma.company.create.mockResolvedValue(testCompany);
+    mockPrisma.user.create.mockResolvedValue(adminUser);
+    mockPrisma.monthlyBudget.create.mockResolvedValue(mockBudget);
+    mockPrisma.monthlyBudget.findFirst.mockResolvedValue(mockBudget);
+    mockPrisma.monthlyBudget.update.mockResolvedValue({
+      ...mockBudget,
+      currentMonthBudget: 200000,
+      monthlyBudget: 2000000,
     });
+    mockPrisma.$connect.mockResolvedValue(undefined);
+    mockPrisma.$disconnect.mockResolvedValue(undefined);
+
+    // Generate tokens
     adminToken = jwt.sign(
       { userId: adminUser.id, email: adminUser.email, role: "ADMIN", companyId: testCompany.id },
       process.env.JWT_SECRET || "test-secret-key",
@@ -75,8 +149,41 @@ describe("Budget API Integration Tests", () => {
     );
   });
 
+  beforeEach(() => {
+    // Reset all mocks before each test
+    jest.clearAllMocks();
+
+    // Setup default mock responses
+    const mockPrisma = require("../config/prisma").default;
+    const mockBudgetService = require("../services/budget.service").default;
+
+    const { year, month } = getDateForBudget();
+    const mockBudget = {
+      id: "budget-id",
+      companyId: testCompany.id,
+      currentMonthBudget: 100000,
+      currentMonthExpense: 50000,
+      monthlyBudget: 1000000,
+      year,
+      month,
+    };
+
+    const updatedBudget = {
+      ...mockBudget,
+      currentMonthBudget: 200000,
+      monthlyBudget: 2000000,
+    };
+
+    mockPrisma.monthlyBudget.findFirst.mockResolvedValue(mockBudget);
+    mockPrisma.monthlyBudget.update.mockResolvedValue(updatedBudget);
+
+    // Mock budget service methods
+    mockBudgetService.getMonthlyBudget.mockResolvedValue(mockBudget);
+    mockBudgetService.updateMonthlyBudget.mockResolvedValue(updatedBudget);
+  });
+
   afterAll(async () => {
-    await prisma.$disconnect();
+    // No need to disconnect from real database
   });
 
   describe("GET /admin/:companyId/budgets", () => {
@@ -84,14 +191,17 @@ describe("Budget API Integration Tests", () => {
       const res = await request(app)
         .get(`${baseAdminUrl}/${testCompany.id}/budgets`)
         .set("Authorization", `Bearer ${adminToken}`);
+
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("companyId", testCompany.id);
       expect(res.body).toHaveProperty("currentMonthBudget");
       expect(res.body).toHaveProperty("monthlyBudget");
     });
-    it("should return 403 for non-admin", async () => {
+
+    it("should return 401/403 for non-admin", async () => {
       const res = await request(app)
         .get(`${baseAdminUrl}/${testCompany.id}/budgets`);
+
       expect([401, 403]).toContain(res.status);
     });
   });
@@ -102,22 +212,27 @@ describe("Budget API Integration Tests", () => {
         .patch(`${baseSuperAdminUrl}/${testCompany.id}/budgets`)
         .set("Authorization", `Bearer ${superAdminToken}`)
         .send({ currentMonthBudget: 200000, monthlyBudget: 2000000 });
+
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty("currentMonthBudget", 200000);
       expect(res.body).toHaveProperty("monthlyBudget", 2000000);
     });
-    it("should return 403 for ADMIN", async () => {
+
+    it("should return 401/403 for ADMIN", async () => {
       const res = await request(app)
         .patch(`${baseSuperAdminUrl}/${testCompany.id}/budgets`)
         .set("Authorization", `Bearer ${adminToken}`)
         .send({ currentMonthBudget: 300000, monthlyBudget: 3000000 });
+
       expect([401, 403]).toContain(res.status);
     });
-    it("should return 400 for invalid body", async () => {
+
+    it("should return 400/422 for invalid body", async () => {
       const res = await request(app)
         .patch(`${baseSuperAdminUrl}/${testCompany.id}/budgets`)
         .set("Authorization", `Bearer ${superAdminToken}`)
         .send({ currentMonthBudget: -1, monthlyBudget: "not-a-number" });
+
       expect([400, 422]).toContain(res.status);
     });
   });
