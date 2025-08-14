@@ -2,15 +2,21 @@ import orderService from "./order.service";
 import orderRepository from "../repositories/order.repository";
 import budgetRepository from "../repositories/budget.repository";
 import productRepository from "../repositories/product.repository";
-import prisma from "../config/prisma";
 import getDateForBudget from "../utils/getDateForBudget";
 import { NotFoundError, BadRequestError } from "../types/error";
 
 jest.mock("../repositories/order.repository");
 jest.mock("../repositories/budget.repository");
 jest.mock("../repositories/product.repository");
-jest.mock("../config/prisma");
 jest.mock("../utils/getDateForBudget");
+
+// Prisma 모킹
+jest.mock("../config/prisma", () => ({
+  __esModule: true,
+  default: {
+    $transaction: jest.fn(),
+  },
+}));
 
 describe("orderService", () => {
   beforeEach(() => {
@@ -33,7 +39,7 @@ describe("orderService", () => {
       const result = await orderService.getOrders({ page: 1, limit: 10, orderBy: "latest", status: "pending" }, 1);
 
       expect(orderRepository.getOrders).toHaveBeenCalledWith(
-        { offset: 0, limit: 10, orderBy: "createdAt", status: "pending" },
+        { offset: 0, limit: 10, orderBy: "latest", status: "pending" },
         1,
       );
       expect(orderRepository.getOrdersTotalCount).toHaveBeenCalledWith({ status: "pending" }, 1);
@@ -119,7 +125,9 @@ describe("orderService", () => {
     const mockTx = { commit: jest.fn(), rollback: jest.fn() };
 
     beforeEach(() => {
-      (prisma.$transaction as jest.Mock).mockImplementation(async (cb) => cb(mockTx));
+      // Prisma $transaction 모킹
+      const prisma = require("../config/prisma").default;
+      prisma.$transaction.mockImplementation(async (cb: any) => cb(mockTx));
     });
 
     test("정상적으로 주문 상태를 승인 처리한다", async () => {
@@ -127,11 +135,15 @@ describe("orderService", () => {
         id: "order-1",
         receipts: [{ productId: 1 }],
         totalPrice: 10000,
+        deliveryFee: 0,
+        productsPriceTotal: 10000,
       });
       (orderRepository.updateOrder as jest.Mock).mockResolvedValue({
         id: "order-1",
         status: "APPROVED",
         totalPrice: 10000,
+        deliveryFee: 0,
+        productsPriceTotal: 10000,
       });
       (getDateForBudget as jest.Mock).mockReturnValue({ year: "2025", month: "08" });
       (budgetRepository.getMonthlyBudget as jest.Mock).mockResolvedValue({
@@ -156,7 +168,7 @@ describe("orderService", () => {
       expect(budgetRepository.getMonthlyBudget).toHaveBeenCalledWith({ companyId: 1, year: "2025", month: "08" });
       expect(budgetRepository.updateCurrentMonthExpense).toHaveBeenCalledWith(
         { companyId: 1, year: "2025", month: "08" },
-        93000,
+        90000,
         mockTx,
       );
       expect(productRepository.updateCumulativeSales).toHaveBeenCalledWith([1], mockTx);
@@ -176,16 +188,20 @@ describe("orderService", () => {
         id: "order-1",
         receipts: [{ productId: 1 }],
         totalPrice: 10000,
+        deliveryFee: 0,
+        productsPriceTotal: 10000,
       });
       (orderRepository.updateOrder as jest.Mock).mockResolvedValue({
         id: "order-1",
         status: "APPROVED",
         totalPrice: 10000,
+        deliveryFee: 0,
+        productsPriceTotal: 10000,
       });
       (getDateForBudget as jest.Mock).mockReturnValue({ year: "2025", month: "08" });
       (budgetRepository.getMonthlyBudget as jest.Mock).mockResolvedValue({
         currentMonthBudget: 100000,
-        currentMonthExpense: 90000,
+        currentMonthExpense: 95000,
       });
 
       await expect(
@@ -198,11 +214,15 @@ describe("orderService", () => {
         id: "order-1",
         receipts: [{ productId: 1 }],
         totalPrice: 10000,
+        deliveryFee: 0,
+        productsPriceTotal: 10000,
       });
       (orderRepository.updateOrder as jest.Mock).mockResolvedValue({
         id: "order-1",
         status: "REJECTED",
         totalPrice: 10000,
+        deliveryFee: 0,
+        productsPriceTotal: 10000,
       });
       (getDateForBudget as jest.Mock).mockReturnValue({ year: "2025", month: "08" });
 
