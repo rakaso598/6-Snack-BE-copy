@@ -2,6 +2,7 @@ import request from "supertest";
 import { PrismaClient } from "@prisma/client";
 import app from "../app";
 import jwt from "jsonwebtoken";
+import { cleanDatabase, createTestCompany, createTestUser, disconnectPrisma } from "./test-utils";
 
 const prisma = new PrismaClient();
 
@@ -21,49 +22,22 @@ describe("User Integration Tests", () => {
 
   beforeAll(async () => {
     await prisma.$connect();
+  });
 
-    // 데이터베이스 초기화
-    await prisma.$executeRaw`TRUNCATE TABLE "User" CASCADE`;
-    await prisma.$executeRaw`TRUNCATE TABLE "Company" CASCADE`;
+  beforeEach(async () => {
+    // 각 테스트 전에 데이터베이스 정리
+    await cleanDatabase();
 
     // 테스트 데이터 생성
-    testCompany = await prisma.company.create({
-      data: { name: "테스트 회사", bizNumber: "1234567890" },
-    });
+    testCompany = await createTestCompany();
 
-    testUser = await prisma.user.create({
-      data: {
-        email: "user@example.com",
-        name: "일반 사용자",
-        password: "hashedPassword",
-        companyId: testCompany.id,
-        role: "USER",
-      },
-    });
-
-    adminUser = await prisma.user.create({
-      data: {
-        email: "admin@example.com",
-        name: "관리자",
-        password: "hashedPassword",
-        companyId: testCompany.id,
-        role: "ADMIN",
-      },
-    });
-
-    superAdminUser = await prisma.user.create({
-      data: {
-        email: "superadmin@example.com",
-        name: "최고 관리자",
-        password: "hashedPassword",
-        companyId: testCompany.id,
-        role: "SUPER_ADMIN",
-      },
-    });
+    testUser = await createTestUser(testCompany.id, "USER");
+    adminUser = await createTestUser(testCompany.id, "ADMIN");
+    superAdminUser = await createTestUser(testCompany.id, "SUPER_ADMIN");
   });
 
   afterAll(async () => {
-    await prisma.$disconnect();
+    await disconnectPrisma();
   });
 
   describe("GET /users/me", () => {
