@@ -58,7 +58,10 @@
 </table>
 
 ## 📱 기능 구현 영상
-(유튜브 링크 넣어주세요)
+<div align="center">
+    
+  [![Snack 시연 영상](https://img.youtube.com/vi/57Z76QTaeqA/hqdefault.jpg)](https://www.youtube.com/watch?v=57Z76QTaeqA)
+</div>
 
 ## 🚧 시스템 아키텍쳐
 
