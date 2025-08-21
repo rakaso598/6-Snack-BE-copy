@@ -181,7 +181,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 11, // 탄산음료
+    categoryId: 14, // 청량/탄산음료
     creatorId: "user-1",
     name: "코카콜라 500ml",
     price: 2000,
@@ -193,7 +193,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 11, // 탄산음료
+    categoryId: 14, // 청량/탄산음료
     creatorId: "user-2",
     name: "펩시콜라 500ml",
     price: 2000,
@@ -205,7 +205,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 11, // 탄산음료
+    categoryId: 14, // 청량/탄산음료
     creatorId: "user-1",
     name: "칠성사이다 500ml",
     price: 1800,
@@ -217,7 +217,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 11, // 탄산음료
+    categoryId: 14, // 청량/탄산음료
     creatorId: "user-2",
     name: "트로피카나 스파클링",
     price: 2200,
@@ -229,7 +229,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 12, // 주스류
+    categoryId: 15, // 과즙음료
     creatorId: "user-1",
     name: "델몬트 오렌지주스",
     price: 2500,
@@ -241,7 +241,7 @@ export const productMockData = [
     deletedAt: null,
   },
   {
-    categoryId: 12, // 주스류
+    categoryId: 15, // 과즙음료
     creatorId: "user-2",
     name: "썬키스트 포도주스",
     price: 2800,
