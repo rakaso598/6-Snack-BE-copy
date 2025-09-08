@@ -22,7 +22,7 @@ app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
-        ? ["https://snackk.store"]
+        ? ["https://snackk.store", "https://www.snackk.store"]
         : ["http://localhost:3000", "http://localhost:3001", "http://localhost:5173", "http://localhost:8080"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
