@@ -256,7 +256,7 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     const accessTokenExpires = new Date(Date.now() + 60 * 60 * 1000);
     const refreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const isProduction = process.env.NODE_ENV === "production";
-    const cookieDomain = isProduction ? ".5nack.site" : undefined;
+    const cookieDomain = isProduction ? ".snackk.store" : undefined;
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       domain: cookieDomain,
@@ -329,7 +329,7 @@ const refreshToken = async (req: Request, res: Response, next: NextFunction) => 
     const newAccessTokenExpires = new Date(Date.now() + 15 * 60 * 1000);
     const newRefreshTokenExpires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     const isProduction = process.env.NODE_ENV === "production";
-    const cookieDomain = isProduction ? ".5nack.site" : undefined;
+    const cookieDomain = isProduction ? ".snackk.store" : undefined;
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       domain: cookieDomain,
@@ -381,7 +381,7 @@ const logout = async (req: Request, res: Response, next: NextFunction) => {
     }
     await authService.logout(req.user.id);
     const isProduction = process.env.NODE_ENV === "production";
-    const cookieDomain = isProduction ? ".5nack.site" : undefined;
+    const cookieDomain = isProduction ? ".snackk.store" : undefined;
     res.clearCookie("accessToken", {
       httpOnly: true,
       domain: cookieDomain,

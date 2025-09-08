@@ -18,7 +18,7 @@
 - [GitHub Repository 보러가기](https://github.com/De-cal/6-Snack-FE)
 
 ### 🧾 API 명세서
-- [Swagger API 보러가기](https://api.5nack.site/api-docs)
+- [Swagger API 보러가기](https://api.snackk.store/api-docs)
 
 ## 🖼️ Snack(스낵) 미리보기
 
