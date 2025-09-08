@@ -13,7 +13,7 @@ const swaggerDefinition = {
       description: "Development server",
     },
     {
-      url: "https://api.5nack.site",
+      url: "https://api.snackk.store",
       description: "Production server",
     },
   ],
