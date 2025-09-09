@@ -1,11 +1,13 @@
 import { Router } from "express";
 import productController from "../controllers/product.controller";
 import authenticateToken from "../middlewares/jwtAuth.middleware";
+import optionalAuthenticateToken from "../middlewares/optionalAuth.middleware";
 import upload from "../middlewares/upload.middleware";
 
 const productRouter = Router();
 
-productRouter.get("/category", productController.getCategoryTree);
+// 카테고리 조회 (선택적 인증)
+productRouter.get("/category", optionalAuthenticateToken, productController.getCategoryTree);
 
 // 상품 등록
 productRouter.post(
@@ -15,10 +17,13 @@ productRouter.post(
   productController.createProduct,
 );
 
-// 상품 상세 조회
+// 상품 리스트 조회 (선택적 인증 - 로그인하지 않아도 접근 가능)
+productRouter.get("/", optionalAuthenticateToken, productController.getProducts);
+
+// 상품 상세 조회 (선택적 인증 - 로그인하지 않아도 접근 가능)  
 productRouter.get(
   "/:id",
-  authenticateToken,
+  optionalAuthenticateToken,
   productController.getProductDetail,
 );
 
@@ -35,8 +40,5 @@ productRouter.delete(
   authenticateToken,
   productController.deleteProduct,
 );
-
-// 상품 리스트 조회
-productRouter.get("/", authenticateToken, productController.getProducts);
 
 export default productRouter;
