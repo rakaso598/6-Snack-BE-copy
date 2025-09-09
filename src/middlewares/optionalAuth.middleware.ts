@@ -6,16 +6,6 @@ import { Prisma } from "@prisma/client";
 
 const JWT_SECRET: string = process.env.JWT_SECRET ?? "your_very_strong_jwt_secret_key_please_change_this_in_production";
 
-declare global {
-  namespace Express {
-    interface Request {
-      user?: Prisma.UserGetPayload<{
-        include: { company: true };
-      }>;
-    }
-  }
-}
-
 /**
  * 선택적 토큰 인증 미들웨어
  * 토큰이 있으면 검증하여 사용자 정보를 req.user에 설정하고,
