@@ -38,11 +38,22 @@ app.use(
     origin: corsOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-    optionsSuccessStatus: 200, // Preflight 요청 성공 상태 코드
-    preflightContinue: false,  // Preflight 요청을 다음 핸들러로 넘기지 않음
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+      "Origin",
+      "Cache-Control",
+      "X-Forwarded-For"
+    ],
+    optionsSuccessStatus: 200,
+    preflightContinue: false,
   }),
 );
+
+// OPTIONS 요청을 명시적으로 처리
+app.options('*', cors());
 
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
