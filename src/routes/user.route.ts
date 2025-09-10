@@ -14,7 +14,7 @@ const userRouter = Router();
 userRouter.get("/me", authenticateToken, userController.getMe);
 
 // 유저 정보 확인
-userRouter.get("/:userId/", authenticateToken, userController.getUserInfo);
+userRouter.get("/:userId", authenticateToken, userController.getUserInfo);
 
 // 유저 비밀번호 변경
 userRouter.patch(
