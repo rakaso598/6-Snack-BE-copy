@@ -53,7 +53,7 @@ app.use(
 );
 
 // OPTIONS 요청을 명시적으로 처리
-app.options('*', cors());
+// app.options('*', cors());
 
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
