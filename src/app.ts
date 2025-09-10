@@ -39,6 +39,8 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    optionsSuccessStatus: 200, // Preflight 요청 성공 상태 코드
+    preflightContinue: false,  // Preflight 요청을 다음 핸들러로 넘기지 않음
   }),
 );
 
