@@ -1,87 +1,34 @@
 # Snack(스낵) - 원스톱 구매 내역 관리 서비스
-<img width="1107" height="380" alt="스크린샷 2025-08-18 130003" src="https://github.com/user-attachments/assets/1b33e7da-435f-47bd-bb99-1a0faf7e91b3" />
+<img height="600" alt="logo" src="https://private-user-images.githubusercontent.com/112613372/489366189-e3bdc850-58ae-454a-9845-57fcb9d84ae5.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTE1OTQsIm5iZiI6MTc1NzkxMTI5NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg5MzY2MTg5LWUzYmRjODUwLTU4YWUtNDU0YS05ODQ1LTU3ZmNiOWQ4NGFlNS5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDQxMzRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yN2UxMzQzNGZmOGQ2NGRjNzY5OGQwNWJkN2VlNWJkMWE1MDZlOGJiMzgwYWQ2YjcyMTNjMDk0ZDY2MWJkNTUzJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.6udunhJF6WFJrNMqPLRayx2NVtcovS0Y_0anjwLbllA" />
+
+-----------------
 
 ## 📑 프로젝트 소개
-- 간식 대장
-    
-    > <mark>**Snack**</mark>은 쿠팡, 네이버 쇼핑 등 다양한 온라인 플랫폼에서 이루어진 간식 구매 내역을 통합 관리할 수 있는 **원스톱 솔루션**입니다.  
-    구매처와 상관없이, 간식 품목, 수량, 금액 등의 정보를 **일괄적으로 등록 및 관리**할 수 있어,  
-    산발적으로 흩어진 데이터를 체계적으로 정리할 수 있습니다.  
-    또한, 비용 분석 리포트, 기간별 통계, 품목별 정렬 등의 기능을 통해 기업은 간식 운영에 대한 인사이트를 확보하고,  
-    **불필요한 지출을 줄이며 합리적인 소비 패턴을 도출**할 수 있습니다.  
-    **복잡한 총무 업무를 줄이고, 기업 복지 운영의 효율성을 극대화**하는 도구, 바로 <mark>**Snack**</mark>입니다.
+
+> Snack은 쿠팡, 네이버 쇼핑 등 다양한 온라인 플랫폼에서 이루어진 간식 구매 내역을 통합 관리할 수 있는 원스톱 솔루션입니다.
+> 
+> 구매처와 상관없이, 간식 품목, 수량, 금액 등의 정보를 일괄적으로 등록 및 관리할 수 있어,
+> 
+> 산발적으로 흩어진 데이터를 체계적으로 정리할 수 있습니다.
+> 
+> 또한, 비용 분석 리포트, 기간별 통계, 품목별 정렬 등의 기능을 통해 기업은 간식 운영에 대한 인사이트를 확보하고,
+> 
+> 불필요한 지출을 줄이며 합리적인 소비 패턴을 도출할 수 있습니다.
+> 
+> 복잡한 총무 업무를 줄이고, 기업 복지 운영의 효율성을 극대화하는 도구, 바로 Snack입니다.
 
 ### 📗 팀 문서 
-- [Notion 링크 바로가기](https://www.notion.so/3-Snack-2156e9d243fd81cd90e7e05503fe930b)  
+- [Snack Notion 바로가기](https://www.notion.so/3-Snack-2156e9d243fd81cd90e7e05503fe930b)  
 
-### 🔧 프론트엔드 Git 저장소  
-- [GitHub Repository 보러가기](https://github.com/De-cal/6-Snack-FE)
+### 🔧 프론트엔드 저장소  
+- [GitHub FE Repo 바로가기](https://github.com/rakaso598/6-Snack-FE-copy)
 
 ### 🧾 API 명세서
-- [Swagger API 보러가기](https://api.snackk.store/api-docs)
+- [Snack Swagger Docs 바로가기](https://api.snackk.store/api-docs)
 
-## 🖼️ Snack(스낵) 미리보기
-
-<table align="center">
-  <thead>
-    <tr>
-      <th align="center">AI 챗봇 도우미</th>
-      <th align="center">결제 모듈</th>
-      <th align="center">모바일 구매 내역 확인</th>
-      <th align="center">상품 상세와 담기</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center"><img src="https://github.com/user-attachments/assets/42bd0632-4e3a-404f-aeb8-02576ac02d07" width="180" alt="AI 챗봇 도우미"></td>
-      <td align="center"><img src="https://github.com/user-attachments/assets/ca2a3cff-ddc5-40ed-bd96-a933744eb2b0" width="180" alt="결제 모듈"></td>
-      <td align="center"><img src="https://github.com/user-attachments/assets/4f56bb40-c95a-4c10-8a95-7831355372c0" width="180" alt="모바일 구매 내역 확인"></td>
-      <td align="center"><img src="https://github.com/user-attachments/assets/ff45a00e-e42c-4d7f-8355-fb326ed719ef" width="180" alt="상품 상세와 담기"></td>
-    </tr>
-  </tbody>
-    <thead>
-    <tr>
-      <th align="center">스낵 예산 관리</th>
-      <th align="center">찜하기 해제 기능</th>
-      <th align="center">카테고리 정렬 둘러보기</th>
-      <th align="center">회원 관리 모바일</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="center"><img src="https://github.com/user-attachments/assets/25c63f64-8f8e-492b-bf48-f8e5f6f826d6" width="180" alt="스낵 예산 관리"></td>
-      <td align="center"><img src="https://github.com/user-attachments/assets/2c8a665c-2956-4273-bd68-a146ff3c645f" width="180" alt="찜하기 해제 기능"></td>
-      <td align="center"><img src="https://github.com/user-attachments/assets/efec779a-5d3b-41fd-8158-f50b9826c240" width="180" alt="카테고리 정렬 둘러보기"></td>
-      <td align="center"><img src="https://github.com/user-attachments/assets/4f5850e2-051d-4383-9143-3852a7f71174" width="180" alt="회원 관리 모바일"></td>
-    </tr>
-  </tbody>
-</table>
-
-## 📱 기능 구현 영상
-<div align="center">
-    
-  [![Snack 시연 영상](https://img.youtube.com/vi/57Z76QTaeqA/hqdefault.jpg)](https://www.youtube.com/watch?v=57Z76QTaeqA)
-</div>
-
-## 🚧 시스템 아키텍쳐
-
-<details>
-  <summary><h3>시스템 아키텍쳐 보기</h3></summary>
-  
-  <p align="center">
-    <img width="596" height="609" alt="image" src="https://github.com/user-attachments/assets/821bee5c-7363-4af1-ba2c-eaedb85c02c4" />
-  </p>
-  
-</details>
+-----------------
 
 ## ⚙️ 기술 스택
-
-<details>
-  <summary><h3>BE 기술 스택 한눈에 보기</h3></summary>
-  
-<img width="1076" height="565" alt="image" src="https://github.com/user-attachments/assets/d2a8c502-9d99-4c6f-a6e5-8bef6e336e11" />
-  
-</details>
 
 #### **백엔드 프레임워크 & 언어**
 [![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/ko/)
@@ -125,6 +72,82 @@
 [![Morgan](https://img.shields.io/badge/Morgan-yellowgreen?style=for-the-badge)](https://www.npmjs.com/package/morgan)
 [![Axios](https://img.shields.io/badge/Axios-black?style=for-the-badge)](https://axios-http.com/)
 [![Dotenv-cli](https://img.shields.io/badge/Dotenv--cli-white?style=for-the-badge)](https://www.npmjs.com/package/dotenv-cli)
+
+-----------------
+
+## 🖼️ Snack 미리보기
+<table align="center">
+  <thead>
+    <tr>
+      <th align="center">AI 챗봇 도우미</th>
+      <th align="center">결제 모듈</th>
+      <th align="center">모바일 구매 내역 확인</th>
+      <th align="center">상품 상세와 담기</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center"><img src="https://private-user-images.githubusercontent.com/112613372/488611049-385b437e-2faf-4b1b-87c3-ed6b983b82e6.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTExODQsIm5iZiI6MTc1NzkxMDg4NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg4NjExMDQ5LTM4NWI0MzdlLTJmYWYtNGIxYi04N2MzLWVkNmI5ODNiODJlNi5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDM0NDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT00NjIzYTlmNDU1MjM0ZGVkODAyNmY4M2YzZWVkYmZlMzVjNGMxMDFiZGMyYmMwNzBlNWI2NjlmOTRlNDVhMGMzJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.6OySvHQdpsxT-imkHX6IJe8sEWoM4weVZcDcK4AoVPA" width="180" alt="AI 챗봇 도우미"></td>
+      <td align="center"><img src="https://private-user-images.githubusercontent.com/112613372/488611194-e6e8f1d9-bcba-4bba-9f3c-441d62431497.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTExODQsIm5iZiI6MTc1NzkxMDg4NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg4NjExMTk0LWU2ZThmMWQ5LWJjYmEtNGJiYS05ZjNjLTQ0MWQ2MjQzMTQ5Ny5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDM0NDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0zNDhiMmVhYzJiNTZhY2I3ZjY2YWJkOWQyNDYyNDFiYTdkOGJhNjFiMTEzYjUxYTRmY2Q1OWQyMjc0ZGI2NjBjJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.J8E7R0_LgXZvsIxjTGuV7R3D1TtqrDIy_eE0YaDxN14" width="180" alt="결제 모듈"></td>
+      <td align="center"><img src="https://private-user-images.githubusercontent.com/112613372/488611247-eb961a71-8af8-4930-8d90-cf9b21881b78.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTExODQsIm5iZiI6MTc1NzkxMDg4NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg4NjExMjQ3LWViOTYxYTcxLThhZjgtNDkzMC04ZDkwLWNmOWIyMTg4MWI3OC5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDM0NDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yZWM1N2ZjZjhiMTU5ZWRjYTM3MjZiMjFmNDcyYjllNzU5OWM0ODgxZmIwMzQ5ODIyMDNhMzliYTY1MWJhOWRlJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.pxNkWOgGQOZHrrEEtBkxkf1y3UUXq7BqR6fFPkDVaTc" width="180" alt="모바일 구매 내역 확인"></td>
+      <td align="center"><img src="https://private-user-images.githubusercontent.com/112613372/488611356-ea8f750f-fe38-4307-ba58-aa436dbc2b59.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTExODQsIm5iZiI6MTc1NzkxMDg4NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg4NjExMzU2LWVhOGY3NTBmLWZlMzgtNDMwNy1iYTU4LWFhNDM2ZGJjMmI1OS5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDM0NDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1lNjU1YWIyMjQ2MjVhODFkMGRmZTBiOTMxMDE5MmI0OWM2NzU2YWVjNjBhZjdiMTg0YmVkZWJhMGQ5OTdmMTYwJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.gylzbPQ3bolsekU_yyQ8xSLLTe9iiaaTOxqvOnr-e3c" width="180" alt="상품 상세와 담기"></td>
+    </tr>
+  </tbody>
+    
+  <thead>
+    <tr>
+      <th align="center">스낵 예산 관리</th>
+      <th align="center">찜하기 해제 기능</th>
+      <th align="center">카테고리 정렬 둘러보기</th>
+      <th align="center">회원 관리 모바일</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center"><img src="https://private-user-images.githubusercontent.com/112613372/488611414-f184adfa-4592-45f6-8ae3-653ea4156a4b.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTExODQsIm5iZiI6MTc1NzkxMDg4NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg4NjExNDE0LWYxODRhZGZhLTQ1OTItNDVmNi04YWUzLTY1M2VhNDE1NmE0Yi5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDM0NDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yMDdlNGUwYmIwZjI1NmQ0ZjU2YTE5YTlkNTA3ODI5OTdmZTAwMWY4MWM0ZDZmNzgyMTU2ZTQzMDY4YTk0NWZmJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.xNKuWuQtQVejOq12iiXAEKY-E6GeXdpTmh7_rUPWwhs" width="180" alt="스낵 예산 관리"></td>
+      <td align="center"><img src="https://private-user-images.githubusercontent.com/112613372/488611538-e13b908d-4232-47df-abbb-5359ae42619e.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTExODQsIm5iZiI6MTc1NzkxMDg4NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg4NjExNTM4LWUxM2I5MDhkLTQyMzItNDdkZi1hYmJiLTUzNTlhZTQyNjE5ZS5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDM0NDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1lNTJmOTEyYjMxOGRmYzM1NDYxZGQzZDEwZGFjMWEzNmJkYjlhMDA2ZDkzNzUxNjAyNTAwZjhmMmQ1ZTQ1ODk3JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.4u4QdwLI9lBqwquTSVMYJNQLE99VRf9wKCps5pSUk8E" width="180" alt="찜하기 해제 기능"></td>
+      <td align="center"><img src="https://private-user-images.githubusercontent.com/112613372/488611566-682279c1-92f8-4f50-940e-6ebc299735f1.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTExODQsIm5iZiI6MTc1NzkxMDg4NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg4NjExNTY2LTY4MjI3OWMxLTkyZjgtNGY1MC05NDBlLTZlYmMyOTk3MzVmMS5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDM0NDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT03N2Q2NWIyM2IxODBmMGE2MTcxMDhiMWY2ZGQ0NGVmMmZlNjVjZDg4M2RiZmIyZTMxZTNhYzE5ZjE2MTk5YWJhJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.Um38lDEVK2wkmkpB7jdJYEiO8bMT2_6m1otteOFenO4" width="180" alt="카테고리 정렬 둘러보기"></td>
+      <td align="center"><img src="https://private-user-images.githubusercontent.com/112613372/488611632-b957d03b-7e46-4673-9e95-de338cfb1da8.gif?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTExODQsIm5iZiI6MTc1NzkxMDg4NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg4NjExNjMyLWI5NTdkMDNiLTdlNDYtNDY3My05ZTk1LWRlMzM4Y2ZiMWRhOC5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDM0NDRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yMGNkNWZkMWVlZjIwNWNkODA3MTMxZjg4YjZlODAyNjRhNmE2NTA5ZmZjMTU2N2UxMTE1MjYxZTE2MjhjZWE4JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.hgLo4O6dvVwvW-dCEWrnChQFFZKtjRrD6zvWGIRdt_k" width="180" alt="회원 관리 모바일"></td>
+    </tr>
+  </tbody>
+</table>
+
+-----------------
+
+## 🚧 시스템 아키텍쳐
+
+  <p align="center">
+    <img width="1100" alt="image" src="https://private-user-images.githubusercontent.com/112613372/489368371-1ae59501-f15b-4371-bd45-bb57ce28a9e9.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTI0MzAsIm5iZiI6MTc1NzkxMjEzMCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg5MzY4MzcxLTFhZTU5NTAxLWYxNWItNDM3MS1iZDQ1LWJiNTdjZTI4YTllOS5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDU1MzBaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1kMzRkMjU2ZTc4ZmJlNDY1YjgzZGFiNWJjYjAyMmZkZjE5OThhNDc0ZDVhMjJhNjYwNWNkYzdjYWI2ZmUxM2E5JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.lLhqRW8BOpXZEAQCKe9DdB-wL_MbTM0BYU_ogmmzvMI" />
+  </p>
+
+-----------------
+
+## 🏗️ 프로젝트 구조
+
+<details>
+  <summary><h3>프로젝트 구조 보기</h3></summary>
+  
+```
+src/
+├── controllers/          # 요청 처리 및 응답 반환
+├── services/            # 비즈니스 로직 처리
+├── repositories/        # 데이터 접근 계층 (Prisma)
+├── routes/              # API 라우팅 정의
+├── middlewares/         # 미들웨어 (인증, 에러 처리 등)
+├── dtos/                # 데이터 전송 객체
+├── types/               # TypeScript 타입 정의
+├── config/              # 설정 파일 (Swagger 등)
+├── utils/               # 유틸리티 함수 (S3, 날짜 처리 등)
+├── cron/                # 정기 작업 스케줄러 (월별 예산 자동 생성)
+├── lib/                 # 외부 라이브러리 설정 (Prisma 등)
+├── test/                # 단위 테스트
+└── integration-test/    # 통합 테스트
+```
+  
+</details>
+
+
+-----------------
 
 ## 👨‍👩‍👧‍👦 팀원 소개
 <table align="center">
@@ -185,29 +208,9 @@
 </table>
 
 
-## 🏗️ 프로젝트 구조
+-----------------
 
-<details>
-  <summary><h3>프로젝트 구조 보기</h3></summary>
-  
-```
-src/
-├── controllers/          # 요청 처리 및 응답 반환
-├── services/            # 비즈니스 로직 처리
-├── repositories/        # 데이터 접근 계층 (Prisma)
-├── routes/              # API 라우팅 정의
-├── middlewares/         # 미들웨어 (인증, 에러 처리 등)
-├── dtos/                # 데이터 전송 객체
-├── types/               # TypeScript 타입 정의
-├── config/              # 설정 파일 (Swagger 등)
-├── utils/               # 유틸리티 함수 (S3, 날짜 처리 등)
-├── cron/                # 정기 작업 스케줄러 (월별 예산 자동 생성)
-├── lib/                 # 외부 라이브러리 설정 (Prisma 등)
-├── test/                # 단위 테스트
-└── integration-test/    # 통합 테스트
-```
-  
-</details>
+
 
 ## ✨ 주요 기능
 
@@ -222,7 +225,7 @@ src/
 </details>
 
 <details>
-  <summary>2. 회사(Company) 관리</summary>
+  <summary>2. 회사 관리</summary>
 
   - 회사 정보 관리
   - 회사 정보(이름 등) 수정, 회사별 유저 관리, 최고관리자 권한에서만 접근 가능
@@ -230,7 +233,7 @@ src/
 </details>
 
 <details>
-  <summary>3. 예산(Budget) 관리</summary>
+  <summary>3. 예산 관리</summary>
 
   - 월별 예산 및 지출 현황 조회/수정
   - 회사별 월 예산, 이번달/저번달/올해/작년 지출액 등 통계 제공
@@ -240,7 +243,7 @@ src/
 </details>
 
 <details>
-  <summary>4. 상품(Product) 관리</summary>
+  <summary>4. 상품 관리</summary>
 
   - 상품 등록/수정/삭제/조회
   - 상품 카테고리(대분류/소분류) 관리, 이미지 업로드, 인기순/최신순/가격순 정렬
@@ -251,7 +254,7 @@ src/
 </details>
 
 <details>
-  <summary>5. 장바구니(Cart) 기능</summary>
+  <summary>5. 장바구니 기능</summary>
 
   - 장바구니 담기/삭제/조회
   - 여러 상품을 장바구니에 담고, 주문 전까지 관리
@@ -259,7 +262,7 @@ src/
 </details>
 
 <details>
-  <summary>6. 주문(Order) 및 결제(Payment)</summary>
+  <summary>6. 주문 및 결제</summary>
 
   - 주문 요청/승인/반려/조회
   - 장바구니 상품 주문, 관리자/최고관리자 승인/반려, 주문 내역 및 상세 조회
@@ -269,7 +272,7 @@ src/
 </details>
 
 <details>
-  <summary>7. 초대(Invite) 및 권한 관리</summary>
+  <summary>7. 초대 및 권한 관리</summary>
 
   - 유저 초대 및 권한 부여
   - 이메일 초대, 만료/사용 여부 관리, 초대 수락 시 권한 자동 부여
@@ -289,14 +292,17 @@ src/
 </details>
 
 
+-----------------
+
 ## 💣 트러블 슈팅
 
 ### **백엔드 - 장바구니와 주문 기록의 분리를 통한 결제 시스템 안정화**
 
-<img width="1106" height="589" alt="image" src="https://github.com/user-attachments/assets/5f50ef9d-1a3d-40ad-9236-d74e04c8c873" />
+<img width="1100" alt="image" src="https://private-user-images.githubusercontent.com/112613372/489367651-ccbb7783-3d05-4e8c-93cf-59cd145d371d.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTIxMjAsIm5iZiI6MTc1NzkxMTgyMCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg5MzY3NjUxLWNjYmI3NzgzLTNkMDUtNGU4Yy05M2NmLTU5Y2QxNDVkMzcxZC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDUwMjBaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT03MDAwZGVmN2Q4MmM5M2Q0N2Q4MGU2YmEzNWMyZmM0MTA5MDc4ZGM4YTJhMGFmYjA1ZmJjNjQxYmU0MDM2N2ViJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.QkzOYOc2Vqdm2IzNN9M4R7y0eMzMlDMDb4BItQlYgNc" />
+
 
 <details>
-  <summary>1. 문제점 (Problem)</summary>
+  <summary>1. 문제점</summary>
 
   초기 시스템은 **`cartItem`** (장바구니)과 **`orderedItem`** (주문 상품) 테이블로 구성되어 있었습니다. 이 구조는 `orderedItem`이 상품 정보(예: 상품 가격, 이름)를 직접 저장하지 않고, `cartItem` 또는 상품 테이블에 의존하는 방식이었습니다.
 
@@ -306,7 +312,7 @@ src/
 </details>
 
 <details>
-  <summary>2. 해결 과정 (Solution)</summary>
+  <summary>2. 해결 과정</summary>
 
   이러한 데이터 무결성 문제를 해결하기 위해 **`orderedItem` 테이블을 제거하고 `receipt` (영수증) 테이블을 새로 도입**했습니다.
   
@@ -319,7 +325,7 @@ src/
 </details>
 
 <details>
-  <summary>3. 결과 및 배운 점 (Result & Learnings)</summary>
+  <summary>3. 결과 및 배운 점</summary>
 
   **결과**: 새로운 `receipt` 테이블 도입을 통해 **데이터의 무결성(Integrity)** 문제를 성공적으로 해결했습니다. 이제 영수증은 결제 시점의 정확한 정보를 안전하게 보존하며, 원본 상품 데이터의 변경으로부터 독립적인 구조를 갖게 되었습니다.
   
@@ -329,4 +335,14 @@ src/
   * 이번 경험을 통해 **결제 시스템의 핵심**은 영수증 데이터의 불변성을 보장하는 데 있다는 것을 깨달았고, 향후 이와 유사한 설계를 진행할 때 이 원칙을 적용할 것입니다.
   
 </details>
+
+-----------------
+
+## 📱 기능 구현 영상
+<div align="center">
+    
+  [![Snack 시연 영상](https://img.youtube.com/vi/57Z76QTaeqA/hqdefault.jpg)](https://www.youtube.com/watch?v=57Z76QTaeqA)
+</div>
+
+-----------------
 
