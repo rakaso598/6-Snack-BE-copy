@@ -1,4 +1,4 @@
-# Snack(스낵) - 원스톱 구매 내역 관리 서비스
+# Snack - 간식 구매 내역 원스톱 관리 솔루션
 <img height="600" alt="logo" src="https://private-user-images.githubusercontent.com/112613372/489366189-e3bdc850-58ae-454a-9845-57fcb9d84ae5.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NTc5MTE1OTQsIm5iZiI6MTc1NzkxMTI5NCwicGF0aCI6Ii8xMTI2MTMzNzIvNDg5MzY2MTg5LWUzYmRjODUwLTU4YWUtNDU0YS05ODQ1LTU3ZmNiOWQ4NGFlNS5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUwOTE1JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDkxNVQwNDQxMzRaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT0yN2UxMzQzNGZmOGQ2NGRjNzY5OGQwNWJkN2VlNWJkMWE1MDZlOGJiMzgwYWQ2YjcyMTNjMDk0ZDY2MWJkNTUzJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.6udunhJF6WFJrNMqPLRayx2NVtcovS0Y_0anjwLbllA" />
 
 -----------------
@@ -7,24 +7,22 @@
 
 > Snack은 쿠팡, 네이버 쇼핑 등 다양한 온라인 플랫폼에서 이루어진 간식 구매 내역을 통합 관리할 수 있는 원스톱 솔루션입니다.
 > 
-> 구매처와 상관없이, 간식 품목, 수량, 금액 등의 정보를 일괄적으로 등록 및 관리할 수 있어,
-> 
+> 구매처와 상관없이, 간식 품목, 수량, 금액 등의 정보를 일괄적으로 등록 및 관리할 수 있어,  
 > 산발적으로 흩어진 데이터를 체계적으로 정리할 수 있습니다.
 > 
-> 또한, 비용 분석 리포트, 기간별 통계, 품목별 정렬 등의 기능을 통해 기업은 간식 운영에 대한 인사이트를 확보하고,
-> 
+> 또한, 비용 분석 리포트, 기간별 통계, 품목별 정렬 등의 기능을 통해 기업은 간식 운영에 대한 인사이트를 확보하고,  
 > 불필요한 지출을 줄이며 합리적인 소비 패턴을 도출할 수 있습니다.
 > 
-> 복잡한 총무 업무를 줄이고, 기업 복지 운영의 효율성을 극대화하는 도구, 바로 Snack입니다.
+> Snack은 복잡한 총무 업무를 줄이고, 기업 복지 운영의 효율성을 극대화하는 도구입니다.
 
 ### 📗 팀 문서 
-- [Snack Notion 바로가기](https://www.notion.so/3-Snack-2156e9d243fd81cd90e7e05503fe930b)  
+> [Snack Notion 바로가기](https://www.notion.so/3-Snack-2156e9d243fd81cd90e7e05503fe930b)  
 
 ### 🔧 프론트엔드 저장소  
-- [GitHub FE Repo 바로가기](https://github.com/rakaso598/6-Snack-FE-copy)
+> [GitHub FE Repo 바로가기](https://github.com/rakaso598/6-Snack-FE-copy)
 
 ### 🧾 API 명세서
-- [Snack Swagger Docs 바로가기](https://api.snackk.store/api-docs)
+> [Snack Swagger Docs 바로가기](https://api.snackk.store/api-docs)
 
 -----------------
 
