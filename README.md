@@ -86,7 +86,7 @@
   <tbody>
     <tr>
       <td align="center"><img src="https://rakaso598.github.io/portfolio/snack/AI챗봇도우미움짤.gif" width="180" alt="AI 챗봇 도우미"></td>
-      <td align="center"><img src="https://rakaso598.github.io/portfolio/snack/결제_모듈.gif" width="180" alt="결제 모듈"></td>
+      <td align="center"><img src="https://rakaso598.github.io/portfolio/snack/결제모듈.gif" width="180" alt="결제 모듈"></td>
       <td align="center"><img src="https://rakaso598.github.io/portfolio/snack/모바일구매내역확인.gif" width="180" alt="모바일 구매 내역 확인"></td>
       <td align="center"><img src="https://rakaso598.github.io/portfolio/snack/상품상세와담기움짤.gif" width="180" alt="상품 상세와 담기"></td>
     </tr>
