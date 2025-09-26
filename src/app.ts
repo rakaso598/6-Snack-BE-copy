@@ -16,7 +16,34 @@ import * as Sentry from "@sentry/node";
 
 const app: Application = express();
 
-app.use(helmet());
+// CSP 설정을 통해 API 도메인으로의 연결을 허용
+const cspConfig = process.env.NODE_ENV === "production"
+  ? {
+    defaultSrc: ["'self'"],
+    connectSrc: [
+      "'self'",
+      "https://api.snackk.store",
+      "https://*.snackk.store" // 모든 서브도메인 허용 (필요시)
+    ],
+    scriptSrc: ["'self'", "'unsafe-inline'"],
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    imgSrc: ["'self'", "data:", "https:"],
+    fontSrc: ["'self'", "https:", "data:"],
+  }
+  : {
+    defaultSrc: ["'self'"],
+    connectSrc: ["'self'", "http://localhost:*", "ws://localhost:*"],
+    scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+    styleSrc: ["'self'", "'unsafe-inline'"],
+    imgSrc: ["'self'", "data:", "https:", "http:"],
+    fontSrc: ["'self'", "https:", "data:"],
+  };
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: cspConfig,
+  },
+}));
 
 let corsOrigins: string[];
 if (process.env.NODE_ENV === "production") {

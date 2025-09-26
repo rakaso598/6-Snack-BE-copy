@@ -16,6 +16,10 @@ const swaggerDefinition = {
       url: "https://api.snackk.store",
       description: "Production server",
     },
+    {
+      url: "https://5nack.site/api", // 만약 다른 도메인을 사용한다면
+      description: "Alternative production server",
+    },
   ],
   components: {
     securitySchemes: {
