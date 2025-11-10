@@ -72,7 +72,7 @@ import { TFavoriteParamsDto, TGetFavoritesQueryDto } from "../dtos/favorite.dto"
  *                           imageUrl:
  *                             type: string
  *                             format: uri
- *                             example: "https://d2e2ap87lbbw61.cloudfront.net/products/nongshim-saewookang.png"
+ *                             example: "https://team3-snack-s3.s3.ap-northeast-2.amazonaws.com/products/nongshim-saewookang.png"
  *                           linkUrl:
  *                             type: string
  *                             format: uri

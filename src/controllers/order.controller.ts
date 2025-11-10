@@ -307,7 +307,7 @@ const getOrders: RequestHandler<{}, {}, {}, TGetOrdersQueryDto> = async (req, re
  *                       imageUrl:
  *                         type: string
  *                         format: uri
- *                         example: "https://d2e2ap87lbbw61.cloudfront.net/products/haetae-homerunball.png"
+ *                         example: "https://team3-snack-s3.s3.ap-northeast-2.amazonaws.com/products/haetae-homerunball.png"
  *                       quantity:
  *                         type: integer
  *                         example: 1
